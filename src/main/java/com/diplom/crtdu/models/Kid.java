@@ -39,9 +39,8 @@ public class Kid {
     private String school;
     private String klas;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    private String username;
+
 
     @ManyToMany
     @JoinTable(name = "kid_parent",
@@ -78,7 +77,7 @@ public class Kid {
         this.klas = klas;
     }
 
-    public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas, User user) {
+    public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas, String username) {
         this.surname = surname;
         this.name = name;
         this.patronymic = patronymic;
@@ -89,7 +88,7 @@ public class Kid {
         this.phone = phone;
         this.school = school;
         this.klas = klas;
-        this.user = user;
+        this.username = username;
     }
 
 
@@ -107,7 +106,7 @@ public class Kid {
                 ", phone='" + phone + '\'' +
                 ", school='" + school + '\'' +
                 ", klas='" + klas + '\'' +
-                ", user=" + user.getUsername() +
+                ", user=" + username +
                 '}';
     }
 

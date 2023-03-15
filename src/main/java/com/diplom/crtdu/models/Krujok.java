@@ -34,7 +34,7 @@ public class Krujok {
     private List<Kid> kids;
 
     @ManyToOne
-    private TypeKrujok type;
+    private TypeKrujok typeKrujok;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "krujok_id")
@@ -43,7 +43,7 @@ public class Krujok {
     public Krujok(String name, String vozrast, TypeKrujok type) {
         this.name = name;
         this.vozrast = vozrast;
-        this.type = type;
+        this.typeKrujok = type;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Krujok {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", vozrast='" + vozrast + '\'' +
-                ", type=" + type.getName() +
+                ", type=" + typeKrujok.getName() +
                 '}';
     }
 }

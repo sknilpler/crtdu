@@ -34,21 +34,25 @@ public class Meropriyatie {
     private List<Dostijenie> dostList;
 
 
-    public Meropriyatie(String name, Date data, String type, String place) {
+    public Meropriyatie(String name, Date data, String type, String place, String level, String otvetstvenniy) {
         this.name = name;
         this.data = data;
         this.type = type;
         this.place = place;
+        this.level = level;
+        this.otvetstvenniy = otvetstvenniy;
     }
 
     @Override
     public String toString() {
-        return "Meropriyatiye{" +
+        return "Meropriyatie{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", data=" + data +
                 ", type='" + type + '\'' +
                 ", place='" + place + '\'' +
+                ", level='" + level + '\'' +
+                ", otvetstvenniy='" + otvetstvenniy + '\'' +
                 '}';
     }
 }

@@ -25,9 +25,6 @@ public class Parents {
     private String adres;
     private String phone;
 
-    @ManyToOne
-    private Kid kid;
-
     @ManyToMany
     @JoinTable(name = "kid_parent",
             joinColumns = @JoinColumn(name = "parent_id"),
@@ -42,15 +39,6 @@ public class Parents {
         this.phone = phone;
     }
 
-    public Parents(String surname, String name, String patronymic, String adres, String phone, Kid kid) {
-        this.surname = surname;
-        this.name = name;
-        this.patronymic = patronymic;
-        this.adres = adres;
-        this.phone = phone;
-        this.kid = kid;
-    }
-
     @Override
     public String toString() {
         return "Parents{" +
@@ -60,7 +48,6 @@ public class Parents {
                 ", patronymic='" + patronymic + '\'' +
                 ", adres='" + adres + '\'' +
                 ", phone='" + phone + '\'' +
-                ", kid=" + kid +
                 '}';
     }
 

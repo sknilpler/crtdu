@@ -32,9 +32,9 @@ public class User implements UserDetails {
 
   //  @OneToOne(mappedBy = "user")
   //  private Buyer buyer;
-
-    @OneToOne(mappedBy = "user")
-    private Kid kid;
+//
+//    @OneToOne(mappedBy = "user")
+//    private Kid kid;
 
     public User(String username, String password, String passwordConfirm) {
         this.username = username;
