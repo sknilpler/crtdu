@@ -49,6 +49,22 @@ public class Kid {
             inverseJoinColumns = @JoinColumn(name = "parent_id"))
     private List<Parents> parents;
 
+    @ManyToMany
+    @JoinTable(name = "kid_krujok",
+            joinColumns = @JoinColumn(name = "kid_id"),
+            inverseJoinColumns = @JoinColumn(name = "krujok_id"))
+    private List<Krujok> krujki;
+
+    @ManyToMany
+    @JoinTable(name = "kid_zanyatie",
+            joinColumns = @JoinColumn(name = "kid_id"),
+            inverseJoinColumns = @JoinColumn(name = "zanyatie_id"))
+    private List<Zanyatie> zanyatiya;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "kid_id")
+    private List<Dostijenie> dostList;
+
     public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas) {
         this.surname = surname;
         this.name = name;
@@ -61,6 +77,21 @@ public class Kid {
         this.school = school;
         this.klas = klas;
     }
+
+    public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas, User user) {
+        this.surname = surname;
+        this.name = name;
+        this.patronymic = patronymic;
+        this.birthday = birthday;
+        this.sex = sex;
+        this.grazhdanstvo = grazhdanstvo;
+        this.adres = adres;
+        this.phone = phone;
+        this.school = school;
+        this.klas = klas;
+        this.user = user;
+    }
+
 
     @Override
     public String toString() {
@@ -78,5 +109,13 @@ public class Kid {
                 ", klas='" + klas + '\'' +
                 ", user=" + user.getUsername() +
                 '}';
+    }
+
+    public String getFullFIO() {
+        return surname + " " + name + " " + patronymic;
+    }
+
+    public String getShortFIO() {
+        return surname + " " + name.charAt(0) + " " + patronymic.charAt(0);
     }
 }

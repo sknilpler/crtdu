@@ -11,8 +11,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Parents {
-
+public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -21,49 +20,35 @@ public class Parents {
     private String surname;
     private String name;
     private String patronymic;
+    private String doljnost;
 
-    private String adres;
-    private String phone;
-
-    @ManyToOne
-    private Kid kid;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "teacher_id")
+    private List<Dostijenie> dostList;
 
     @ManyToMany
-    @JoinTable(name = "kid_parent",
-            joinColumns = @JoinColumn(name = "parent_id"),
-            inverseJoinColumns = @JoinColumn(name = "kid_id"))
-    private List<Kid> kids;
+    @JoinTable(name = "teacher_krujok",
+            joinColumns = @JoinColumn(name = "teacher_id"),
+            inverseJoinColumns = @JoinColumn(name = "krujok_id"))
+    private List<Krujok> krujki;
 
-    public Parents(String surname, String name, String patronymic, String adres, String phone) {
+    public Teacher(String surname, String name, String patronymic, String doljnost) {
         this.surname = surname;
         this.name = name;
         this.patronymic = patronymic;
-        this.adres = adres;
-        this.phone = phone;
-    }
-
-    public Parents(String surname, String name, String patronymic, String adres, String phone, Kid kid) {
-        this.surname = surname;
-        this.name = name;
-        this.patronymic = patronymic;
-        this.adres = adres;
-        this.phone = phone;
-        this.kid = kid;
+        this.doljnost = doljnost;
     }
 
     @Override
     public String toString() {
-        return "Parents{" +
+        return "Teacher{" +
                 "id=" + id +
                 ", surname='" + surname + '\'' +
                 ", name='" + name + '\'' +
                 ", patronymic='" + patronymic + '\'' +
-                ", adres='" + adres + '\'' +
-                ", phone='" + phone + '\'' +
-                ", kid=" + kid +
+                ", doljnost='" + doljnost + '\'' +
                 '}';
     }
-
 
     public String getFullFIO() {
         return surname + " " + name + " " + patronymic;
