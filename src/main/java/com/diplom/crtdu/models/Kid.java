@@ -39,6 +39,8 @@ public class Kid {
     private String school;
     private String klas;
 
+    private int rang;
+
     private String username;
 
 

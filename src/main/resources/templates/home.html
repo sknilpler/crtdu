@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title th:text="${title}"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="/fonts/material-icons.min.css">
+    <link rel="stylesheet" href="/css/Navbar-Right-Links-icons.css">
+    <link rel="stylesheet" href="/css/animate.min.css">
+    <link rel="stylesheet" href="/css/google-font.css">
+</head>
+
+<body>
+<header th:insert="blocks/header :: header"></header>
+
+    <div class="row">
+        <div class="col-xl-12 text-center">
+            <a sec:authorize="hasRole('ROLE_ADMIN')" class="nav-link p-2 text-dark" href="/admin">Администрирование</a>
+        </div>
+    </div>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/theme.js"></script>
+</body>
+
+</html>

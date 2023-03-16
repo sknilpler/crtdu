@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"/>
+    <title>Авторизация</title>
+<!--    <link rel="stylesheet" href="/css/bootstrap.min.css">-->
+<!--    <link rel="stylesheet" href="/fonts/fontawesome-all.min.css">-->
+<!--    <link rel="stylesheet" href="/fonts/material-icons.min.css">-->
+<!--    <link rel="stylesheet" href="/css/Navbar-Right-Links-icons.css">-->
+<!--    <link rel="stylesheet" href="/css/animate.min.css">-->
+<!--    <link rel="stylesheet" href="/css/google-font.css">-->
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/google-font.css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
+    <link rel="stylesheet" href="/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="/css/animate.min.css">
+</head>
+
+<body class="bg-gradient-primary" style="background: linear-gradient(var(--bs-primary) 10%, white 100%);">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-12 col-xl-10">
+            <div class="card shadow-lg o-hidden border-0 my-5">
+                <div class="card-body p-0">
+                    <div class="row d-xl-flex justify-content-xl-center">
+                        <div class="col-lg-6 col-xl-6">
+                            <div class="text-start p-5">
+                                <div class="text-center">
+                                    <h4 class="text-dark mb-4">Добро пожаловать!</h4>
+                                </div>
+                                <form class="user" action="/login" method="post">
+                                    <div class="fs-6 text-danger" th:if="${param.error}">
+                                        Неправильный логин или пароль.
+                                    </div>
+                                    <div class="mb-3"><input id="exampleInputEmail"
+                                                             class="form-control form-control-user" type="text"
+                                                             aria-describedby="emailHelp" placeholder="Логин"
+                                                              name="username"/></div>
+                                    <div class="mb-3"><input id="exampleInputPassword"
+                                                             class="form-control form-control-user" type="password"
+                                                             placeholder="Пароль" name="password"/></div>
+                                    <button class="btn btn-primary d-block btn-user w-100" type="submit">Войти</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/theme.js"></script>
+</body>
+
+</html>

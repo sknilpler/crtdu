@@ -22,6 +22,8 @@ public class Teacher {
     private String patronymic;
     private String doljnost;
 
+    private String username;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "teacher_id")
     private List<Dostijenie> dostList;
@@ -47,6 +49,7 @@ public class Teacher {
                 ", name='" + name + '\'' +
                 ", patronymic='" + patronymic + '\'' +
                 ", doljnost='" + doljnost + '\'' +
+                ", username='" + username + '\'' +
                 '}';
     }
 

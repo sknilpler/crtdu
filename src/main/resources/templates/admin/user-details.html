@@ -1,0 +1,198 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Информация о пользователе</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+</head>
+<body>
+<!--<header th:insert="blocks/header :: header"></header>-->
+<!-- Modal windows for accepting delete -->
+<div th:insert="blocks/accept-delete :: accept-delete"></div>
+<!-- Modal window for add role -->
+<div id="exampleModalLive" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLiveLabel">Доступные роли пользователей</h5>
+                <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal" aria-label="Close"
+                        onclick="closeModalWindow()">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-roles" style="max-height: 40vh; min-height: 40vh; overflow-y: auto;"
+                     th:fragment="table-roles">
+
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" name="all-checkbox"
+                                       th:onchange="'javascript:selectAllRecord(this);'">
+                            </th>
+                            <th>Наименование</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="r : ${roles}" style="cursor: pointer">
+                            <td>
+                                <input type="checkbox" name="record-checkbox" th:onchange="'javascript:selectRecord(this,\'' + ${r.id} + '\');'">
+                            </td>
+                            <td th:text="${r.name}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" name="saveBtn" class="btn btn-primary btn-sm" data-dismiss="modal" onclick="saveNewRoles()" disabled>
+                    Подтвердить
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closeModalWindow()">
+                    Закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="user-info" th:fragment="user-info">
+    <div class="container mt-5" th:each="el : ${user}">
+        <div class="alert alert-info mt-2">
+            <h1 th:text="${el.username}"/>
+            <h5 th:text="${el.surname}+' '+${el.name}+' '+${el.patronymic}"></h5>
+            <h5 th:text="${el.post}"></h5>
+            <h5>Роли:</h5>
+            <div th:each="r : ${el.roles}">
+                <div class="d-flex justify-content-start flex-wrap">
+                    <li th:text="${r.name}+' '"></li>
+                    <span th:unless="${el.roles.contains(var_AdminRole)}">
+                        <span>
+                            <i>  </i>
+                        </span>
+                        <button class="btn btn-danger btn-sm rounded-2" type="button" data-toggle="tooltip"
+                                data-placement="top"
+                                title="" data-original-title="Delete" th:onclick="'javascript:deleteRole(\'' + ${el.id} + '\',\'' + ${r.id} + '\');'">
+<!--                            <img src="/images/bootstrap-icons/trash.svg" alt="Bootstrap" width="16"-->
+<!--                                 height="16">-->
+                            <span aria-hidden="true">×</span>
+                        </button>
+            </span>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-start flex-wrap">
+            <form class="form-row">
+                <a th:href="'/admin/all-users'" class="btn btn-secondary mx-auto">Назад</a>
+            </form>
+            <span th:unless="${el.roles.contains(var_AdminRole)}">
+                <button class="btn btn-warning mx-1" th:onclick="'javascript:showModalWindow(\'' + ${el.id} + '\');'">Добавить роль</button>
+                <button class="btn btn-danger mx-1" th:onclick="'javascript:showDeleteModalWindow(\'' + ${el.id} + '\');'">Удалить</button>
+            </span>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+function closeModalWindow() {
+	$("#exampleModalLive").modal('hide');
+	$("#deleteAccept").modal('hide');
+};
+
+var user_id;
+
+function showModalWindow(value) {
+   user_id = value;
+   $("#exampleModalLive").modal('show');
+}
+
+var u_id_del;
+
+function showDeleteModalWindow(u_id){
+    u_id_del = u_id;
+    document.getElementById("delete-object").innerHTML = "Вы точно хотите удалить?";
+    $("#deleteAccept").modal('show');
+}
+
+//////////////////////////////////////
+var selRecs = [];
+
+function selectRecord(value, id) {
+	if (value.checked) {
+		selRecs.push(Number(id));
+	} else {
+		selRecs = arrayRemove(selRecs, Number(id));
+	}
+	var btns =  document.getElementsByName('saveBtn');
+	if(selRecs.length === 0){
+	   btns.forEach(el => el.disabled = true);
+	} else {
+	   btns.forEach(el => el.disabled = false);
+	}
+};
+
+function arrayRemove(arr, value) {
+	return arr.filter(function(ele) {
+		return ele !== value;
+	});
+}
+////////////////////////////////////
+function selectAllRecord(value){
+    if (value.checked) {
+		/*<![CDATA[*/
+ 	    var list = [];
+ 	    /*[# th:each="elVar : ${roles}"]*/
+ 	        list.push(/*[[${elVar.id}]]*/);
+ 		/*[/]*/
+ 		/*]]>*/
+        selRecs = list;
+	} else {
+		selRecs = [];
+	}
+	$('body input:checkbox').prop('checked',value.checked);
+	var btns =  document.getElementsByName('saveBtn');
+	btns.forEach(el => el.disabled = !value.checked);
+}
+///////////////////////////////////////
+function saveNewRoles(){
+    closeModalWindow();
+    $.ajax({
+		type: 'post',
+		url: '/admin/all-users/user-details/' + user_id +'/add_roles/'+selRecs,
+		success: function(data) {
+			$('.user-info').html(data);
+		},
+	})
+}
+///////////////////////////////
+function deleteRole(u_id,r_id){
+    $.ajax({
+		type: 'post',
+		url: '/admin/all-users/user-details/' + u_id +'/remove-role/'+r_id,
+		success: function(data) {
+			$('.user-info').html(data);
+		},
+	})
+}
+//////////////////////////////
+function deleteObject(){
+    post('/admin/all-users/user-details/' + u_id_del +'/remove');
+}
+
+function post(path, method='post') {
+  const form = document.createElement('form');
+  form.method = method;
+  form.action = path;
+  const hiddenField = document.createElement('input');
+  hiddenField.type = 'hidden';
+  form.appendChild(hiddenField);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+</script>
+<!--<div th:insert="blocks/footer :: footer"></div>-->
+</body>
+</html>

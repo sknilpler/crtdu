@@ -1,0 +1,33 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:fragment="header">
+    <!-- Jumbotron -->
+    <div class="p-5 text-center bg-light">
+        <h1 class="mb-3">
+            <img src="/img/logo.png"
+                 height="225"
+                 alt="MDB Logo"
+                 loading="lazy" />
+        </h1>
+    </div>
+    <!-- Jumbotron -->
+
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+
+        <h5 sec:authorize="hasRole('ROLE_USER')" class="my-0 mr-md-auto font-weight-normal"><a sec:authentication="name"/></h5>
+        <h5 sec:authorize="isAuthenticated() && !hasRole('ROLE_USER')" class="my-0 mr-md-auto font-weight-normal"><a th:text="${komplex?.name}"/></h5>
+        <h5 sec:authorize="!isAuthenticated()" class="my-0 mr-md-auto font-weight-normal">Гость</h5>
+
+        <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
+            <a class="nav-link p-2 text-dark" href="/">Главная</a>
+<!--            <a class="nav-link p-2 text-dark" href="/about">О нас</a>-->
+<!--            <a sec:authorize="!isAuthenticated()" class="nav-link p-2 text-dark" href="/login">Вход</a>-->
+            <a sec:authorize="hasRole('ROLE_ADMIN')" class="nav-link p-2 text-dark" href="/admin">Администрирование</a>
+        </ul>
+
+        <a sec:authorize="!isAuthenticated()" class="btn btn-outline-primary" href="/login">Вход</a>
+        <form th:action="@{/logout}" method="post">
+            <input sec:authorize="isAuthenticated()" type="submit" class="btn btn-outline-primary" value="Выход"/>
+        </form>
+
+    </div>
+</div>
