@@ -25,14 +25,17 @@ public class User implements UserDetails {
     private Long id;
     private String username;
     private String password;
+    private String type;
+
+    private String surname;
+    private String name;
+    private String patronymic;
     @Transient
     private String passwordConfirm;
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
-  //  @OneToOne(mappedBy = "user")
-  //  private Buyer buyer;
-//
+
 //    @OneToOne(mappedBy = "user")
 //    private Kid kid;
 
@@ -42,6 +45,22 @@ public class User implements UserDetails {
         this.passwordConfirm = passwordConfirm;
     }
 
+    public User(String username, String password, String passwordConfirm, String type) {
+        this.username = username;
+        this.password = password;
+        this.passwordConfirm = passwordConfirm;
+        this.type = type;
+    }
+
+    public User(String username, String password, String type, String surname, String name, String patronymic, String passwordConfirm) {
+        this.username = username;
+        this.password = password;
+        this.type = type;
+        this.surname = surname;
+        this.name = name;
+        this.patronymic = patronymic;
+        this.passwordConfirm = passwordConfirm;
+    }
 
     @Override
     public String toString() {
@@ -49,6 +68,10 @@ public class User implements UserDetails {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", type='" + type + '\'' +
+                ", surname='" + surname + '\'' +
+                ", name='" + name + '\'' +
+                ", patronymic='" + patronymic + '\'' +
                 ", passwordConfirm='" + passwordConfirm + '\'' +
                 '}';
     }

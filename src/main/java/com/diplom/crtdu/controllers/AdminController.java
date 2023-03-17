@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -40,16 +41,9 @@ public class AdminController {
         List<User> var_list = userService.allUsers();
         //Удаляем текущего пользователя из списка для отображения, чтобы он не мог удалить сам себя
         var_list.remove(userRepository.findByUsername(auth.getName()));
-        Role userRole = roleRepository.findByName("ROLE_USER");
-        if (userRole != null)
-            model.addAttribute("userRole", userRole);
-        Role docRole = roleRepository.findByName("ROLE_DOC");
-        if (docRole != null)
-            model.addAttribute("docRole", docRole);
-        Role farmRole = roleRepository.findByName("ROLE_FARM");
-        if (farmRole != null)
-            model.addAttribute("farmRole", farmRole);
-        model.addAttribute("allUsers", var_list);
+        model.addAttribute("tUsers", var_list.stream().filter(user -> user.getType().contains("teacher")).collect(Collectors.toList()));
+        model.addAttribute("kUsers", var_list.stream().filter(user -> user.getType().contains("kid")).collect(Collectors.toList()));
+        model.addAttribute("oUsers", var_list.stream().filter(user -> user.getType().contains("other")).collect(Collectors.toList()));
         return "admin/all-users";
     }
 
@@ -111,9 +105,13 @@ public class AdminController {
     @PostMapping("/admin/all-users/add-user")
     public String save_user(@RequestParam String username,
                             @RequestParam String password,
+                            @RequestParam String surname,
+                            @RequestParam String name,
+                            @RequestParam String patronymic,
+                            @RequestParam String type,
                             @RequestParam Long dropRole, Authentication authentication) {
         Role role = roleRepository.findById(dropRole).orElseThrow(() -> new NotFoundException("Role " + dropRole + " not found"));
-        User user = new User(username, password, password);
+        User user = new User(username, password, type, surname, name, patronymic, password);
         user.setRoles(Collections.singleton(role));
         userService.saveUser(user);
         return "redirect:/admin/all-users";

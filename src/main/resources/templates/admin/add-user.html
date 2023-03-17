@@ -42,11 +42,13 @@
         </div>
 
         <div class="container mt-1 md-12">
-            <label class="md-2" for="post">Должность</label>
-            <div class="md-7">
-                <input type="text" id="post" name="post" class="form-control"
-                       placeholder="Введите должность" required/>
-            </div>
+            <label class="md-2" for="patronymic">Отчество</label>
+            <select class="form-control" id="type" name="type" required>
+                <option value="">Назначте тип пользователя</option>
+                <option value="teacher">Преподаватель</option>
+                <option value="kid">Воспитанник</option>
+                <option value="other">Специалист</option>
+            </select>
         </div>
 
         <div class="container mt-1 md-12">
@@ -66,6 +68,7 @@
                 </select>
             </div>
         </div>
+        <hr>
         <div class="mt-1 form-actions floatRight">
             <button type="submit" class="btn btn-success">Добавить</button>
             <button type="button" onclick="window.location.reload();" class="btn btn-secondary">Очистить поля</button>

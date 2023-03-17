@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Collections;
+import java.util.Date;
 
 @Slf4j
 @Controller
@@ -56,6 +57,12 @@ public class MainController {
     public String admin(Model model) {
         model.addAttribute("title", "Администрирование");
         return "admin/admin";
+    }
+
+    @GetMapping("/success-login")
+    public String successLogin(Model model, Authentication authentication){
+        model.addAttribute("userType", userService.getUserByUsername(authentication.getName()).getType());
+        return "success-login";
     }
 
 }

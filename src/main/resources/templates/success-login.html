@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Успешный вход</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+
+</head>
+
+<body class="text-center">
+<!--<header th:insert="blocks/header :: header"></header>-->
+<div class="position-absolute top-50 start-50 translate-middle">
+    <h1 class="h1 mb-3 fw-normal"><a sec:authentication="name"/></h1>
+    <h5 class="h5 mb-3 fw-normal"><a id="usertype" th:text="${userType}"></a></h5>
+    <h3 class="h3 mb-3 fw-normal">Добро пожаловать! Через несколько секунд Вас перенаправят на главную страницу</h3>
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+<!--<div th:insert="blocks/footer :: footer"></div>-->
+</body>
+<script>
+
+var usertype = document.getElementById("usertype").innerHTML
+if (usertype === "teacher"){
+    setTimeout("location.href = '/teacher';",3000);
+} else
+    if (usertype === "kid"){
+        setTimeout("location.href = '/kid';",3000);
+    } else
+        setTimeout("location.href = '/';",3000);
+
+</script>
+</html>

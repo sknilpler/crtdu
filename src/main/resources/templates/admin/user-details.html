@@ -64,7 +64,6 @@
         <div class="alert alert-info mt-2">
             <h1 th:text="${el.username}"/>
             <h5 th:text="${el.surname}+' '+${el.name}+' '+${el.patronymic}"></h5>
-            <h5 th:text="${el.post}"></h5>
             <h5>Роли:</h5>
             <div th:each="r : ${el.roles}">
                 <div class="d-flex justify-content-start flex-wrap">
