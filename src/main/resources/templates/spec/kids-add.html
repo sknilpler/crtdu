@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Форма ввода данных воспитанника</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-5">Данные воспитанника</h1>
+            <form action="/spec/kid-add" method="post">
+                <div class="mb-3">
+                    <label for="surname" class="form-label">Фамилия</label>
+                    <input type="text" class="form-control" id="surname" name="surname">
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Имя</label>
+                    <input type="text" class="form-control" id="name" name="name">
+                </div>
+                <div class="mb-3">
+                    <label for="patronymic" class="form-label">Отчество</label>
+                    <input type="text" class="form-control" id="patronymic" name="patronymic">
+                </div>
+
+                <div class="mb-3">
+                    <label for="birthday" class="form-label">Дата рождения</label>
+                    <input type="date" class="form-control" id="birthday" name="birthday">
+                </div>
+                <div class="mb-3">
+                    <label for="sex" class="form-label">Пол</label>
+                    <select class="form-control" id="sex" name="sex">
+                        <option value="male">Мужской</option>
+                        <option value="female">Женский</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="grazhdanstvo" class="form-label">Гражданство</label>
+                    <input type="text" class="form-control" id="grazhdanstvo" name="grazhdanstvo">
+                </div>
+                <div class="mb-3">
+                    <label for="adres" class="form-label">Адрес</label>
+                    <input type="text" class="form-control" id="adres" name="adres">
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Телефон</label>
+                    <input type="tel" class="form-control" id="phone" name="phone">
+                </div>
+                <div class="mb-3">
+                    <label for="school" class="form-label">Школа</label>
+                    <input type="text" class="form-control" id="school" name="school">
+                </div>
+                <div class="mb-3">
+                    <label for="klas" class="form-label">Класс</label>
+                    <input type="text" class="form-control" id="klas" name="klas">
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
+                    <button type="submit" class="btn btn-primary" id="save-btn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.min.js"></script>
+<script>
+		// очистка полей ввода данных
+		document.getElementById("clear-btn").addEventListener("click", function() {
+		//	document.getElementById("fio-input").value = "";
+		//	document.getElementById("dob-input").value = "";
+		//	document.getElementById("gender-input").value = "";
+		//	document.getElementById("citizenship-input").value = "";
+		//	document.getElementById("address-input").value = "";
+		//	document.getElementById("phone-input").value = "";
+		//	document.getElementById("school-input").value = "";
+		//	document.getElementById("class-input").value = "";
+		location.reload();
+		});
+
+
+		// валидация формы при отправке
+		//document.getElementById("submit-button").addEventListener("click", function(event) {
+		//	event.preventDefault(); // отменяем отправку формы по умолчанию
+//
+		//	// получаем значения полей ввода
+		//	var fio = document.getElementById("fio-input").value.trim();
+		//	var dob = document.getElementById("dob-input").value.trim();
+		//	var gender = document.getElementById("gender-input").value.trim();
+		//	var citizenship = document.getElementById("citizenship-input").value.trim();
+		//	var address = document.getElementById("address-input").value.trim();
+		//	var phone = document.getElementById("phone-input").value.trim();
+		//	var school = document.getElementById("school-input").value.trim();
+		//	var class = document.getElementById("class-input").value.trim();
+//
+		//	// регулярные выражения для проверки формата телефона и даты рождения
+		//	var phoneRegExp = /^\+?\d{10,12}$/;
+		//	var dobRegExp = /^\d{4}-\d{2}-\d{2}$/;
+//
+		//	// проверяем заполнены ли обязательные поля
+		//	if (fio === "" || dob === "" || address === "" || phone === "") {
+		//		alert("Пожалуйста, заполните обязательные поля: ФИО, Дата рождения, Адрес и Телефон");
+		//		return;
+		//	}
+//
+		//	// проверяем формат телефона и даты рождения
+		//	if (!phoneRegExp.test(phone)) {
+		//		alert("Номер телефона должен быть в формате: +XXXXXXXXXXX (от 10 до 12 цифр)");
+		//		return;
+		//	}
+		//	if (!dobRegExp.test(dob)) {
+		//		alert("Дата рождения должна быть в формате: ГГГГ-ММ-ДД");
+		//		return;
+		//	}
+//
+		//	// отправляем данные на сервер
+		//	// ...
+		//});
+	</script>
+</body>
+</html>

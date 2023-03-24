@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Список воспитанников</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <style>
+    .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 200px;
+  background-color: #f1f1f1;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #000;
+}
+
+.sidebar ul li a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.sidebar ul li a:hover {
+  background-color: #ddd;
+}
+
+.main-content {
+  margin-left: 200px; /* ширина боковой панели */
+}
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <ul>
+    <li><a href="#" class="active">Воспитанники</a></li>
+    <li><a href="#">Воспитатели</a></li>
+    <li><a href="#">Коллективы</a></li>
+    <li><a href="#">Расписание</a></li>
+  </ul>
+</div>
+<div class="container mt-5 main-content">
+  <h1 class="text-center mb-4">Список воспитанников</h1>
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input type="text" class="form-control" id="search-input" placeholder="Поиск...">
+    </div>
+    <div class="col-md-6 text-md-end">
+      <a class="btn btn-info" id="add-btn" href="/spec/kid-add">Добавить воспитанника</a>
+      <button class="btn btn-success" id="export-btn">Экспорт в Excel</button>
+    </div>
+  </div>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>ФИО</th>
+      <th>Дата рождения</th>
+      <th>Пол</th>
+      <th>Гражданство</th>
+      <th>Адрес</th>
+      <th>Телефон</th>
+      <th>Школа</th>
+      <th>Действия</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="k : ${kids}">
+      <td th:text="${k.getFullFIO()}"></td>
+      <td th:text="${k.birthday}"></td>
+      <td th:text="${k.sex} ? 'Мужской' : 'Женский'"></td>
+      <td th:text="${k.grazhdanstvo}"></td>
+      <td th:text="${k.adres}"></td>
+      <td th:text="${k.phone}"></td>
+      <td th:text="${k.getStudy()}"></td>
+      <td>
+        <button class="btn btn-info">Подробнее</button>
+        <button class="btn btn-warning">Редактировать</button>
+        <button class="btn btn-danger">Удалить</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<!-- Модальное окно с подробной информацией -->
+<div class="modal fade" id="info-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Подробная информация о воспитаннике</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>ФИО:</strong> Иванов Иван Иванович</p>
+        <p><strong>Дата рождения:</strong> 01.01.2000</p>
+        <p><strong>Пол:</strong> М</p>
+        <p><strong>Гражданство:</strong> Россия</p>
+        <p><strong>Адрес:</strong> г. Москва, ул. Ленина, д.1, кв. 1</p>
+        <p><strong>Телефон:</strong> +7 (999) 999-99-99</p>
+        <hr>
+        <h6>Законные представители</h6>
+        <p><strong>ФИО:</strong> Иванова Елена Петровна</p>
+        <p><strong>Телефон:</strong> +7 (999) 999-99-98</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/xlsx.full.min.js"></script>
+<script>
+	// Показать модальное окно с подробной информацией
+	$('table').on('click', '.btn-info', function() {
+		$('#info-modal').modal('show');
+	});
+
+	// Поиск по таблице
+	$('#search-input').on('keyup', function() {
+		var value = $(this).val().toLowerCase();
+		$('table tbody tr').filter(function() {
+			$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+		});
+	});
+
+	// Экспорт таблицы в Excel
+	$('#export-btn').on('click', function() {
+		var wb = XLSX.utils.table_to_book($('table')[0], {sheet:"Sheet JS"});
+		XLSX.writeFile(wb, 'список_воспитанников.xlsx');
+	});
+</script>
+</body>
+</html>

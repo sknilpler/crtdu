@@ -119,4 +119,8 @@ public class Kid {
     public String getShortFIO() {
         return surname + " " + name.charAt(0) + " " + patronymic.charAt(0);
     }
+
+    public String getStudy(){
+        return "шк.: "+school+" кл.: " + klas;
+    }
 }
