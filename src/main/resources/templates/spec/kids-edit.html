@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Форма редактирования данных воспитанника</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="modal fade" id="new-p-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Новый законный представитель</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="surnameP" class="form-label">Фамилия</label>
+                    <input type="text" class="form-control" id="surnameP" name="surnameP">
+                </div>
+                <div class="mb-3">
+                    <label for="nameP" class="form-label">Имя</label>
+                    <input type="text" class="form-control" id="nameP" name="nameP">
+                </div>
+                <div class="mb-3">
+                    <label for="patronymicP" class="form-label">Отчество</label>
+                    <input type="text" class="form-control" id="patronymicP" name="patronymicP">
+                </div>
+                <div class="mb-3">
+                    <label for="phoneP" class="form-label">Телефон</label>
+                    <input type="tel" class="form-control" id="phoneP" name="phoneP">
+                </div>
+                <div class="mb-3">
+                    <label for="adresP" class="form-label">Адрес</label>
+                    <input type="text" class="form-control" id="adresP" name="adresP">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                        th:onclick="'javascript:saveP();'">Сохранить
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="edit-p-modal">
+    <div class="modal-dialog">
+        <div class="edit-parent"
+             th:fragment="edit-parent">
+            <div class="modal-content" th:object="${parent}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактирование законного представителя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="surnamePE" class="form-label">Фамилия</label>
+                        <input type="text" class="form-control" th:field="*{surname}" id="surnamePE" name="surnamePE">
+                    </div>
+                    <div class="mb-3">
+                        <label for="namePE" class="form-label">Имя</label>
+                        <input type="text" class="form-control" th:field="*{name}" id="namePE" name="namePE">
+                    </div>
+                    <div class="mb-3">
+                        <label for="patronymicPE" class="form-label">Отчество</label>
+                        <input type="text" class="form-control" th:field="*{patronymic}" id="patronymicPE"
+                               name="patronymicPE">
+                    </div>
+                    <div class="mb-3">
+                        <label for="phonePE" class="form-label">Телефон</label>
+                        <input type="tel" class="form-control" th:field="*{phone}" id="phonePE" name="phonePE">
+                    </div>
+                    <div class="mb-3">
+                        <label for="adresPE" class="form-label">Адрес</label>
+                        <input type="text" class="form-control" th:field="*{adres}" id="adresPE" name="adresPE">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                            th:onclick="'javascript:savePE(\'' + *{id} + '\');'">Сохранить
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h3 class="text-center mb-5">Данные воспитанника</h3>
+            <form th:object="${kid}" method="post">
+                <div class="mb-3">
+                    <label for="surname" class="form-label">Фамилия</label>
+                    <input type="text" th:field="*{surname}" class="form-control" id="surname" name="surname">
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Имя</label>
+                    <input type="text" th:field="*{name}" class="form-control" id="name" name="name">
+                </div>
+                <div class="mb-3">
+                    <label for="patronymic" class="form-label">Отчество</label>
+                    <input type="text" th:field="*{patronymic}" class="form-control" id="patronymic"
+                           name="patronymic">
+                </div>
+
+                <div class="mb-3">
+                    <label for="birthday" class="form-label">Дата рождения</label>
+                    <input type="date" th:value="*{{#dates.format(birthday, 'yyyy-MM-dd')}}" class="form-control"
+                           id="birthday" name="birthday">
+                </div>
+                <div class="mb-3">
+                    <label for="sex" class="form-label">Пол</label>
+                    <select class="form-control" th:field="*{sex}" id="sex" name="sex">
+                        <option value="true">Мужской</option>
+                        <option value="false">Женский</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="grazhdanstvo" class="form-label">Гражданство</label>
+                    <input type="text" th:field="*{grazhdanstvo}" class="form-control" id="grazhdanstvo"
+                           name="grazhdanstvo">
+                </div>
+                <div class="mb-3">
+                    <label for="adres" class="form-label">Адрес</label>
+                    <input type="text" th:field="*{adres}" class="form-control" id="adres" name="adres">
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Телефон</label>
+                    <input type="tel" th:field="*{phone}" class="form-control" id="phone" name="phone">
+                </div>
+                <div class="mb-3">
+                    <label for="school" class="form-label">Школа</label>
+                    <input type="text" th:field="*{school}" class="form-control" id="school" name="school">
+                </div>
+                <div class="mb-3">
+                    <label for="klas" class="form-label">Класс</label>
+                    <input type="text" th:field="*{klas}" class="form-control" id="klas" name="klas">
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
+                    <button type="button" class="btn btn-primary" th:onclick="'javascript:save(\'' + *{id} + '\');'"
+                            id="save-btn">Сохранить
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h3 class="text-center mb-5">Законные представители</h3>
+            <button class="btn btn-info" id="add-btn" th:onclick="'javascript:newParent();'">Добавить
+                представителя
+            </button>
+            <div class="parents-table"
+                 th:fragment="parents-table">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ФИО</th>
+                        <th>Телефон</th>
+                        <th>Адрес</th>
+                        <th>Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${parents}">
+                        <td th:text="${p.getShortFIO()}"></td>
+                        <td th:text="${p.phone}"></td>
+                        <td th:text="${p.adres}"></td>
+                        <td>
+                            <button class="btn btn-warning"
+                                    th:onclick="'javascript:editParent(\'' + ${p.id} + '\');'">Редактировать
+                            </button>
+                            <button class="btn btn-danger"
+                                    th:onclick="'javascript:delParent(\'' + ${p.id} + '\');'">Удалить
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script>
+    function save(id){
+       var surname = document.getElementById("surname").value;
+       var name = document.getElementById("name").value;
+       var patronymic = document.getElementById("patronymic").value;
+       var birthday = document.getElementById("birthday").value;
+       var sex = document.getElementById("sex").value;
+       var grazhdanstvo = document.getElementById("grazhdanstvo").value;
+       var adres = document.getElementById("adres").value;
+       var phone = document.getElementById("phone").value;
+       var school = document.getElementById("school").value;
+       var klas = document.getElementById("klas").value;
+
+       post('/spec/list-kids/edit/'+id+'/'+surname+'/'+name+'/'+patronymic+'/'+birthday+'/'+sex+'/'+grazhdanstvo+'/'+adres+'/'+phone+'/'+replaceChar(school,"/","-")+'/'+klas);
+
+        //console.log(surname
+        //console.log(name
+        //console.log(patronymic
+        //console.log(birthday
+        //console.log(sex
+        //console.log(grazhdanstvo
+        //console.log(adres
+        //console.log(phone
+        //console.log(school
+        //console.log(klas
+
+        }
+
+function post(path, method='post') {
+  const form = document.createElement('form');
+  form.method = method;
+  form.action = path;
+  const hiddenField = document.createElement('input');
+  hiddenField.type = 'hidden';
+  form.appendChild(hiddenField);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function replaceChar(str, charToReplace, replacementChar) {
+  return str.split(charToReplace).join(replacementChar);
+}
+
+function newParent(){
+    $('#new-p-modal').modal('show');
+}
+
+function editParent(id){
+console.log(id);
+    $.ajax({
+			type: 'get',
+			url: '/spec/list-kids/kid/edit-parent/' + id,
+			success: function (data) {
+				$('.edit-parent').html(data);
+				$("#edit-p-modal").modal('show');
+			},
+	})
+}
+
+ function saveP(){
+       var surname = document.getElementById("surnameP").value;
+       var name = document.getElementById("nameP").value;
+       var patronymic = document.getElementById("patronymicP").value;
+       var adres = document.getElementById("adresP").value;
+       var phone = document.getElementById("phoneP").value;
+
+       $.ajax({
+			type: 'get',
+			url: '/spec/list-kids/kid/new-parent/'+surname+'/'+name+'/'+patronymic+'/'+adres+'/'+phone,
+			success: function (data) {
+				$('.parents-table').html(data);
+			},
+	   })
+
+}
+
+function savePE(id){
+       var surname = document.getElementById("surnamePE").value;
+       var name = document.getElementById("namePE").value;
+       var patronymic = document.getElementById("patronymicPE").value;
+       var adres = document.getElementById("adresPE").value;
+       var phone = document.getElementById("phonePE").value;
+
+       $.ajax({
+			type: 'get',
+			url: '/spec/list-kids/kid/edit-parent/'+id+'/'+surname+'/'+name+'/'+patronymic+'/'+adres+'/'+phone,
+			success: function (data) {
+				$('.parents-table').html(data);
+				$("#edit-p-modal").modal('hide');
+			},
+	   })
+}
+
+function delParent(id){
+        $.ajax({
+			type: 'get',
+			url: '/spec/list-kids/edit/del-parent/'+id,
+			success: function (data) {
+				$('.parents-table').html(data);
+			},
+	   })
+}
+</script>
+</body>
+</html>

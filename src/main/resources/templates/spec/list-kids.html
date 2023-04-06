@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Список воспитанников</title>
-  <link rel="stylesheet" href="/css/bootstrap.min.css">
-  <style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Список воспитанников</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
     .sidebar {
   position: fixed;
   top: 0;
@@ -42,85 +42,120 @@
 .main-content {
   margin-left: 200px; /* ширина боковой панели */
 }
-  </style>
+
+    </style>
 </head>
 <body>
 <div class="sidebar">
-  <ul>
-    <li><a href="#" class="active">Воспитанники</a></li>
-    <li><a href="#">Воспитатели</a></li>
-    <li><a href="#">Коллективы</a></li>
-    <li><a href="#">Расписание</a></li>
-  </ul>
+    <ul>
+        <li><a href="#" class="active">Воспитанники</a></li>
+        <li><a href="#">Воспитатели</a></li>
+        <li><a href="#">Коллективы</a></li>
+        <li><a href="#">Расписание</a></li>
+    </ul>
 </div>
 <div class="container mt-5 main-content">
-  <h1 class="text-center mb-4">Список воспитанников</h1>
-  <div class="row mb-3">
-    <div class="col-md-6">
-      <input type="text" class="form-control" id="search-input" placeholder="Поиск...">
+    <h1 class="text-center mb-4">Список воспитанников</h1>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control" id="search-input" placeholder="Поиск...">
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a class="btn btn-info" id="add-btn" href="/spec/kid-add">Добавить воспитанника</a>
+            <button class="btn btn-success" id="export-btn">Экспорт в Excel</button>
+        </div>
     </div>
-    <div class="col-md-6 text-md-end">
-      <a class="btn btn-info" id="add-btn" href="/spec/kid-add">Добавить воспитанника</a>
-      <button class="btn btn-success" id="export-btn">Экспорт в Excel</button>
-    </div>
-  </div>
-  <table class="table table-striped">
-    <thead>
-    <tr>
-      <th>ФИО</th>
-      <th>Дата рождения</th>
-      <th>Пол</th>
-      <th>Гражданство</th>
-      <th>Адрес</th>
-      <th>Телефон</th>
-      <th>Школа</th>
-      <th>Действия</th>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Дата рождения</th>
+            <th>Пол</th>
+            <th>Гражданство</th>
+            <th>Адрес</th>
+            <th>Телефон</th>
+            <th>Школа</th>
+            <th>Действия</th>
 
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="k : ${kids}">
-      <td th:text="${k.getFullFIO()}"></td>
-      <td th:text="${k.birthday}"></td>
-      <td th:text="${k.sex} ? 'Мужской' : 'Женский'"></td>
-      <td th:text="${k.grazhdanstvo}"></td>
-      <td th:text="${k.adres}"></td>
-      <td th:text="${k.phone}"></td>
-      <td th:text="${k.getStudy()}"></td>
-      <td>
-        <button class="btn btn-info">Подробнее</button>
-        <button class="btn btn-warning">Редактировать</button>
-        <button class="btn btn-danger">Удалить</button>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="k : ${kids}">
+            <td th:text="${k.getFullFIO()}"></td>
+            <td th:text="${#dates.format(k.birthday, 'dd.MM.yyyy')}"></td>
+            <td th:text="${k.sex} ? 'Мужской' : 'Женский'"></td>
+            <td th:text="${k.grazhdanstvo}"></td>
+            <td th:text="${k.adres}"></td>
+            <td th:text="${k.phone}"></td>
+            <td th:text="${k.getStudy()}"></td>
+            <td>
+                <button class="btn btn-info" th:onclick="'javascript:openInfo(\'' + ${k.id} + '\');'">Подробнее</button>
+                <a class="btn btn-warning" th:href="'/spec/list-kids/edit/'+${k.id}">Редактировать</a>
+                <button class="btn btn-danger">Удалить</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 <!-- Модальное окно с подробной информацией -->
 <div class="modal fade" id="info-modal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Подробная информация о воспитаннике</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p><strong>ФИО:</strong> Иванов Иван Иванович</p>
-        <p><strong>Дата рождения:</strong> 01.01.2000</p>
-        <p><strong>Пол:</strong> М</p>
-        <p><strong>Гражданство:</strong> Россия</p>
-        <p><strong>Адрес:</strong> г. Москва, ул. Ленина, д.1, кв. 1</p>
-        <p><strong>Телефон:</strong> +7 (999) 999-99-99</p>
-        <hr>
-        <h6>Законные представители</h6>
-        <p><strong>ФИО:</strong> Иванова Елена Петровна</p>
-        <p><strong>Телефон:</strong> +7 (999) 999-99-98</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подробная информация о воспитаннике</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="info-kids" style="max-height: 50vh; min-height: 30vh; overflow-y: auto;"
+                     th:fragment="info-kids">
+                    <p th:inline='text'>
+                        <strong>ФИО:</strong>
+                        [[${kid?.getFullFIO()}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Дата рождения:</strong>
+                        [[${#dates.format(kid?.birthday, 'dd.MM.yyyy')}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Пол:</strong>
+                        [[${kid?.sex} ? 'Мужской' : 'Женский']]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Гражданство:</strong>
+                        [[${kid?.grazhdanstvo}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Адрес:</strong>
+                        [[${kid?.adres}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Телефон:</strong>
+                        [[${kid?.phone}]]
+                    </p>
+                    <hr>
+                    <h6>Законные представители</h6>
+                    <div th:each="p : ${parents}">
+                        <p th:inline='text'>
+                            <strong>ФИО:</strong>
+                            [[${p?.getFullFIO()}]]
+                        </p>
+                        <p th:inline='text'>
+                            <strong>Телефон:</strong>
+                            [[${p?.phone}]]
+                        </p>
+                        <p th:inline='text'>
+                            <strong>Адрес:</strong>
+                            [[${p?.adres}]]
+                        </p>
+                        <br>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
@@ -144,6 +179,18 @@
 		var wb = XLSX.utils.table_to_book($('table')[0], {sheet:"Sheet JS"});
 		XLSX.writeFile(wb, 'список_воспитанников.xlsx');
 	});
+
+ function openInfo(id){
+    console.log(id);
+        $.ajax({
+			type: 'get',
+			url: '/spec/list-kids/info/' + id,
+			success: function (data) {
+				$('.info-kids').html(data);
+				$("#info-modal").modal('show');
+			},
+		})
+	}
 </script>
 </body>
 </html>
