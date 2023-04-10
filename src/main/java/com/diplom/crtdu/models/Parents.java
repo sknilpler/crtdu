@@ -24,6 +24,7 @@ public class Parents {
 
     private String adres;
     private String phone;
+    private String email;
 
     @ManyToMany
     @JoinTable(name = "kid_parent",
@@ -31,12 +32,13 @@ public class Parents {
             inverseJoinColumns = @JoinColumn(name = "kid_id"))
     private List<Kid> kids;
 
-    public Parents(String surname, String name, String patronymic, String adres, String phone) {
+    public Parents(String surname, String name, String patronymic, String adres, String phone, String email) {
         this.surname = surname;
         this.name = name;
         this.patronymic = patronymic;
         this.adres = adres;
         this.phone = phone;
+        this.email = email;
     }
 
     @Override
@@ -48,9 +50,9 @@ public class Parents {
                 ", patronymic='" + patronymic + '\'' +
                 ", adres='" + adres + '\'' +
                 ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
                 '}';
     }
-
 
     public String getFullFIO() {
         return surname + " " + name + " " + patronymic;

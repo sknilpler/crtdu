@@ -98,7 +98,7 @@ public class SpecController {
         List<Parents> parents = parentsRepository.findByKidsId(kid.getId());
         model.addAttribute("kid", kid);
         model.addAttribute("parents", parents);
-        model.addAttribute("parent", parents.size() > 0 ? parents.get(0) : new Parents("", "", "", "", ""));
+        model.addAttribute("parent", parents.size() > 0 ? parents.get(0) : new Parents("", "", "", "", "",""));
         return "spec/kids-edit";
     }
 
@@ -145,13 +145,14 @@ public class SpecController {
         return "spec/kids-edit :: edit-parent";
     }
 
-    @GetMapping("/spec/list-kids/kid/new-parent/{surname}/{name}/{patronymic}/{adres}/{phone}")
+    @GetMapping("/spec/list-kids/kid/new-parent/{surname}/{name}/{patronymic}/{adres}/{phone}/{email}")
     public String saveNewParent(Model model, @PathVariable("surname") String surname,
                                 @PathVariable("name") String name,
                                 @PathVariable("patronymic") String patronymic,
                                 @PathVariable("adres") String adres,
+                                @PathVariable("email") String email,
                                 @PathVariable("phone") String phone) {
-        Parents parents = new Parents(surname, name, patronymic, adres, phone);
+        Parents parents = new Parents(surname, name, patronymic, adres, phone,email);
         List<Kid> kids = new ArrayList<>();
         kids.add(editedKid);
         parents.setKids(kids);
@@ -161,12 +162,13 @@ public class SpecController {
         return "spec/kids-edit :: parents-table";
     }
 
-    @GetMapping("/spec/list-kids/kid/edit-parent/{id}/{surname}/{name}/{patronymic}/{adres}/{phone}")
+    @GetMapping("/spec/list-kids/kid/edit-parent/{id}/{surname}/{name}/{patronymic}/{adres}/{phone}/{email}")
     public String saveEditParent(Model model, @PathVariable("surname") String surname,
                                  @PathVariable("name") String name,
                                  @PathVariable("patronymic") String patronymic,
                                  @PathVariable("adres") String adres,
                                  @PathVariable("phone") String phone,
+                                 @PathVariable("email") String email,
                                  @PathVariable("id") Long id) {
         Parents parents = parentsRepository.findById(id).orElseThrow(() -> new NotFoundException("Parent with id = " + id + " not found on server!"));
         parents.setSurname(surname);
@@ -174,6 +176,7 @@ public class SpecController {
         parents.setPatronymic(patronymic);
         parents.setAdres(adres);
         parents.setPhone(phone);
+        parents.setEmail(email);
         parentsRepository.save(parents);
         List<Parents> p = parentsRepository.findByKidsId(kidEditId);
         model.addAttribute("parents", p);

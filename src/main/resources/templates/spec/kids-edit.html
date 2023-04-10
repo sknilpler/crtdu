@@ -9,6 +9,7 @@
 <header th:insert="blocks/header2 :: header2"></header>
 <!-- Modal windows for accepting delete -->
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
+<div th:insert="blocks/sidebar :: sidebar"></div>
 <div class="modal fade" id="new-p-modal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -36,6 +37,10 @@
                 <div class="mb-3">
                     <label for="adresP" class="form-label">Адрес</label>
                     <input type="text" class="form-control" id="adresP" name="adresP">
+                </div>
+                <div class="mb-3">
+                    <label for="emailP" class="form-label">E-mail</label>
+                    <input type="email" class="form-control" id="emailP" name="emailP">
                 </div>
             </div>
             <div class="modal-footer">
@@ -79,6 +84,10 @@
                     <div class="mb-3">
                         <label for="adresPE" class="form-label">Адрес</label>
                         <input type="text" class="form-control" th:field="*{adres}" id="adresPE" name="adresPE">
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailPE" class="form-label">E-mail</label>
+                        <input type="email" class="form-control" th:field="*{adres}" id="emailPE" name="emailPE">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -171,6 +180,7 @@
                             <th>ФИО</th>
                             <th>Телефон</th>
                             <th>Адрес</th>
+                            <th>E-mail</th>
                             <th>Действия</th>
                         </tr>
                         </thead>
@@ -179,6 +189,7 @@
                             <td th:text="${p.getShortFIO()}"></td>
                             <td th:text="${p.phone}"></td>
                             <td th:text="${p.adres}"></td>
+                            <td th:text="${p.email}"></td>
                             <td>
                                 <button class="btn btn-outline-warning" title="Редактировать"
                                         th:onclick="'javascript:editParent(\'' + ${p.id} + '\');'">
@@ -271,10 +282,11 @@ console.log(id);
        var patronymic = document.getElementById("patronymicP").value;
        var adres = document.getElementById("adresP").value;
        var phone = document.getElementById("phoneP").value;
+       var email = document.getElementById("emailP").value;
 
        $.ajax({
 			type: 'get',
-			url: '/spec/list-kids/kid/new-parent/'+surname+'/'+name+'/'+patronymic+'/'+adres+'/'+phone,
+			url: '/spec/list-kids/kid/new-parent/'+surname+'/'+name+'/'+patronymic+'/'+adres+'/'+phone+'/'+email,
 			success: function (data) {
 				$('.parents-table').html(data);
 			},
@@ -288,10 +300,11 @@ function savePE(id){
        var patronymic = document.getElementById("patronymicPE").value;
        var adres = document.getElementById("adresPE").value;
        var phone = document.getElementById("phonePE").value;
+       var email = document.getElementById("emailPE").value;
 
        $.ajax({
 			type: 'get',
-			url: '/spec/list-kids/kid/edit-parent/'+id+'/'+surname+'/'+name+'/'+patronymic+'/'+adres+'/'+phone,
+			url: '/spec/list-kids/kid/edit-parent/'+id+'/'+surname+'/'+name+'/'+patronymic+'/'+adres+'/'+phone+'/'+email,
 			success: function (data) {
 				$('.parents-table').html(data);
 				$("#edit-p-modal").modal('hide');
