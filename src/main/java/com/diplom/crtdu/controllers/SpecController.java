@@ -6,7 +6,6 @@ import com.diplom.crtdu.models.Parents;
 import com.diplom.crtdu.repo.KidRepository;
 import com.diplom.crtdu.repo.ParentsRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Parent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -21,6 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Controller
@@ -82,12 +83,12 @@ public class SpecController {
         return "spec/list-kids :: info-kids";
     }
 
-    @PostMapping("/spec/list-kids/{id}/remove")
-    public String kidDelete(@PathVariable(value = "id") long id, Model model) {
-        Kid kid = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
-        kidRepository.deleteById(id);
-        return "redirect:/spec/list-kids";
-    }
+//    @PostMapping("/spec/list-kids/{id}/remove")
+//    public String kidDelete(@PathVariable(value = "id") long id, Model model) {
+//        Kid kid = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
+//        kidRepository.deleteById(id);
+//        return "redirect:/spec/list-kids";
+//    }
 
     @GetMapping("/spec/list-kids/edit/{id}")
     public String openEditKid(Model model, @PathVariable("id") Long id) {
@@ -146,11 +147,11 @@ public class SpecController {
 
     @GetMapping("/spec/list-kids/kid/new-parent/{surname}/{name}/{patronymic}/{adres}/{phone}")
     public String saveNewParent(Model model, @PathVariable("surname") String surname,
-                              @PathVariable("name") String name,
-                              @PathVariable("patronymic") String patronymic,
-                              @PathVariable("adres") String adres,
-                              @PathVariable("phone") String phone) {
-        Parents parents = new Parents(surname,name,patronymic,adres,phone);
+                                @PathVariable("name") String name,
+                                @PathVariable("patronymic") String patronymic,
+                                @PathVariable("adres") String adres,
+                                @PathVariable("phone") String phone) {
+        Parents parents = new Parents(surname, name, patronymic, adres, phone);
         List<Kid> kids = new ArrayList<>();
         kids.add(editedKid);
         parents.setKids(kids);
@@ -162,10 +163,10 @@ public class SpecController {
 
     @GetMapping("/spec/list-kids/kid/edit-parent/{id}/{surname}/{name}/{patronymic}/{adres}/{phone}")
     public String saveEditParent(Model model, @PathVariable("surname") String surname,
-                                @PathVariable("name") String name,
-                                @PathVariable("patronymic") String patronymic,
-                                @PathVariable("adres") String adres,
-                                @PathVariable("phone") String phone,
+                                 @PathVariable("name") String name,
+                                 @PathVariable("patronymic") String patronymic,
+                                 @PathVariable("adres") String adres,
+                                 @PathVariable("phone") String phone,
                                  @PathVariable("id") Long id) {
         Parents parents = parentsRepository.findById(id).orElseThrow(() -> new NotFoundException("Parent with id = " + id + " not found on server!"));
         parents.setSurname(surname);
@@ -179,7 +180,7 @@ public class SpecController {
         return "spec/kids-edit :: parents-table";
     }
 
-    @GetMapping("/spec/list-kids/edit/del-parent/{id}")
+    @PostMapping("/spec/list-kids/edit/del-parent/{id}")
     public String delParent(Model model, @PathVariable("id") Long id) {
         parentsRepository.deleteById(id);
         List<Parents> p = parentsRepository.findByKidsId(kidEditId);
@@ -187,14 +188,18 @@ public class SpecController {
         return "spec/kids-edit :: parents-table";
     }
 
-    @GetMapping("/spec/list-kids/del/{id}")
+    @PostMapping("/spec/list-kids/del/{id}")
     public String delKid(Model model, @PathVariable("id") Long id) {
-        boolean haveAnotherKid = false;
-
-        List<Parents> p = parentsRepository.findByKidsId(kidEditId);
-        parentsRepository.deleteById(id);
-        model.addAttribute("parents", p);
-        return "spec/kids-edit :: parents-table";
+        System.out.println("Deleting kid with ID: " + id);
+        List<Parents> p = parentsRepository.findByKidsId(id);
+        p.forEach(parents -> {
+            if ((parents.getKids().size() == 1) && (Objects.equals(parents.getKids().get(0).getId(), id))) {
+                parentsRepository.deleteById(parents.getId());
+                System.out.println("\tDeleted parents: ID - " + parents.getId() + " FIO - " + parents.getFullFIO());
+            }
+        });
+        kidRepository.deleteById(id);
+        return "redirect:/spec/list-kids";
     }
 }
 
