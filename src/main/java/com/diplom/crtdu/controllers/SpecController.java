@@ -186,5 +186,15 @@ public class SpecController {
         model.addAttribute("parents", p);
         return "spec/kids-edit :: parents-table";
     }
+
+    @GetMapping("/spec/list-kids/del/{id}")
+    public String delKid(Model model, @PathVariable("id") Long id) {
+        boolean haveAnotherKid = false;
+
+        List<Parents> p = parentsRepository.findByKidsId(kidEditId);
+        parentsRepository.deleteById(id);
+        model.addAttribute("parents", p);
+        return "spec/kids-edit :: parents-table";
+    }
 }
 
