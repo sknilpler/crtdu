@@ -87,7 +87,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="emailPE" class="form-label">E-mail</label>
-                        <input type="email" class="form-control" th:field="*{adres}" id="emailPE" name="emailPE">
+                        <input type="email" class="form-control" th:field="*{email}" id="emailPE" name="emailPE">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -218,100 +218,95 @@
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/jquery.min.js"></script>
 <script>
-    function save(id){
-       var surname = document.getElementById("surname").value;
-       var name = document.getElementById("name").value;
-       var patronymic = document.getElementById("patronymic").value;
-       var birthday = document.getElementById("birthday").value;
-       var sex = document.getElementById("sex").value;
-       var grazhdanstvo = document.getElementById("grazhdanstvo").value;
-       var adres = document.getElementById("adres").value;
-       var phone = document.getElementById("phone").value;
-       var school = document.getElementById("school").value;
-       var klas = document.getElementById("klas").value;
+function save(id) {
+	var surname = document.getElementById("surname").value;
+	var name = document.getElementById("name").value;
+	var patronymic = document.getElementById("patronymic").value;
+	var birthday = document.getElementById("birthday").value;
+	var sex = document.getElementById("sex").value;
+	var grazhdanstvo = document.getElementById("grazhdanstvo").value;
+	var adres = document.getElementById("adres").value;
+	var phone = document.getElementById("phone").value;
+	var school = document.getElementById("school").value;
+	var klas = document.getElementById("klas").value;
 
-       post('/spec/list-kids/edit/'+id+'/'+surname+'/'+name+'/'+patronymic+'/'+birthday+'/'+sex+'/'+grazhdanstvo+'/'+adres+'/'+phone+'/'+replaceChar(school,"/","-")+'/'+klas);
+	post('/spec/list-kids/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + birthday + '/' + sex + '/' + grazhdanstvo + '/' + adres + '/' + phone + '/' + replaceChar(school, "/", "-") + '/' + klas);
 
-        //console.log(surname
-        //console.log(name
-        //console.log(patronymic
-        //console.log(birthday
-        //console.log(sex
-        //console.log(grazhdanstvo
-        //console.log(adres
-        //console.log(phone
-        //console.log(school
-        //console.log(klas
+	//console.log(surname
+	//console.log(name
+	//console.log(patronymic
+	//console.log(birthday
+	//console.log(sex
+	//console.log(grazhdanstvo
+	//console.log(adres
+	//console.log(phone
+	//console.log(school
+	//console.log(klas
+}
 
-        }
-
-function post(path, method='post') {
-  const form = document.createElement('form');
-  form.method = method;
-  form.action = path;
-  const hiddenField = document.createElement('input');
-  hiddenField.type = 'hidden';
-  form.appendChild(hiddenField);
-  document.body.appendChild(form);
-  form.submit();
+function post(path, method = 'post') {
+	const form = document.createElement('form');
+	form.method = method;
+	form.action = path;
+	const hiddenField = document.createElement('input');
+	hiddenField.type = 'hidden';
+	form.appendChild(hiddenField);
+	document.body.appendChild(form);
+	form.submit();
 }
 
 function replaceChar(str, charToReplace, replacementChar) {
-  return str.split(charToReplace).join(replacementChar);
+	return str.split(charToReplace).join(replacementChar);
 }
 
-function newParent(){
-    $('#new-p-modal').modal('show');
+function newParent() {
+	$('#new-p-modal').modal('show');
 }
 
-function editParent(id){
-console.log(id);
-    $.ajax({
-			type: 'get',
-			url: '/spec/list-kids/kid/edit-parent/' + id,
-			success: function (data) {
-				$('.edit-parent').html(data);
-				$("#edit-p-modal").modal('show');
-			},
+function editParent(id) {
+	console.log(id);
+	$.ajax({
+		type: 'get',
+		url: '/spec/list-kids/kid/edit-parent/' + id,
+		success: function(data) {
+			$('.edit-parent').html(data);
+			$("#edit-p-modal").modal('show');
+		},
 	})
 }
 
- function saveP(){
-       var surname = document.getElementById("surnameP").value;
-       var name = document.getElementById("nameP").value;
-       var patronymic = document.getElementById("patronymicP").value;
-       var adres = document.getElementById("adresP").value;
-       var phone = document.getElementById("phoneP").value;
-       var email = document.getElementById("emailP").value;
-
-       $.ajax({
-			type: 'get',
-			url: '/spec/list-kids/kid/new-parent/'+surname+'/'+name+'/'+patronymic+'/'+adres+'/'+phone+'/'+email,
-			success: function (data) {
-				$('.parents-table').html(data);
-			},
-	   })
-
+function saveP() {
+	var surname = document.getElementById("surnameP").value;
+	var name = document.getElementById("nameP").value;
+	var patronymic = document.getElementById("patronymicP").value;
+	var adres = document.getElementById("adresP").value;
+	var phone = document.getElementById("phoneP").value;
+	var email = document.getElementById("emailP").value;
+	$.ajax({
+		type: 'get',
+		url: '/spec/list-kids/kid/new-parent/' + surname + '/' + name + '/' + patronymic + '/' + adres + '/' + phone + '/' + email,
+		success: function(data) {
+			$('.parents-table').html(data);
+		},
+	})
 }
 
-function savePE(id){
-       var surname = document.getElementById("surnamePE").value;
-       var name = document.getElementById("namePE").value;
-       var patronymic = document.getElementById("patronymicPE").value;
-       var adres = document.getElementById("adresPE").value;
-       var phone = document.getElementById("phonePE").value;
-       var email = document.getElementById("emailPE").value;
-
-       $.ajax({
-			type: 'get',
-			url: '/spec/list-kids/kid/edit-parent/'+id+'/'+surname+'/'+name+'/'+patronymic+'/'+adres+'/'+phone+'/'+email,
-			success: function (data) {
-				$('.parents-table').html(data);
-				$("#edit-p-modal").modal('hide');
-			},
-	   })
+function savePE(id) {
+	var surname = document.getElementById("surnamePE").value;
+	var name = document.getElementById("namePE").value;
+	var patronymic = document.getElementById("patronymicPE").value;
+	var adres = document.getElementById("adresPE").value;
+	var phone = document.getElementById("phonePE").value;
+	var email = document.getElementById("emailPE").value;
+	$.ajax({
+		type: 'get',
+		url: '/spec/list-kids/kid/edit-parent/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + adres + '/' + phone + '/' + email,
+		success: function(data) {
+			$('.parents-table').html(data);
+			$("#edit-p-modal").modal('hide');
+		},
+	})
 }
-
 //function delParent(id){
 //        $.ajax({
 //			type: 'get',
@@ -323,34 +318,33 @@ function savePE(id){
 //}
 
 var id_del;
+
 function showDeleteModalWindow(id) {
-    id_del = id;
-    document.getElementById("delete-object").innerHTML = "Вы точно хотите удалить?";
-    $("#deleteAccept").modal('show');
+	id_del = id;
+	document.getElementById("delete-object").innerHTML = "Вы точно хотите удалить?";
+	$("#deleteAccept").modal('show');
 }
 
 function closeModalWindow() {
-    $("#deleteAccept").modal('hide');
+	$("#deleteAccept").modal('hide');
 }
 
 function deleteObject() {
-    post('/spec/list-kids/edit/del-parent/' + id_del);
+	post('/spec/list-kids/edit/del-parent/' + id_del);
 }
-
 // очистка полей ввода данных
 document.getElementById("clear-btn").addEventListener("click", function() {
-    document.getElementById("surname").value = "";
-    document.getElementById("name").value = "";
-    document.getElementById("patronymic").value = "";
-    document.getElementById("birthday").value = "";
-    document.getElementById("sex").value = "";
-    document.getElementById("grazhdanstvo").value = "";
-    document.getElementById("adres").value = "";
-    document.getElementById("phone").value = "";
-    document.getElementById("school").value = "";
-    document.getElementById("klas").value = "";
+	document.getElementById("surname").value = "";
+	document.getElementById("name").value = "";
+	document.getElementById("patronymic").value = "";
+	document.getElementById("birthday").value = "";
+	document.getElementById("sex").value = "";
+	document.getElementById("grazhdanstvo").value = "";
+	document.getElementById("adres").value = "";
+	document.getElementById("phone").value = "";
+	document.getElementById("school").value = "";
+	document.getElementById("klas").value = "";
 });
-
 </script>
 </body>
 </html>

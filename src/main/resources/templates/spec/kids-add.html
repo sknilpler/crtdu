@@ -12,7 +12,8 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="text-center mb-5">Данные воспитанника</h1>
-            <form action="/spec/kid-add" method="post">
+<!--            <form action="/spec/kid-add" method="post" th:target="${formTarget}">-->
+            <div>
                 <div class="mb-3">
                     <label for="surname" class="form-label">Фамилия</label>
                     <input type="text" class="form-control" id="surname" name="surname" required>
@@ -61,64 +62,112 @@
                     <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
                     <button type="submit" class="btn btn-primary" id="save-btn">Сохранить</button>
                 </div>
-            </form>
+<!--            </form>-->
+            </div>
         </div>
     </div>
 </div>
 
 <script src="/js/bootstrap.min.js"></script>
 <script>
-		// очистка полей ввода данных
-		document.getElementById("clear-btn").addEventListener("click", function() {
-		//	document.getElementById("fio-input").value = "";
-		//	document.getElementById("dob-input").value = "";
-		//	document.getElementById("gender-input").value = "";
-		//	document.getElementById("citizenship-input").value = "";
-		//	document.getElementById("address-input").value = "";
-		//	document.getElementById("phone-input").value = "";
-		//	document.getElementById("school-input").value = "";
-		//	document.getElementById("class-input").value = "";
-		location.reload();
-		});
+// очистка полей ввода данных
+document.getElementById("clear-btn").addEventListener("click", function() {
+	location.reload();
+});
+// валидация формы при отправке
+document.getElementById("save-btn").addEventListener("click", function(event) {
+	event.preventDefault(); // отменяем отправку формы по умолчанию
+	// получаем значения полей ввода
+	var surname = document.getElementById("surname").value;
+	var name = document.getElementById("name").value;
+	var patronymic = document.getElementById("patronymic").value;
+	var birthday = document.getElementById("birthday").value;
+	var sex = document.getElementById("sex").value;
+	var grazhdanstvo = document.getElementById("grazhdanstvo").value;
+	var adres = document.getElementById("adres").value;
+	var phone = document.getElementById("phone").value;
+	var school = document.getElementById("school").value;
+	var klas = document.getElementById("klas").value;
+	// регулярные выражения для проверки формата телефона и даты рождения
+	var phoneRegExp = /^\+?\d{10,12}$/;;
+	// проверяем формат телефона
+	if(!phoneRegExp.test(phone)) {
+		alert("Номер телефона должен быть в формате: +XXXXXXXXXXX (от 10 до 12 цифр)");
+		return;
+	}
+	// Генерируем уникальный логин, используя первую букву имени, полностью фамилию и случайное число от 0 до 9999
+	var username = transliterate(surname) + transliterate(name) + Math.floor(Math.random() * 10000);
+	// Генерируем уникальный пароль, используя первые три буквы фамилии, длину имени и случайную строку из символов
+	var password = transliterate(surname.slice(0, 3)) + name.length + Math.random().toString(36).slice(-8);
+	downloadTextFile("Логин: " + username + "\n" + "Пароль: " + password, "Логин и пароль для доступа к личному кабинету " + surname + ".txt")
+	post('/spec/kid-add/' + surname + '/' + name + '/' + patronymic + '/' + birthday + '/' + sex + '/' + grazhdanstvo + '/' + adres + '/' + phone + '/' + school + '/' + klas + '/' + username + '/' + password);
+});
 
+function transliterate(str) {
+	const cyrillicChars = {
+		"а": "a",
+		"б": "b",
+		"в": "v",
+		"г": "g",
+		"д": "d",
+		"е": "e",
+		"ё": "yo",
+		"ж": "zh",
+		"з": "z",
+		"и": "i",
+		"й": "j",
+		"к": "k",
+		"л": "l",
+		"м": "m",
+		"н": "n",
+		"о": "o",
+		"п": "p",
+		"р": "r",
+		"с": "s",
+		"т": "t",
+		"у": "u",
+		"ф": "f",
+		"х": "h",
+		"ц": "c",
+		"ч": "ch",
+		"ш": "sh",
+		"щ": "shh",
+		"ъ": "",
+		"ы": "y",
+		"ь": "",
+		"э": "e",
+		"ю": "yu",
+		"я": "ya"
+	};
+	return str.split("").map(function(char) {
+		return cyrillicChars[char.toLowerCase()] || char;
+	}).join("");
+}
 
-		// валидация формы при отправке
-		//document.getElementById("submit-button").addEventListener("click", function(event) {
-		//	event.preventDefault(); // отменяем отправку формы по умолчанию
-//
-		//	// получаем значения полей ввода
-		//	var fio = document.getElementById("fio-input").value.trim();
-		//	var dob = document.getElementById("dob-input").value.trim();
-		//	var gender = document.getElementById("gender-input").value.trim();
-		//	var citizenship = document.getElementById("citizenship-input").value.trim();
-		//	var address = document.getElementById("address-input").value.trim();
-		//	var phone = document.getElementById("phone-input").value.trim();
-		//	var school = document.getElementById("school-input").value.trim();
-		//	var class = document.getElementById("class-input").value.trim();
-//
-		//	// регулярные выражения для проверки формата телефона и даты рождения
-		//	var phoneRegExp = /^\+?\d{10,12}$/;
-		//	var dobRegExp = /^\d{4}-\d{2}-\d{2}$/;
-//
-		//	// проверяем заполнены ли обязательные поля
-		//	if (fio === "" || dob === "" || address === "" || phone === "") {
-		//		alert("Пожалуйста, заполните обязательные поля: ФИО, Дата рождения, Адрес и Телефон");
-		//		return;
-		//	}
-//
-		//	// проверяем формат телефона и даты рождения
-		//	if (!phoneRegExp.test(phone)) {
-		//		alert("Номер телефона должен быть в формате: +XXXXXXXXXXX (от 10 до 12 цифр)");
-		//		return;
-		//	}
-		//	if (!dobRegExp.test(dob)) {
-		//		alert("Дата рождения должна быть в формате: ГГГГ-ММ-ДД");
-		//		return;
-		//	}
-//
-		//	// отправляем данные на сервер
-		//	// ...
-		//});
+function downloadTextFile(text, fileName) {
+	// Создаем элемент ссылки в DOM
+	var link = document.createElement('a');
+	link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+	link.setAttribute('download', fileName);
+	// Скрываем элемент ссылки в DOM
+	link.style.display = 'none';
+	document.body.appendChild(link);
+	// Имитируем клик по ссылке, чтобы начать загрузку файла
+	link.click();
+	// Удаляем элемент ссылки из DOM
+	document.body.removeChild(link);
+}
+
+function post(path, method = 'post') {
+	const form = document.createElement('form');
+	form.method = method;
+	form.action = path;
+	const hiddenField = document.createElement('input');
+	hiddenField.type = 'hidden';
+	form.appendChild(hiddenField);
+	document.body.appendChild(form);
+	form.submit();
+}
 	</script>
 </body>
 </html>

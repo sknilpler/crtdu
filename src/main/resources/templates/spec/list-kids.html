@@ -149,60 +149,63 @@
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/xlsx.full.min.js"></script>
 <script>
-	// Показать модальное окно с подробной информацией
-	$('table').on('click', '.btn-info', function() {
-		$('#info-modal').modal('show');
-	});
+// Показать модальное окно с подробной информацией
+$('table').on('click', '.btn-info', function() {
+	$('#info-modal').modal('show');
+});
 
-	// Поиск по таблице
-	$('#search-input').on('keyup', function() {
-		var value = $(this).val().toLowerCase();
-		$('table tbody tr').filter(function() {
-			$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-		});
+// Поиск по таблице
+$('#search-input').on('keyup', function() {
+	var value = $(this).val().toLowerCase();
+	$('table tbody tr').filter(function() {
+		$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
 	});
+});
 
-	// Экспорт таблицы в Excel
-	$('#export-btn').on('click', function() {
-		var wb = XLSX.utils.table_to_book($('table')[0], {sheet:"Sheet JS"});
-		XLSX.writeFile(wb, 'список_воспитанников.xlsx');
+// Экспорт таблицы в Excel
+$('#export-btn').on('click', function() {
+	var wb = XLSX.utils.table_to_book($('table')[0], {
+		sheet: "Sheet JS"
 	});
+	XLSX.writeFile(wb, 'список_воспитанников.xlsx');
+});
 
- function openInfo(id){
-    console.log(id);
-        $.ajax({
-			type: 'get',
-			url: '/spec/list-kids/info/' + id,
-			success: function (data) {
-				$('.info-kids').html(data);
-				$("#info-modal").modal('show');
-			},
-		})
-	}
+function openInfo(id) {
+	console.log(id);
+	$.ajax({
+		type: 'get',
+		url: '/spec/list-kids/info/' + id,
+		success: function(data) {
+			$('.info-kids').html(data);
+			$("#info-modal").modal('show');
+		},
+	})
+}
 var id_del;
+
 function showDeleteModalWindow(id) {
-    id_del = id;
-    document.getElementById("delete-object").innerHTML = "Вы точно хотите удалить?";
-    $("#deleteAccept").modal('show');
+	id_del = id;
+	document.getElementById("delete-object").innerHTML = "Вы точно хотите удалить?";
+	$("#deleteAccept").modal('show');
 }
 
 function closeModalWindow() {
-    $("#deleteAccept").modal('hide');
+	$("#deleteAccept").modal('hide');
 }
 
 function deleteObject() {
-    post('/spec/list-kids/del/' + id_del);
+	post('/spec/list-kids/del/' + id_del);
 }
 
 function post(path, method = 'post') {
-    const form = document.createElement('form');
-    form.method = method;
-    form.action = path;
-    const hiddenField = document.createElement('input');
-    hiddenField.type = 'hidden';
-    form.appendChild(hiddenField);
-    document.body.appendChild(form);
-    form.submit();
+	const form = document.createElement('form');
+	form.method = method;
+	form.action = path;
+	const hiddenField = document.createElement('input');
+	hiddenField.type = 'hidden';
+	form.appendChild(hiddenField);
+	document.body.appendChild(form);
+	form.submit();
 }
 </script>
 </body>

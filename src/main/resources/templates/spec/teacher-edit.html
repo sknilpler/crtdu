@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Форма редактирования данных преподавателя</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+<!-- Modal windows for accepting delete -->
+<div th:insert="blocks/accept-delete :: accept-delete"></div>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+
+<div class="container py-5">
+    <div class="justify-content-center">
+        <div class="alert alert-info" style="box-shadow: 0px 0px 4px;">
+            <h3 class="text-center mb-5">Данные преподавателя</h3>
+            <form th:object="${teacher}" method="post">
+                <div class="mb-3">
+                    <label for="surname" class="form-label">Фамилия</label>
+                    <input type="text" th:field="*{surname}" class="form-control" id="surname" name="surname">
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Имя</label>
+                    <input type="text" th:field="*{name}" class="form-control" id="name" name="name">
+                </div>
+                <div class="mb-3">
+                    <label for="patronymic" class="form-label">Отчество</label>
+                    <input type="text" th:field="*{patronymic}" class="form-control" id="patronymic"
+                           name="patronymic">
+                </div>
+                <div class="mb-3">
+                    <label for="doljnost" class="form-label">Должность</label>
+                    <input type="text" th:field="*{doljnost}" class="form-control" id="doljnost"
+                           name="doljnost">
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
+                    <button type="button" class="btn btn-primary" th:onclick="'javascript:save(\'' + *{id} + '\');'"
+                            id="save-btn">Сохранить
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script>
+function save(id) {
+	var surname = document.getElementById("surname").value;
+	var name = document.getElementById("name").value;
+	var patronymic = document.getElementById("patronymic").value;
+	var doljnost = document.getElementById("doljnost").value;
+
+	post('/spec/list-teachers/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + doljnost);
+}
+
+function post(path, method = 'post') {
+	const form = document.createElement('form');
+	form.method = method;
+	form.action = path;
+	const hiddenField = document.createElement('input');
+	hiddenField.type = 'hidden';
+	form.appendChild(hiddenField);
+	document.body.appendChild(form);
+	form.submit();
+}
+
+function replaceChar(str, charToReplace, replacementChar) {
+	return str.split(charToReplace).join(replacementChar);
+}
+
+// очистка полей ввода данных
+document.getElementById("clear-btn").addEventListener("click", function() {
+	document.getElementById("surname").value = "";
+	document.getElementById("name").value = "";
+	document.getElementById("patronymic").value = "";
+	document.getElementById("doljnost").value = "";
+});
+
+</script>
+</body>
+</html>

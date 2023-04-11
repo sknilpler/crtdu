@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Форма ввода данных преподавателя</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-5">Данные преподавателя</h1>
+            <div>
+                <div class="mb-3">
+                    <label for="surname" class="form-label">Фамилия</label>
+                    <input type="text" class="form-control" id="surname" name="surname" required>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Имя</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="patronymic" class="form-label">Отчество</label>
+                    <input type="text" class="form-control" id="patronymic" name="patronymic">
+                </div>
+
+                <div class="mb-3">
+                    <label for="doljnost" class="form-label">Должность</label>
+                    <input type="text" class="form-control" id="doljnost" name="doljnost" required>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
+                    <button type="submit" class="btn btn-primary" id="save-btn">Сохранить</button>
+                </div>
+<!--            </form>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.min.js"></script>
+<script>
+		// очистка полей ввода данных
+		document.getElementById("clear-btn").addEventListener("click", function() {
+		location.reload();
+		});
+
+
+		// валидация формы при отправке
+		document.getElementById("save-btn").addEventListener("click", function(event) {
+			event.preventDefault(); // отменяем отправку формы по умолчанию
+			// получаем значения полей ввода
+            var surname = document.getElementById("surname").value;
+            var name = document.getElementById("name").value;
+            var patronymic = document.getElementById("patronymic").value;
+            var doljnost = document.getElementById("doljnost").value;
+
+			// Генерируем уникальный логин, используя первую букву имени, полностью фамилию и случайное число от 0 до 9999
+            var username = transliterate(surname) + transliterate(name) + Math.floor(Math.random() * 10000);
+
+            // Генерируем уникальный пароль, используя первые три буквы фамилии, длину имени и случайную строку из символов
+            var password = transliterate(surname.slice(0, 3)) + name.length + Math.random().toString(36).slice(-8);
+
+            downloadTextFile("Логин: " + username + "\n" + "Пароль: " + password, "Логин и пароль преподавателя "+surname+".txt")
+
+	        post('/spec/teacher-add/'+surname+'/'+name+'/'+patronymic+'/'+doljnost+'/'+username+'/'+password);
+        });
+
+		function transliterate(str) {
+  const cyrillicChars = {
+    "а": "a",
+    "б": "b",
+    "в": "v",
+    "г": "g",
+    "д": "d",
+    "е": "e",
+    "ё": "yo",
+    "ж": "zh",
+    "з": "z",
+    "и": "i",
+    "й": "j",
+    "к": "k",
+    "л": "l",
+    "м": "m",
+    "н": "n",
+    "о": "o",
+    "п": "p",
+    "р": "r",
+    "с": "s",
+    "т": "t",
+    "у": "u",
+    "ф": "f",
+    "х": "h",
+    "ц": "c",
+    "ч": "ch",
+    "ш": "sh",
+    "щ": "shh",
+    "ъ": "",
+    "ы": "y",
+    "ь": "",
+    "э": "e",
+    "ю": "yu",
+    "я": "ya"
+  };
+
+  return str.split("").map(function(char) {
+    return cyrillicChars[char.toLowerCase()] || char;
+  }).join("");
+}
+
+function downloadTextFile(text, fileName) {
+  // Создаем элемент ссылки в DOM
+  var link = document.createElement('a');
+  link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  link.setAttribute('download', fileName);
+
+  // Скрываем элемент ссылки в DOM
+  link.style.display = 'none';
+  document.body.appendChild(link);
+
+  // Имитируем клик по ссылке, чтобы начать загрузку файла
+  link.click();
+
+  // Удаляем элемент ссылки из DOM
+  document.body.removeChild(link);
+}
+
+function post(path, method='post') {
+  const form = document.createElement('form');
+  form.method = method;
+  form.action = path;
+  const hiddenField = document.createElement('input');
+  hiddenField.type = 'hidden';
+  form.appendChild(hiddenField);
+  document.body.appendChild(form);
+  form.submit();
+}
+	</script>
+</body>
+</html>
