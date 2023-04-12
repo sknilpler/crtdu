@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Форма ввода данных мероприятия</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-5">Данные мероприятия</h1>
+            <form method="post">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Наименование мероприятия</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="data" class="form-label">Дата и время проведения</label>
+                    <input type="datetime-local" class="form-control" id="data" name="data" required>
+                </div>
+                <div class="mb-3">
+                    <label for="place" class="form-label">Место проведения</label>
+                    <input type="text" class="form-control" id="place" name="place">
+                </div>
+
+                <div class="mb-3">
+                    <label for="type" class="form-label">Тип мероприятия</label>
+                    <input type="text" class="form-control" id="type" name="type" required>
+                </div>
+                <div class="mb-3">
+                    <label for="level" class="form-label">Уровень мероприятия</label>
+                    <input type="text" class="form-control" id="level" name="level" required>
+                </div>
+                <div class="mb-3">
+                    <label for="otvetstvenniy" class="form-label">Ответственный</label>
+                    <input type="text" class="form-control" id="otvetstvenniy" name="otvetstvenniy" required>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
+                    <button type="submit" class="btn btn-primary" id="save-btn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.min.js"></script>
+<script>
+  		// очистка полей ввода данных
+		document.getElementById("clear-btn").addEventListener("click", function() {
+		location.reload();
+		});
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

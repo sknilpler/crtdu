@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -43,6 +44,8 @@ public class SpecController {
     private TeacherRepository teacherRepository;
     @Autowired
     private KrujokRepository krujokRepository;
+    @Autowired
+    private MeropriyatieRepository meropriyatieRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -322,5 +325,35 @@ public class SpecController {
         log.warn("Edit Teacher: {}", teacher);
         return "redirect:/spec/list-teachers";
     }
+
+    //------------------------------- мероприятия---------------
+
+    @GetMapping("/spec/list-meropriyatiya")
+    public String openMeropriyatiyaPage(Model model) {
+        model.addAttribute("merop", meropriyatieRepository.findAll());
+        return "spec/meropriyatiya";
+    }
+
+    @GetMapping("/spec/meropriyatiya-add")
+    public String openMeropriyatiyaAddPage(Model model) {
+        return "spec/meropriyatiya-add";
+    }
+
+    @PostMapping("/spec/meropriyatiya-add")
+    public String saveMeropriyatie(@RequestParam String name,
+                            @RequestParam String data,
+                            @RequestParam String place,
+                            @RequestParam String type,
+                            @RequestParam String level,
+                            @RequestParam String otvetstvenniy,
+                            Authentication authentication) throws ParseException {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+        Date d = dateFormat.parse(data);
+        Meropriyatie m = new Meropriyatie(name, d, type, place, level, otvetstvenniy);
+        log.warn("Add meropriyatie: {}", m);
+        meropriyatieRepository.save(m);
+        return "redirect:/spec/list-meropriyatiya";
+    }
+
 }
 
