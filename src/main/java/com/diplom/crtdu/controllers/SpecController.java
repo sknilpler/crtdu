@@ -6,6 +6,7 @@ import com.diplom.crtdu.repo.*;
 import com.diplom.crtdu.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +20,8 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -262,12 +265,12 @@ public class SpecController {
 
     @PostMapping("/spec/teacher-add/{surname}/{name}/{patronymic}/{doljnost}/{username}/{password}")
     public String addTeacher(@PathVariable("surname") String surname,
-                         @PathVariable("name") String name,
-                         @PathVariable("patronymic") String patronymic,
-                         @PathVariable("doljnost") String doljnost,
-                         @PathVariable("username") String username,
-                         @PathVariable("password") String password,
-                         Authentication authentication) {
+                             @PathVariable("name") String name,
+                             @PathVariable("patronymic") String patronymic,
+                             @PathVariable("doljnost") String doljnost,
+                             @PathVariable("username") String username,
+                             @PathVariable("password") String password,
+                             Authentication authentication) {
 
         Role role = roleRepository.findByName("ROLE_TEACHER");
         User user = new User(username, password, "teacher", surname, name, patronymic, password);
@@ -312,10 +315,10 @@ public class SpecController {
 
     @PostMapping("/spec/list-teachers/edit/{id}/{surname}/{name}/{patronymic}/{doljnost}")
     public String saveEditTeacher(Model model, @PathVariable("id") Long id,
-                              @PathVariable("surname") String surname,
-                              @PathVariable("name") String name,
-                              @PathVariable("patronymic") String patronymic,
-                              @PathVariable("doljnost") String doljnost) {
+                                  @PathVariable("surname") String surname,
+                                  @PathVariable("name") String name,
+                                  @PathVariable("patronymic") String patronymic,
+                                  @PathVariable("doljnost") String doljnost) {
         Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new NotFoundException("Teacher with id = " + id + " not found on server!"));
         teacher.setSurname(surname);
         teacher.setName(name);
@@ -330,6 +333,15 @@ public class SpecController {
 
     @GetMapping("/spec/list-meropriyatiya")
     public String openMeropriyatiyaPage(Model model) {
+        int year = LocalDate.now().getYear(); // текущий год
+        // дата 1 января текущего года
+        //String d1 = LocalDate.of(year, 1, 1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        //текущая дата
+        String d1 = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        // дата 31 декабря текущего года
+        String d2 = LocalDate.of(year, 12, 31).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        model.addAttribute("d1", d1);
+        model.addAttribute("d2", d2);
         model.addAttribute("merop", meropriyatieRepository.findAll());
         return "spec/meropriyatiya";
     }
@@ -341,12 +353,12 @@ public class SpecController {
 
     @PostMapping("/spec/meropriyatiya-add")
     public String saveMeropriyatie(@RequestParam String name,
-                            @RequestParam String data,
-                            @RequestParam String place,
-                            @RequestParam String type,
-                            @RequestParam String level,
-                            @RequestParam String otvetstvenniy,
-                            Authentication authentication) throws ParseException {
+                                   @RequestParam String data,
+                                   @RequestParam String place,
+                                   @RequestParam String type,
+                                   @RequestParam String level,
+                                   @RequestParam String otvetstvenniy,
+                                   Authentication authentication) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         Date d = dateFormat.parse(data);
         Meropriyatie m = new Meropriyatie(name, d, type, place, level, otvetstvenniy);
@@ -355,5 +367,26 @@ public class SpecController {
         return "redirect:/spec/list-meropriyatiya";
     }
 
+    @PostMapping("/spec/meropriyatiya/del/{id}")
+    public String delMerop(Model model, @PathVariable("id") Long id) {
+        Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
+        log.warn("Deleting Meropriyatie: {}", m);
+        meropriyatieRepository.deleteById(id);
+        return "redirect:/spec/list-meropriyatiya";
+    }
+
+    @GetMapping("/spec/meropriyatiya/filter/{type}/{level}/{startDate}/{endDate}")
+    public String filterMeropriyatiya(Model model,
+                                      @PathVariable("type") String type,
+                                      @PathVariable("level") String level,
+                                      @PathVariable("startDate") String startDate,
+                                      @PathVariable("endDate") String endDate) {
+        System.out.println(type);
+        System.out.println(level);
+        System.out.println(startDate);
+        System.out.println(endDate);
+        model.addAttribute("merop", meropriyatieRepository.findAll());
+        return "spec/meropriyatiya :: table-merop";
+    }
 }
 
