@@ -16,11 +16,55 @@
 <body>
 <header th:insert="blocks/header :: header"></header>
 
-    <div class="row">
-        <div class="col-xl-12 text-center">
-            <a sec:authorize="hasRole('ROLE_ADMIN')" class="nav-link p-2 text-dark" href="/admin">Администрирование</a>
-        </div>
-    </div>
+<div class="container">
+    <h1>Расписание кружков по дням недели</h1>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Наименование объединения</th>
+            <th>Понедельник</th>
+            <th>Вторник</th>
+            <th>Среда</th>
+            <th>Четверг</th>
+            <th>Пятница</th>
+            <th>Суббота</th>
+            <th>Воскресенье</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Ансамбль "Ромашки"</strong><br>преп: Иванов И.И.</td>
+            <td>15:00-16:30<br>каб. 101</td>
+            <td></td>
+            <td>15:00-16:30<br>каб. 101</td>
+            <td></td>
+            <td>15:00-16:30<br>каб. 101</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><strong>Хореографический кружок</strong><br>преп: Сидорова О.П.</td>
+            <td></td>
+            <td>14:00-15:30<br>каб. 102</td>
+            <td></td>
+            <td>14:00-15:30<br>каб. 102</td>
+            <td></td>
+            <td>14:00-15:30<br>каб. 102</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><strong>Каратэ</strong><br>преп: Ким Р.А.</td>
+            <td></td>
+            <td>16:00-17:30<br>каб. 103</td>
+            <td>16:00-17:30<br>каб. 103</td>
+            <td>16:00-17:30<br>каб. 103</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/theme.js"></script>
 </body>

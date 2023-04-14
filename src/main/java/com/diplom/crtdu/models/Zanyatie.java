@@ -20,6 +20,7 @@ public class Zanyatie {
     private Long id;
 
     private Date dataZan;
+    private int dlitelnost;
     private String mesto;
 
     @ManyToOne
@@ -31,8 +32,17 @@ public class Zanyatie {
             inverseJoinColumns = @JoinColumn(name = "kid_id"))
     private List<Kid> kids;
 
-    public Zanyatie(Date dataZan, String mesto, Krujok krujok) {
+    /**
+     * Объект занятие
+     *
+     * @param dataZan дата и время проведения
+     * @param dlitelnost длительность в минутах
+     * @param mesto место проведения
+     * @param krujok кружок по которому будет занятие
+     */
+    public Zanyatie(Date dataZan, int dlitelnost, String mesto, Krujok krujok) {
         this.dataZan = dataZan;
+        this.dlitelnost = dlitelnost;
         this.mesto = mesto;
         this.krujok = krujok;
     }
@@ -42,6 +52,7 @@ public class Zanyatie {
         return "Zanyatie{" +
                 "id=" + id +
                 ", dataZan=" + dataZan +
+                ", dlitelnost=" + dlitelnost +
                 ", mesto='" + mesto + '\'' +
                 ", krujok=" + krujok +
                 '}';

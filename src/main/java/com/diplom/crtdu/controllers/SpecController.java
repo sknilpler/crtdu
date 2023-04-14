@@ -34,6 +34,8 @@ public class SpecController {
     private Kid editedKid;
     private long teachEditId;
     private Teacher editedTeach;
+    private Long meropEditId;
+    private Meropriyatie editedMerop;
 
     @Autowired
     private KidRepository kidRepository;
@@ -49,6 +51,8 @@ public class SpecController {
     private KrujokRepository krujokRepository;
     @Autowired
     private MeropriyatieRepository meropriyatieRepository;
+    @Autowired
+    private TypeMeropriyatiyaRepository typeMeropriyatiyaRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -348,6 +352,7 @@ public class SpecController {
 
     @GetMapping("/spec/meropriyatiya-add")
     public String openMeropriyatiyaAddPage(Model model) {
+        model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
         return "spec/meropriyatiya-add";
     }
 
@@ -361,6 +366,7 @@ public class SpecController {
                                    Authentication authentication) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         Date d = dateFormat.parse(data);
+        //TypeMeropriyatiya t = typeMeropriyatiyaRepository.findById(type).orElseThrow(() -> new NotFoundException("TypeMeropriyatiya with id = " + type + " not found on server!"));
         Meropriyatie m = new Meropriyatie(name, d, type, place, level, otvetstvenniy);
         log.warn("Add meropriyatie: {}", m);
         meropriyatieRepository.save(m);
@@ -387,6 +393,40 @@ public class SpecController {
         System.out.println(endDate);
         model.addAttribute("merop", meropriyatieRepository.findAll());
         return "spec/meropriyatiya :: table-merop";
+    }
+
+    @GetMapping("/spec/meropriyatiya/edit/{id}")
+    public String openEditMeropriyatiya(Model model, @PathVariable("id") Long id) {
+        Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
+        meropEditId = id;
+        editedMerop = m;
+        model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
+        model.addAttribute("merop", m);
+        return "spec/meropriyatiya-edit";
+    }
+
+    @PostMapping("/spec/meropriyatiya/edit/{id}/{name}/{data}/{place}/{type}/{level}/{otvetstvenniy}")
+    public String saveEditedMeropriyatie(@PathVariable("id") Long id,
+                                         @PathVariable("name") String name,
+                                         @PathVariable("data") String data,
+                                         @PathVariable("place") String place,
+                                         @PathVariable("type") String type,
+                                         @PathVariable("level") String level,
+                                         @PathVariable("otvetstvenniy") String otvetstvenniy,
+                                         Authentication authentication) throws ParseException {
+        Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+        Date d = dateFormat.parse(data);
+        //TypeMeropriyatiya t = typeMeropriyatiyaRepository.findById(type).orElseThrow(() -> new NotFoundException("TypeMeropriyatiya with id = " + type + " not found on server!"));
+        m.setName(name);
+        m.setData(d);
+        m.setPlace(place);
+        m.setType(type);
+        m.setLevel(level);
+        m.setOtvetstvenniy(otvetstvenniy);
+        meropriyatieRepository.save(m);
+        log.warn("Edit Meropriyatie: {}", m);
+        return "redirect:/spec/list-meropriyatiya";
     }
 }
 

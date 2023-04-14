@@ -28,7 +28,10 @@
 
                 <div class="mb-3">
                     <label for="type" class="form-label">Тип мероприятия</label>
-                    <input type="text" class="form-control" id="type" name="type" required>
+                    <select class="form-control" id="type" name="type" required>
+                        <option value disabled="">Выберите тип мероприятия</option>
+                        <option th:each="t : ${types}" th:value="${t.name}" th:text="${t.name}"></option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="level" class="form-label">Уровень мероприятия</label>
@@ -53,10 +56,6 @@
 		document.getElementById("clear-btn").addEventListener("click", function() {
 		location.reload();
 		});
-
-
-
-
 
 
 
