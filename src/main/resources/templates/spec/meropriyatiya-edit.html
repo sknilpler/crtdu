@@ -32,13 +32,16 @@
                 <div class="mb-3">
                     <label for="type" class="form-label">Тип мероприятия</label>
                     <select class="form-control" th:field="*{type}" id="type" name="type" required>
-                        <option value="" disabled="">Выберите тип мероприятия</option>
+                        <option value="0" disabled>-- Выберите --</option>
                         <option th:each="t : ${types}" th:value="${t.name}" th:text="${t.name}"></option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="level" class="form-label">Уровень мероприятия</label>
-                    <input type="text" class="form-control" th:field="*{level}" id="level" name="level" required>
+                    <select class="form-select" th:field="*{level}" id="level" name="level">
+                        <option disabled value="0">-- Выберите --</option>
+                        <option th:each="l : ${levels}" th:value="${l.name}" th:text="${l.name}"></option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="otvetstvenniy" class="form-label">Ответственный</label>

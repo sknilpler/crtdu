@@ -1,8 +1,10 @@
 package com.diplom.crtdu.controllers;
 
+import com.diplom.crtdu.models.LevelMeropriyatiya;
 import com.diplom.crtdu.models.Role;
 import com.diplom.crtdu.models.TypeMeropriyatiya;
 import com.diplom.crtdu.models.User;
+import com.diplom.crtdu.repo.LevelMeropriyatiyaRepository;
 import com.diplom.crtdu.repo.RoleRepository;
 import com.diplom.crtdu.repo.TypeMeropriyatiyaRepository;
 import com.diplom.crtdu.services.UserService;
@@ -27,11 +29,13 @@ public class MainController {
     private RoleRepository roleRepository;
     @Autowired
     private TypeMeropriyatiyaRepository typeMeropriyatiyaRepository;
+    @Autowired
+    private LevelMeropriyatiyaRepository levelMeropriyatiyaRepository;
 
     @GetMapping("/")
     public String home(Model model, Authentication authentication) {
         //если программа впервые запускается на сервере
-        if (roleRepository.findAll().size() == 0){
+        if (roleRepository.findAll().size() == 0) {
             System.out.println("ROLES in Database NOT present! Add them to DB");
             roleRepository.save(new Role("ROLE_ADMIN"));
             roleRepository.save(new Role("ROLE_USER"));
@@ -47,7 +51,7 @@ public class MainController {
             System.out.println("User ADMIN successfully saved!");
         }
 
-        if (typeMeropriyatiyaRepository.findAll().size() == 0){
+        if (typeMeropriyatiyaRepository.findAll().size() == 0) {
             System.out.println("Add list of types meropriyatiya");
             typeMeropriyatiyaRepository.save(new TypeMeropriyatiya("Балет"));
             typeMeropriyatiyaRepository.save(new TypeMeropriyatiya("Вечеринка"));
@@ -80,6 +84,16 @@ public class MainController {
             typeMeropriyatiyaRepository.save(new TypeMeropriyatiya("Шоу-программа"));
         }
 
+        if (levelMeropriyatiyaRepository.findAll().size() == 0) {
+            System.out.println("Add list of levels meropriyatiya");
+            levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Местный"));
+            levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Районный"));
+            levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Городской"));
+            levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Региональный"));
+            levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Национальный"));
+            levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Международный"));
+        }
+
         model.addAttribute("title", "Главная страница");
         return "home";
     }
@@ -97,7 +111,7 @@ public class MainController {
     }
 
     @GetMapping("/success-login")
-    public String successLogin(Model model, Authentication authentication){
+    public String successLogin(Model model, Authentication authentication) {
         model.addAttribute("userType", userService.getUserByUsername(authentication.getName()).getType());
         return "success-login";
     }

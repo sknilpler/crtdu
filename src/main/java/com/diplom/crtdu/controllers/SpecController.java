@@ -36,6 +36,7 @@ public class SpecController {
     private Teacher editedTeach;
     private Long meropEditId;
     private Meropriyatie editedMerop;
+    private List<String> meropLevel;
 
     @Autowired
     private KidRepository kidRepository;
@@ -53,6 +54,8 @@ public class SpecController {
     private MeropriyatieRepository meropriyatieRepository;
     @Autowired
     private TypeMeropriyatiyaRepository typeMeropriyatiyaRepository;
+    @Autowired
+    private LevelMeropriyatiyaRepository levelMeropriyatiyaRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -346,12 +349,15 @@ public class SpecController {
         String d2 = LocalDate.of(year, 12, 31).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         model.addAttribute("d1", d1);
         model.addAttribute("d2", d2);
+        model.addAttribute("levels",levelMeropriyatiyaRepository.findAll());
+        model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
         model.addAttribute("merop", meropriyatieRepository.findAll());
         return "spec/meropriyatiya";
     }
 
     @GetMapping("/spec/meropriyatiya-add")
     public String openMeropriyatiyaAddPage(Model model) {
+        model.addAttribute("levels",levelMeropriyatiyaRepository.findAll());
         model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
         return "spec/meropriyatiya-add";
     }
@@ -400,6 +406,7 @@ public class SpecController {
         Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
         meropEditId = id;
         editedMerop = m;
+        model.addAttribute("levels",levelMeropriyatiyaRepository.findAll());
         model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
         model.addAttribute("merop", m);
         return "spec/meropriyatiya-edit";
