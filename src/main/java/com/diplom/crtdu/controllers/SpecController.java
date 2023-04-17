@@ -56,6 +56,8 @@ public class SpecController {
     private TypeMeropriyatiyaRepository typeMeropriyatiyaRepository;
     @Autowired
     private LevelMeropriyatiyaRepository levelMeropriyatiyaRepository;
+    @Autowired
+    private DostijenieRepository dostijenieRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -349,7 +351,7 @@ public class SpecController {
         String d2 = LocalDate.of(year, 12, 31).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         model.addAttribute("d1", d1);
         model.addAttribute("d2", d2);
-        model.addAttribute("levels",levelMeropriyatiyaRepository.findAll());
+        model.addAttribute("levels", levelMeropriyatiyaRepository.findAll());
         model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
         model.addAttribute("merop", meropriyatieRepository.findAll());
         return "spec/meropriyatiya";
@@ -357,7 +359,7 @@ public class SpecController {
 
     @GetMapping("/spec/meropriyatiya-add")
     public String openMeropriyatiyaAddPage(Model model) {
-        model.addAttribute("levels",levelMeropriyatiyaRepository.findAll());
+        model.addAttribute("levels", levelMeropriyatiyaRepository.findAll());
         model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
         return "spec/meropriyatiya-add";
     }
@@ -406,7 +408,7 @@ public class SpecController {
         Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
         meropEditId = id;
         editedMerop = m;
-        model.addAttribute("levels",levelMeropriyatiyaRepository.findAll());
+        model.addAttribute("levels", levelMeropriyatiyaRepository.findAll());
         model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
         model.addAttribute("merop", m);
         return "spec/meropriyatiya-edit";
@@ -433,6 +435,61 @@ public class SpecController {
         m.setOtvetstvenniy(otvetstvenniy);
         meropriyatieRepository.save(m);
         log.warn("Edit Meropriyatie: {}", m);
+        return "redirect:/spec/list-meropriyatiya";
+    }
+
+    @GetMapping("/spec/meropriyatiya/info/{id}")
+    public String openInfoMeropriyatiya(Model model, @PathVariable("id") Long id) {
+        model.addAttribute("merop", dostijenieRepository.findByMeropriyatieId(id));
+        return "spec/meropriyatiya :: info-dost";
+    }
+
+    @GetMapping("/spec/meropriyatiya/dost/add/{id}")
+    public String openDostAddPageForMerop(@PathVariable("id") Long id, Model model) {
+        Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
+        model.addAttribute("merop", m);
+        model.addAttribute("meropriyaties", meropriyatieRepository.findAll());
+        model.addAttribute("kids", kidRepository.findAll());
+        model.addAttribute("teachers", teacherRepository.findAll());
+        return "spec/dost-add";
+    }
+
+    @PostMapping("/spec/meropriyatiya/dost/add/{id}")
+    public String saveDostAddPageForMerop(@PathVariable("id") Long id,
+                                          @RequestParam String name,
+                                          @RequestParam String place,
+                                          @RequestParam String meropriyatie,
+                                          @RequestParam String kid,
+                                          @RequestParam String teacher,
+                                          Model model) {
+        Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
+        Kid k = kidRepository.findById(Long.valueOf(kid)).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
+        Teacher t = teacherRepository.findById(Long.valueOf(teacher)).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
+        Dostijenie d = dostijenieRepository.save(new Dostijenie(name, place, m, k, t));
+        log.warn("Save New Dostijenie: {}", d);
+        return "redirect:/spec/list-meropriyatiya";
+    }
+
+    @GetMapping("/spec/meropriyatiya/dost/add")
+    public String openDostAddPage(Model model) {
+        model.addAttribute("meropriyaties", meropriyatieRepository.findAll());
+        model.addAttribute("kids", kidRepository.findAll());
+        model.addAttribute("teachers", teacherRepository.findAll());
+        return "spec/dost-add";
+    }
+
+    @PostMapping("/spec/meropriyatiya/dost/add")
+    public String saveDostAddPage(@RequestParam String name,
+                                  @RequestParam String place,
+                                  @RequestParam String meropriyatie,
+                                  @RequestParam String kid,
+                                  @RequestParam String teacher,
+                                  Model model) {
+        Meropriyatie m = meropriyatieRepository.findById(Long.valueOf(meropriyatie)).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropriyatie + " not found on server!"));
+        Kid k = kidRepository.findById(Long.valueOf(kid)).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
+        Teacher t = teacherRepository.findById(Long.valueOf(teacher)).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
+        Dostijenie d = dostijenieRepository.save(new Dostijenie(name, place, m, k, t));
+        log.warn("Save New Dostijenie: {}", d);
         return "redirect:/spec/list-meropriyatiya";
     }
 }

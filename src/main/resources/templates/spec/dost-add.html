@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Форма ввода данных достижения</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1 class="text-center mb-5">Данные достижения</h1>
+      <form method="post">
+        <div class="mb-3">
+          <label for="name" class="form-label">Наименование достижения</label>
+          <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+          <label for="place" class="form-label">Занятое место</label>
+          <input type="text" class="form-control" id="place" name="place">
+        </div>
+
+        <div class="mb-3">
+          <label for="meropriyatie" class="form-label">Мероприятие</label>
+
+          <select class="form-control" th:if="${merop != null}" th:field="${merop.id}" id="meropriyatie" name="meropriyatie" required>
+            <option value="0" disabled>-- Выберите --</option>
+            <option th:each="m : ${meropriyaties}" th:value="${m.id}" th:text="${m.name}"></option>
+          </select>
+
+          <select class="form-control" th:if="${merop == null}" id="meropriyatie" name="meropriyatie" required>
+            <option value="0" disabled selected>-- Выберите --</option>
+            <option th:each="m : ${meropriyaties}" th:value="${m.id}" th:text="${m.name}"></option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="kid" class="form-label">Воспитанник</label>
+          <select class="form-select" id="kid" name="kid">
+            <option disabled value="0" selected>-- Выберите --</option>
+            <option th:each="k : ${kids}" th:value="${k.id}" th:text="${k.getFullFIO()}"></option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="teacher" class="form-label">Преподаватель</label>
+          <select class="form-select" id="teacher" name="teacher">
+            <option disabled value="0" selected>-- Выберите --</option>
+            <option th:each="t : ${teachers}" th:value="${t.id}" th:text="${t.getFullFIO()}"></option>
+          </select>
+        </div>
+        <div class="d-grid gap-2">
+          <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
+          <button type="submit" class="btn btn-primary" id="save-btn">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+<script>
+  		// очистка полей ввода данных
+		document.getElementById("clear-btn").addEventListener("click", function() {
+		  document.getElementById("name").value = "";
+		  document.getElementById("place").value = "";
+		});
+
+$(document).ready(function() {
+    $('#kid').select2({
+      placeholder: '-- Выберите --',
+      minimumResultsForSearch: 10,
+      maximumSelectionSize: 1,
+      language: {
+        noResults: function() {
+          return "Ничего не найдено";
+        },
+        searching: function() {
+          return "Поиск...";
+        },
+        maximumSelected: function() {
+          return "Вы можете выбрать только один вариант";
+        }
+      }
+    });
+  });
+
+</script>
+</body>
+</html>
