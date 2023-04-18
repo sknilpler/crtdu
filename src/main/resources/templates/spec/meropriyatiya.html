@@ -169,8 +169,11 @@
                 </div>
             </div>
             <div class="modal-footer">
+<!--                <a class="btn btn-success"-->
+<!--                   th:href="${dost != null ? '/spec/meropriyatiya/dost/add/' + (dost[0]?.meropriyatie?.id ?: '') : '/spec/meropriyatiya/dost/add'}">Добавить-->
+<!--                    достижение</a>-->
                 <a class="btn btn-success"
-                   th:href="${dost != null ? '/spec/meropriyatiya/dost/add/' + (dost[0]?.meropriyatie?.id ?: '') : '/spec/meropriyatiya/dost/add'}">Добавить
+                   th:href="${'/spec/meropriyatiya/dost/add'}">Добавить
                     достижение</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>

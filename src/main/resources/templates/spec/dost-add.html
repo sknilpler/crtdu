@@ -23,15 +23,15 @@
           <input type="text" class="form-control" id="place" name="place">
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" th:if="${merop == null}">
           <label for="meropriyatie" class="form-label">Мероприятие</label>
 
-          <select class="form-control" th:if="${merop != null}" th:field="${merop.id}" id="meropriyatie" name="meropriyatie" required>
-            <option value="0" disabled>-- Выберите --</option>
-            <option th:each="m : ${meropriyaties}" th:value="${m.id}" th:text="${m.name}"></option>
-          </select>
+<!--          <select class="form-control" th:if="${merop != null}" th:field="${merop.id}" id="meropriyatie" name="meropriyatie" required>-->
+<!--            <option value="0" disabled>&#45;&#45; Выберите &#45;&#45;</option>-->
+<!--            <option th:each="m : ${meropriyaties}" th:value="${m.id}" th:text="${m.name}"></option>-->
+<!--          </select>-->
 
-          <select class="form-control" th:if="${merop == null}" id="meropriyatie" name="meropriyatie" required>
+          <select class="form-control" id="meropriyatie" name="meropriyatie" required>
             <option value="0" disabled selected>-- Выберите --</option>
             <option th:each="m : ${meropriyaties}" th:value="${m.id}" th:text="${m.name}"></option>
           </select>
