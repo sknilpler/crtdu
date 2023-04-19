@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Форма редактирования данных достижения</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+<!-- Modal windows for accepting delete -->
+<div th:insert="blocks/accept-delete :: accept-delete"></div>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+
+<div class="container py-5">
+    <div class="justify-content-center">
+        <div class="alert alert-info" style="box-shadow: 0px 0px 4px;">
+            <h3 class="text-center mb-5">Данные достижения</h3>
+            <form th:object="${dost}" method="post">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Наименование достижения</label>
+                    <input type="text" class="form-control" th:field="*{name}" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="place" class="form-label">Занятое место</label>
+                    <input type="text" class="form-control" th:field="*{winPlace}" id="place" name="place">
+                </div>
+                <div class="mb-3">
+                    <label for="meropriyatie" class="form-label">Мероприятие</label>
+                    <select class="form-control" id="meropriyatie" th:field="*{meropriyatie.id}" name="meropriyatie" required>
+                        <option value="0" disabled selected>-- Выберите --</option>
+                        <option th:each="m : ${meropriyaties}" th:value="${m.id}" th:text="${m.name}"></option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="kid" class="form-label">Воспитанник</label>
+                    <select class="form-select" id="kid" th:field="*{kid.id}" name="kid">
+                        <option disabled value="0" selected>-- Выберите --</option>
+                        <option th:each="k : ${kids}" th:value="${k.id}" th:text="${k.getFullFIO()}"></option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="teacher" class="form-label">Преподаватель</label>
+                    <select class="form-select" id="teacher" th:field="*{teacher.id}" name="teacher">
+                        <option disabled value="0" selected>-- Выберите --</option>
+                        <option th:each="t : ${teachers}" th:value="${t.id}" th:text="${t.getFullFIO()}"></option>
+                    </select>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
+                    <button type="button" class="btn btn-primary" th:onclick="'javascript:save(\'' + *{id} + '\');'"
+                            id="save-btn">Сохранить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script>
+function save(id) {
+	var name = document.getElementById("name").value;
+    var place = document.getElementById("place").value;
+    var meropriyatie = document.getElementById("meropriyatie").value;
+    var kid = document.getElementById("kid").value;
+    var teacher = document.getElementById("teacher").value;
+
+	post('/spec/dost/edit/' + id + '/' + name+'/'+ place+'/'+ meropriyatie +'/'+ kid+'/'+ teacher);
+}
+
+function post(path, method = 'post') {
+	const form = document.createElement('form');
+	form.method = method;
+	form.action = path;
+	const hiddenField = document.createElement('input');
+	hiddenField.type = 'hidden';
+	form.appendChild(hiddenField);
+	document.body.appendChild(form);
+	form.submit();
+}
+
+// очистка полей ввода данных
+document.getElementById("clear-btn").addEventListener("click", function() {
+	document.getElementById("name").value;
+    document.getElementById("place").value;
+});
+
+</script>
+</body>
+</html>

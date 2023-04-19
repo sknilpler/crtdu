@@ -485,7 +485,7 @@ public class SpecController {
     @PostMapping("/spec/meropriyatiya/dost/add")
     public String saveDostAddPage(@RequestParam String name,
                                   @RequestParam String place,
-                                 // @RequestParam String meropriyatie,
+                                  // @RequestParam String meropriyatie,
                                   @RequestParam String kid,
                                   @RequestParam String teacher,
                                   Model model) {
@@ -496,5 +496,73 @@ public class SpecController {
         log.warn("Save New Dostijenie: {}", d);
         return "redirect:/spec/list-meropriyatiya";
     }
+
+    @GetMapping("/spec/dost-list")
+    public String openDostPage(Model model) {
+        model.addAttribute("dost", dostijenieRepository.findAll());
+        return "spec/dost-list";
+    }
+
+    @PostMapping("/spec/dost/del/{id}")
+    public String delDost(@PathVariable("id") Long id, Model model) {
+        dostijenieRepository.deleteById(id);
+        return "redirect:/spec/dost-list";
+    }
+
+    @GetMapping("/spec/dost-add")
+    public String addDost(Model model) {
+        model.addAttribute("meropriyaties", meropriyatieRepository.findAll());
+        model.addAttribute("kids", kidRepository.findAll());
+        model.addAttribute("teachers", teacherRepository.findAll());
+        return "spec/dost-add";
+    }
+
+    @PostMapping("/spec/dost-add")
+    public String saveDost(@RequestParam String name,
+                           @RequestParam String place,
+                           @RequestParam Long kid,
+                           @RequestParam Long meropriyatie,
+                           @RequestParam Long teacher,
+                           Model model) {
+        Meropriyatie m = meropriyatieRepository.findById(meropIDForDost).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropIDForDost + " not found on server!"));
+        Kid k = kidRepository.findById(kid).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
+        Teacher t = teacherRepository.findById(teacher).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
+        Dostijenie d = dostijenieRepository.save(new Dostijenie(name, place, m, k, t));
+        log.warn("Save New Dostijenie: {}", d);
+        return "redirect:/spec/list-meropriyatiya";
+    }
+
+    @GetMapping("/spec/dost/edit/{id}")
+    public String openEditDost(Model model, @PathVariable("id") Long id) {
+        Dostijenie d = dostijenieRepository.findById(id).orElseThrow(() -> new NotFoundException("Dostijenie with id = " + id + " not found on server!"));
+        model.addAttribute("meropriyaties", meropriyatieRepository.findAll());
+        model.addAttribute("kids", kidRepository.findAll());
+        model.addAttribute("teachers", teacherRepository.findAll());
+        model.addAttribute("dost", d);
+        return "spec/dost-edit";
+    }
+
+    @PostMapping("/spec/dost/edit/{id}/{name}/{place}/{meropriyatie}/{kid}/{teacher}")
+    public String saveDostAfterEditing(@PathVariable("id") Long id,
+                                       @PathVariable("name") String name,
+                                       @PathVariable("place") String place,
+                                       @PathVariable("kid") Long kid,
+                                       @PathVariable("meropriyatie") Long meropriyatie,
+                                       @PathVariable("teacher") Long teacher,
+                                       Model model) {
+        Meropriyatie m = meropriyatieRepository.findById(meropriyatie).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropriyatie + " not found on server!"));
+        Kid k = kidRepository.findById(kid).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
+        Teacher t = teacherRepository.findById(teacher).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
+        Dostijenie d = dostijenieRepository.findById(id).orElseThrow(() -> new NotFoundException("Dostijenie with id = " + id + " not found on server!"));
+        d.setName(name);
+        d.setWinPlace(place);
+        d.setKid(k);
+        d.setMeropriyatie(m);
+        d.setTeacher(t);
+        dostijenieRepository.save(d);
+        log.warn("Save edited Dostijenie: {}", d);
+        return "redirect:/spec/dost-list";
+    }
+
 }
 
