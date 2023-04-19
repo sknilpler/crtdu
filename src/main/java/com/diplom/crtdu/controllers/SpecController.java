@@ -497,6 +497,7 @@ public class SpecController {
         return "redirect:/spec/list-meropriyatiya";
     }
 
+    //---------------------- Достижения -------------------------
     @GetMapping("/spec/dost-list")
     public String openDostPage(Model model) {
         model.addAttribute("dost", dostijenieRepository.findAll());
