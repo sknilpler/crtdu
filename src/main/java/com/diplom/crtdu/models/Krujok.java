@@ -36,6 +36,9 @@ public class Krujok {
     @ManyToOne
     private TypeKrujok typeKrujok;
 
+    @ManyToOne
+    private CreativeAssociation creativeAssociation;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "krujok_id")
     private List<Zanyatie> zanyatiya;
@@ -44,6 +47,13 @@ public class Krujok {
         this.name = name;
         this.vozrast = vozrast;
         this.typeKrujok = type;
+    }
+
+    public Krujok(String name, String vozrast, TypeKrujok typeKrujok, CreativeAssociation creativeAssociation) {
+        this.name = name;
+        this.vozrast = vozrast;
+        this.typeKrujok = typeKrujok;
+        this.creativeAssociation = creativeAssociation;
     }
 
     @Override

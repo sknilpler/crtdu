@@ -58,6 +58,10 @@ public class SpecController {
     private LevelMeropriyatiyaRepository levelMeropriyatiyaRepository;
     @Autowired
     private DostijenieRepository dostijenieRepository;
+    @Autowired
+    private TypeKrujokRepository typeKrujokRepository;
+    @Autowired
+    private CreativeAssociationRepository caRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -563,6 +567,47 @@ public class SpecController {
         dostijenieRepository.save(d);
         log.warn("Save edited Dostijenie: {}", d);
         return "redirect:/spec/dost-list";
+    }
+    //-------------------- кружки ------------------------------
+
+    @GetMapping("/spec/kruj-type-list")
+    public String openKryjTypePage(Model model){
+        model.addAttribute("type", new TypeKrujok());
+        model.addAttribute("types",typeKrujokRepository.findAll());
+        return "spec/kruj-type-list";
+    }
+
+//    @PostMapping("/spec/kruj-type-list")
+//    public String saveKryjType(Model model,
+//                               @RequestParam String name){
+//        TypeKrujok t = typeKrujokRepository.save(new TypeKrujok(name));
+//        log.warn("Save new type kruj: {}", t);
+//        return "redirect:/spec/kruj-type-list";
+//    }
+
+    @GetMapping("/spec/kruj-type/edit/{id}")
+    public String editKrujType(Model model,
+                               @PathVariable("id") Long id){
+        TypeKrujok t = typeKrujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id + " not found on server!"));
+        model.addAttribute("type",t);
+        return "spec/kruj-type-list :: form-type";
+    }
+
+    @PostMapping("/spec/kruj-type-list/{id}/{name}")
+    public String saveEditedKryjType(Model model,
+                               @PathVariable("id") Long id,
+                               @PathVariable("name") String name){
+        TypeKrujok t = typeKrujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id + " not found on server!"));
+        t.setName(name);
+        typeKrujokRepository.save(t);
+        return "redirect:/spec/kruj-type-list";
+    }
+
+    @PostMapping("/spec/kruj-type/del/{id}")
+    public String delTypeKruj(@PathVariable("id") Long id){
+        typeKrujokRepository.deleteById(id);
+        log.warn("Deleted type kruj with id: {}", id);
+        return "redirect:/spec/kruj-type-list";
     }
 
 }
