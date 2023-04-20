@@ -15,19 +15,19 @@
             <h1 class="text-center mb-5">Виды кружков</h1>
             <div class="form-type alert alert-info mb-2">
                 <div th:fragment="form-type">
-                    <form method="post" th:object="${type}">
+                    <div th:object="${type}">
                         <input type="text" id="name" name="name" class="form-control" th:field="*{name}"
                                placeholder="Введите тип кружка" required/>
                         <div class="container mt-1 form-actions floatRight">
                             <button class="btn btn-success" th:onclick="'javascript:save(\'' + *{id} + '\');'"
                                     th:if="${type != null and type.name != null and type.name != ''}">Сохранить
                             </button>
-                            <button type="submit" th:unless="${type != null and type.name != null and type.name != ''}"
-                                    class="btn btn-success">Сохр
+                            <button th:unless="${type != null and type.name != null and type.name != ''}"
+                                    class="btn btn-success" th:onclick="'javascript:save2();'">Сохр
                             </button>
                         </div>
                         <br>
-                    </form>
+                    </div>
                 </div>
             </div>
 
@@ -93,7 +93,15 @@ function deleteObject() {
 
 function save(id){
     var name = document.getElementById("name").value;
-    post('/spec/kruj-type-list/'+id+'/'+name);
+    console.log(id);
+    console.log(name);
+    post('/spec/kruj-type-list/edit/'+id+'/'+name);
+}
+
+function save2(id){
+    var name = document.getElementById("name").value;
+    console.log(name);
+    post('/spec/kruj-type-list/save-new/' + name);
 }
 
 function edit(id){

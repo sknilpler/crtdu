@@ -569,7 +569,7 @@ public class SpecController {
         return "redirect:/spec/dost-list";
     }
     //-------------------- кружки ------------------------------
-
+    //-------------------- виды кружков ---------------------
     @GetMapping("/spec/kruj-type-list")
     public String openKryjTypePage(Model model){
         model.addAttribute("type", new TypeKrujok());
@@ -577,13 +577,13 @@ public class SpecController {
         return "spec/kruj-type-list";
     }
 
-//    @PostMapping("/spec/kruj-type-list")
-//    public String saveKryjType(Model model,
-//                               @RequestParam String name){
-//        TypeKrujok t = typeKrujokRepository.save(new TypeKrujok(name));
-//        log.warn("Save new type kruj: {}", t);
-//        return "redirect:/spec/kruj-type-list";
-//    }
+    @PostMapping("/spec/kruj-type-list/save-new/{name}")
+    public String saveKryjType(Model model,
+                               @PathVariable("name") String name){
+        TypeKrujok t = typeKrujokRepository.save(new TypeKrujok(name));
+        log.warn("Save new type kruj: {}", t);
+        return "redirect:/spec/kruj-type-list";
+    }
 
     @GetMapping("/spec/kruj-type/edit/{id}")
     public String editKrujType(Model model,
@@ -593,7 +593,7 @@ public class SpecController {
         return "spec/kruj-type-list :: form-type";
     }
 
-    @PostMapping("/spec/kruj-type-list/{id}/{name}")
+    @PostMapping("/spec/kruj-type-list/edit/{id}/{name}")
     public String saveEditedKryjType(Model model,
                                @PathVariable("id") Long id,
                                @PathVariable("name") String name){
@@ -609,6 +609,8 @@ public class SpecController {
         log.warn("Deleted type kruj with id: {}", id);
         return "redirect:/spec/kruj-type-list";
     }
+
+    //-------------------
 
 }
 
