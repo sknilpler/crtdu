@@ -44,7 +44,7 @@
                     <tbody>
                     <tr th:each="t : ${types}">
                         <td th:text="${t.name}"></td>
-                        <td>
+                        <td class="text-md-end">
                             <button class="btn btn-outline-warning" th:onclick="'javascript:edit(\'' + ${t.id} + '\');'"
                                     title="Редактировать">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em"

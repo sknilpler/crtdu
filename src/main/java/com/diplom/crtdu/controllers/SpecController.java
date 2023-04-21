@@ -372,14 +372,15 @@ public class SpecController {
     public String saveMeropriyatie(@RequestParam String name,
                                    @RequestParam String data,
                                    @RequestParam String place,
-                                   @RequestParam String type,
-                                   @RequestParam String level,
+                                   @RequestParam Long type,
+                                   @RequestParam Long level,
                                    @RequestParam String otvetstvenniy,
                                    Authentication authentication) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         Date d = dateFormat.parse(data);
-        //TypeMeropriyatiya t = typeMeropriyatiyaRepository.findById(type).orElseThrow(() -> new NotFoundException("TypeMeropriyatiya with id = " + type + " not found on server!"));
-        Meropriyatie m = new Meropriyatie(name, d, type, place, level, otvetstvenniy);
+        TypeMeropriyatiya t = typeMeropriyatiyaRepository.findById(type).orElseThrow(() -> new NotFoundException("Type Meropriyatiya with id = " + type + " not found on server!"));
+        LevelMeropriyatiya l = levelMeropriyatiyaRepository.findById(level).orElseThrow(() -> new NotFoundException("Level Meropriyatiya with id = " + level + " not found on server!"));
+        Meropriyatie m = new Meropriyatie(name, d, t, place, l, otvetstvenniy);
         log.warn("Add meropriyatie: {}", m);
         meropriyatieRepository.save(m);
         return "redirect:/spec/list-meropriyatiya";
@@ -423,19 +424,21 @@ public class SpecController {
                                          @PathVariable("name") String name,
                                          @PathVariable("data") String data,
                                          @PathVariable("place") String place,
-                                         @PathVariable("type") String type,
-                                         @PathVariable("level") String level,
+                                         @PathVariable("type") Long type_id,
+                                         @PathVariable("level") Long level_id,
                                          @PathVariable("otvetstvenniy") String otvetstvenniy,
                                          Authentication authentication) throws ParseException {
         Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
+        TypeMeropriyatiya t = typeMeropriyatiyaRepository.findById(type_id).orElseThrow(() -> new NotFoundException("Type Meropriyatiya with id = " + type_id + " not found on server!"));
+        LevelMeropriyatiya l = levelMeropriyatiyaRepository.findById(level_id).orElseThrow(() -> new NotFoundException("Level Meropriyatiya with id = " + level_id + " not found on server!"));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         Date d = dateFormat.parse(data);
         //TypeMeropriyatiya t = typeMeropriyatiyaRepository.findById(type).orElseThrow(() -> new NotFoundException("TypeMeropriyatiya with id = " + type + " not found on server!"));
         m.setName(name);
         m.setData(d);
         m.setPlace(place);
-        m.setType(type);
-        m.setLevel(level);
+        m.setType(t);
+        m.setLevel(l);
         m.setOtvetstvenniy(otvetstvenniy);
         meropriyatieRepository.save(m);
         log.warn("Edit Meropriyatie: {}", m);
@@ -610,7 +613,20 @@ public class SpecController {
         return "redirect:/spec/kruj-type-list";
     }
 
-    //-------------------
+    //------------------- твороческие объединения ----------
 
+    @GetMapping("/spec/kruj-ca")
+    public String openCAPage(Model model){
+        model.addAttribute("ca", caRepository.findAllByOrderByName());
+
+        return "spec/creative-association";
+    }
+
+    @GetMapping("/spec/ca-add-new/{name}")
+    public String addNewCA(Model model, @PathVariable("name") String name){
+        caRepository.save(new CreativeAssociation(name));
+        model.addAttribute("ca", caRepository.findAllByOrderByName());
+        return "spec/creative-association :: ca-table";
+    }
 }
 

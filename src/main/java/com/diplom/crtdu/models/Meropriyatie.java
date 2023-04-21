@@ -22,10 +22,15 @@ public class Meropriyatie {
 
     private String name;
     private Date data;
-    private String type;
+    //private String type;
     private String place;
 
-    private String level;
+    //private String level;
+    @ManyToOne
+    private LevelMeropriyatiya level;
+
+    @ManyToOne
+    private TypeMeropriyatiya type;
 
     private String otvetstvenniy;
 
@@ -34,7 +39,7 @@ public class Meropriyatie {
     private List<Dostijenie> dostList;
 
 
-    public Meropriyatie(String name, Date data, String type, String place, String level, String otvetstvenniy) {
+    public Meropriyatie(String name, Date data, TypeMeropriyatiya type, String place, LevelMeropriyatiya level, String otvetstvenniy) {
         this.name = name;
         this.data = data;
         this.type = type;
@@ -49,9 +54,9 @@ public class Meropriyatie {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", data=" + data +
-                ", type='" + type + '\'' +
+                ", type='" + type.getName() + '\'' +
                 ", place='" + place + '\'' +
-                ", level='" + level + '\'' +
+                ", level='" + level.getName() + '\'' +
                 ", otvetstvenniy='" + otvetstvenniy + '\'' +
                 '}';
     }

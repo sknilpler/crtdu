@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,6 +18,10 @@ public class TypeMeropriyatiya {
     private Long id;
 
     private String name;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "type_id")
+    private List<Meropriyatie> meropriyaties;
 
     public TypeMeropriyatiya(String name) {
         this.name = name;
