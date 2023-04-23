@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface KrujokRepository extends CrudRepository<Krujok,Long> {
     List<Krujok> findByTeachersId(Long id);
+
+    List<Krujok> findByCreativeAssociationId(Long id);
 }

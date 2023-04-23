@@ -37,6 +37,7 @@ public class SpecController {
     private Long meropEditId;
     private Meropriyatie editedMerop;
     private Long meropIDForDost;
+    private Long krujok_id;
 
     @Autowired
     private KidRepository kidRepository;
@@ -571,18 +572,19 @@ public class SpecController {
         log.warn("Save edited Dostijenie: {}", d);
         return "redirect:/spec/dost-list";
     }
+
     //-------------------- кружки ------------------------------
     //-------------------- виды кружков ---------------------
     @GetMapping("/spec/kruj-type-list")
-    public String openKryjTypePage(Model model){
+    public String openKryjTypePage(Model model) {
         model.addAttribute("type", new TypeKrujok());
-        model.addAttribute("types",typeKrujokRepository.findAll());
+        model.addAttribute("types", typeKrujokRepository.findAll());
         return "spec/kruj-type-list";
     }
 
     @PostMapping("/spec/kruj-type-list/save-new/{name}")
     public String saveKryjType(Model model,
-                               @PathVariable("name") String name){
+                               @PathVariable("name") String name) {
         TypeKrujok t = typeKrujokRepository.save(new TypeKrujok(name));
         log.warn("Save new type kruj: {}", t);
         return "redirect:/spec/kruj-type-list";
@@ -590,16 +592,16 @@ public class SpecController {
 
     @GetMapping("/spec/kruj-type/edit/{id}")
     public String editKrujType(Model model,
-                               @PathVariable("id") Long id){
+                               @PathVariable("id") Long id) {
         TypeKrujok t = typeKrujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id + " not found on server!"));
-        model.addAttribute("type",t);
+        model.addAttribute("type", t);
         return "spec/kruj-type-list :: form-type";
     }
 
     @PostMapping("/spec/kruj-type-list/edit/{id}/{name}")
     public String saveEditedKryjType(Model model,
-                               @PathVariable("id") Long id,
-                               @PathVariable("name") String name){
+                                     @PathVariable("id") Long id,
+                                     @PathVariable("name") String name) {
         TypeKrujok t = typeKrujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id + " not found on server!"));
         t.setName(name);
         typeKrujokRepository.save(t);
@@ -607,7 +609,7 @@ public class SpecController {
     }
 
     @PostMapping("/spec/kruj-type/del/{id}")
-    public String delTypeKruj(@PathVariable("id") Long id){
+    public String delTypeKruj(@PathVariable("id") Long id) {
         typeKrujokRepository.deleteById(id);
         log.warn("Deleted type kruj with id: {}", id);
         return "redirect:/spec/kruj-type-list";
@@ -616,17 +618,69 @@ public class SpecController {
     //------------------- твороческие объединения ----------
 
     @GetMapping("/spec/kruj-ca")
-    public String openCAPage(Model model){
-        model.addAttribute("ca", caRepository.findAllByOrderByName());
-
+    public String openCAPage(Model model) {
+        model.addAttribute("cas", caRepository.findAllByOrderByName());
+        model.addAttribute("ca", new CreativeAssociation());
+        model.addAttribute("types", typeKrujokRepository.findAll());
         return "spec/creative-association";
     }
 
     @GetMapping("/spec/ca-add-new/{name}")
-    public String addNewCA(Model model, @PathVariable("name") String name){
+    public String addNewCA(Model model, @PathVariable("name") String name) {
         caRepository.save(new CreativeAssociation(name));
-        model.addAttribute("ca", caRepository.findAllByOrderByName());
+        model.addAttribute("cas", caRepository.findAllByOrderByName());
         return "spec/creative-association :: ca-table";
     }
+
+    @PostMapping("/spec/ca-delete/{id}")
+    public String delCA(@PathVariable("id") Long id) {
+        caRepository.deleteById(id);
+        return "redirect:/spec/kruj-ca";
+    }
+
+
+    @GetMapping("/spec/ca-edit/{id}")
+    public String editCA(Model model, @PathVariable("id") Long id) {
+        CreativeAssociation ca = caRepository.findById(id).orElseThrow(() -> new NotFoundException("Creative Association with id = " + id + " not found on server!"));
+        model.addAttribute("ca", ca);
+        return "spec/creative-association :: ca-edit";
+    }
+
+    @GetMapping("/spec/ca-save-edit/{id}/{name}")
+    public String saveEditCA(Model model, @PathVariable("id") Long id, @PathVariable("name") String name) {
+        CreativeAssociation ca = caRepository.findById(id).orElseThrow(() -> new NotFoundException("Creative Association with id = " + id + " not found on server!"));
+        ca.setName(name);
+        caRepository.save(ca);
+        model.addAttribute("cas", caRepository.findAllByOrderByName());
+        return "spec/creative-association :: ca-table";
+    }
+
+    @GetMapping("/spec/kruj-load-for/{id}")
+    public String loadKruj(Model model, @PathVariable("id") Long id) {
+        krujok_id = id;
+        model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(id));
+        return "spec/creative-association :: kruj-table";
+    }
+
+    @GetMapping("/spec/kruj-add-new/{name}/{id}/{vozrast}/{type}")
+    public String saveKruj(Model model,
+                           @PathVariable("id") Long id,
+                           @PathVariable("name") String name,
+                           @PathVariable("vozrast") String vozrast,
+                           @PathVariable("type") Long type) {
+        //Krujok k = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
+        CreativeAssociation ca = caRepository.findById(id).orElseThrow(() -> new NotFoundException("Creative Association with id = " + id + " not found on server!"));
+        TypeKrujok tk = typeKrujokRepository.findById(type).orElseThrow(() -> new NotFoundException("Type kryjok with id = " + type + " not found on server!"));
+        Krujok k = new Krujok();
+        k.setName(name);
+        k.setVozrast(vozrast);
+        k.setTypeKrujok(tk);
+        k.setCreativeAssociation(ca);
+        krujokRepository.save(k);
+        model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(krujok_id));
+        return "spec/creative-association :: kruj-table";
+    }
+    //---------------
+
 }
 

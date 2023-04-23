@@ -81,8 +81,8 @@
                 <td th:text="${m.name}"></td>
                 <td th:text="${#dates.format(m.data, 'dd.MM.yyyy HH:mm')}"></td>
                 <td th:text="${m.place}"></td>
-                <td th:text="${m.type.name}"></td>
-                <td th:text="${m.level.name}"></td>
+                <td th:text="${m.type?.name}"></td>
+                <td th:text="${m.level?.name}"></td>
                 <td th:text="${m.otvetstvenniy}"></td>
                 <td class="text-md-end">
                     <button class="btn btn-outline-info" th:onclick="'javascript:openDost(\'' + ${m.id} + '\');'"
