@@ -622,6 +622,7 @@ public class SpecController {
         model.addAttribute("cas", caRepository.findAllByOrderByName());
         model.addAttribute("ca", new CreativeAssociation());
         model.addAttribute("types", typeKrujokRepository.findAll());
+        model.addAttribute("teachers",teacherRepository.findAll());
         return "spec/creative-association";
     }
 

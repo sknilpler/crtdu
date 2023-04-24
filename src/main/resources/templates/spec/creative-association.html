@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Творческие объединения</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        tr.selected {
+            background-color: MediumAquamarine;
+        }
+    </style>
 </head>
 <body>
 <header th:insert="blocks/header2 :: header2"></header>
@@ -88,6 +93,35 @@
                         <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.name}"></option>
                     </select>
                 </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="assignTeachersCheckbox">
+                        <label class="form-check-label" for="assignTeachersCheckbox">
+                            Назначить преподавателей
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-3" id="teachersTableContainer" style="display: none; max-height: 200px; overflow-y: scroll;">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="teachersSearch" placeholder="Поиск по ФИО">
+                    </div>
+                    <table class="table table-hover" id="teachersTable">
+                        <tbody>
+                        <tr th:each="t : ${teachers}">
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input teacher-checkbox" type="checkbox" value="" id="teacherCheckbox_"
+                                           th:id="${t.id}">
+                                    <label class="form-check-label" for="teacherCheckbox_">
+                                        <span th:text="${t.getShortFIO}"></span>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" data-bs-dismiss="modal"
@@ -103,8 +137,8 @@
     <!--    <h1 class="text-center mb-4">Творческие объединения</h1>-->
 
     <div class="row justify-content-center">
-        <div class="col-md-6 ">
-            <div class="alert alert-info" style="box-shadow: 0px 0px 4px;">
+        <div class="col-md-4 ">
+            <div class="alert" style="box-shadow: 0px 0px 4px;">
                 <h3 class="text-center mb-5">Творческие объединения</h3>
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -121,9 +155,10 @@
                         </button>
                     </div>
                 </div>
+                <hr>
                 <div class="ca-table"
                      th:fragment="ca-table">
-                    <table class="table table-striped">
+                    <table class="table table-striped table-hover" id="tb">
                         <thead>
                         <tr>
                             <th>Название</th>
@@ -131,9 +166,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="c : ${cas}">
-                            <td th:text="${c.name}" th:onclick="'javascript:rowClicked(\'' + ${c.id} + '\');'"></td>></td>
-                            <td class="text-md-end" th:onclick="'javascript:rowClicked(\'' + ${c.id} + '\');'"></td>>
+                        <tr th:each="c : ${cas}" th:id="${c.id}">
+                            <td th:text="${c.name}" th:onclick="'javascript:rowClicked(\'' + ${c.id} + '\');'"></td>
+                            <td class="text-md-end" th:onclick="'javascript:rowClicked(\'' + ${c.id} + '\');'"></td>
+                            <td class="text-md-end">
                                 <button class="btn btn-outline-warning"
                                         th:onclick="'javascript:openEditCA(\'' + ${c.id} + '\');'"
                                         title="Редактировать">
@@ -162,13 +198,13 @@
             </div>
         </div>
 
-        <div class="col-md-6 ">
-            <div class="alert alert-info" style="box-shadow: 0px 0px 4px;">
+        <div class="col-md-8 ">
+            <div class="alert" style="box-shadow: 0px 0px 4px;">
                 <h3 class="text-center mb-5">Кружки</h3>
                 <div class="row mb-3">
                     <div class="col-md-12 text-md-end">
                         <button class="btn btn-outline-success" id="add-btn-kruj" th:onclick="'javascript:addKruj();'"
-                                title="Добавить кружок">
+                                title="Добавить кружок" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -32 576 576" width="1em" height="1em"
                                  fill="currentColor" style="width: 25px;height: 25px;">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
@@ -177,9 +213,10 @@
                         </button>
                     </div>
                 </div>
+                <hr>
                 <div class="kruj-table"
                      th:fragment="kruj-table">
-                    <table class="table table-striped">
+                    <table class="table table-striped table-hover">
                         <thead>
                         <tr>
                             <th>Название</th>
@@ -193,7 +230,7 @@
                         <tr th:each="k : ${krujki}">
                             <td th:text="${k.name}"></td>
                             <td th:text="${k.vozrast}"></td>
-                            <td th:text="${k.typeKrujok}"></td>
+                            <td th:text="${k.typeKrujok.name}"></td>
                             <td>
                                 <div th:each="t: ${k.teachers}">
                                     <p th:text="${t.getShortFIO}"></p>
@@ -308,6 +345,13 @@ function saveEditedCA(id) {
 var id_ca;
 function rowClicked(id) {
 	id_ca = id;
+	document.getElementById("add-btn-kruj").disabled = false;
+	var rows = document.getElementsByTagName("tr");
+    for (var i = 0; i < rows.length; i++) {
+        rows[i].classList.remove("selected");
+    }
+    var row = document.getElementById(id);
+    row.classList.add("selected");
 	updateKrujForCA(id);
 };
 
@@ -329,6 +373,8 @@ function saveKruj() {
 	var nameK = document.getElementById("nameK").value;
     var vozrast = document.getElementById("vozrast").value;
     var typeK = document.getElementById("typeK").value;
+    console.log("teachers:");
+    console.log(getSelectedTeachers());
 	$.ajax({
 		type: 'get',
 		url: '/spec/kruj-add-new/' + nameK + '/' + id_ca+'/'+vozrast+'/'+typeK,
@@ -338,8 +384,49 @@ function saveKruj() {
 		},
 	})
 }
+//----- -----------------
+    const assignTeachersCheckbox = document.getElementById("assignTeachersCheckbox");
+    const teachersTableContainer = document.getElementById("teachersTableContainer");
+    const teacherCheckboxes = document.querySelectorAll(".teacher-checkbox");
 
+    assignTeachersCheckbox.addEventListener("change", function() {
+        if (this.checked) {
+            teachersTableContainer.style.display = "block";
+        } else {
+            teachersTableContainer.style.display = "none";
+            teacherCheckboxes.forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
+        }
+    });
 
+    const teachersSearch = document.getElementById("teachersSearch");
+    teachersSearch.addEventListener("keyup", function() {
+        const filter = this.value.toUpperCase();
+        const tableRows = teachersTableContainer.querySelectorAll("tr");
+        tableRows.forEach(function(row) {
+            const nameCell = row.querySelector("td span");
+            if (nameCell.textContent.toUpperCase().indexOf(filter) > -1) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+
+function getSelectedTeachers() {
+  const selectedTeachers = [];
+  const table = document.getElementById('teachersTable');
+  const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+  for (let i = 0; i < checkboxes.length; i++) {
+    const checkbox = checkboxes[i];
+    if (checkbox.checked) {
+      selectedTeachers.push(checkbox.dataset.id);
+    }
+  }
+  return selectedTeachers;
+}
+//------------------------------------------------
 
 </script>
 </body>
