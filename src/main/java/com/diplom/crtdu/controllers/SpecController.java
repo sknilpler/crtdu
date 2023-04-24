@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -622,7 +623,9 @@ public class SpecController {
         model.addAttribute("cas", caRepository.findAllByOrderByName());
         model.addAttribute("ca", new CreativeAssociation());
         model.addAttribute("types", typeKrujokRepository.findAll());
-        model.addAttribute("teachers",teacherRepository.findAll());
+        model.addAttribute("typesE", typeKrujokRepository.findAll());
+        model.addAttribute("teachers", teacherRepository.findAll());
+        model.addAttribute("krujok", new Krujok());
         return "spec/creative-association";
     }
 
@@ -678,7 +681,94 @@ public class SpecController {
         k.setTypeKrujok(tk);
         k.setCreativeAssociation(ca);
         krujokRepository.save(k);
-        model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(krujok_id));
+        model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(id));
+        return "spec/creative-association :: kruj-table";
+    }
+
+    @GetMapping("/spec/kruj-add-new/{name}/{id}/{vozrast}/{type}/list-ids/{list}")
+    public String saveKrujWithTeachers(Model model,
+                                       @PathVariable("id") Long id,
+                                       @PathVariable("name") String name,
+                                       @PathVariable("vozrast") String vozrast,
+                                       @PathVariable("type") Long type,
+                                       @PathVariable("list") List<String> ids) {
+        List<Teacher> teachers = ids.stream()
+                .map(Long::valueOf)
+                .map(teacherRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        CreativeAssociation ca = caRepository.findById(id).orElseThrow(() -> new NotFoundException("Creative Association with id = " + id + " not found on server!"));
+        TypeKrujok tk = typeKrujokRepository.findById(type).orElseThrow(() -> new NotFoundException("Type kryjok with id = " + type + " not found on server!"));
+        Krujok k = new Krujok();
+        k.setName(name);
+        k.setVozrast(vozrast);
+        k.setTypeKrujok(tk);
+        k.setCreativeAssociation(ca);
+        k.setTeachers(teachers);
+        krujokRepository.save(k);
+        model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(id));
+        return "spec/creative-association :: kruj-table";
+    }
+
+
+    @GetMapping("/spec/kruj-edit/{id}")
+    public String editKruj(Model model, @PathVariable("id") Long id) {
+        Krujok k = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
+        model.addAttribute("krujok", k);
+        model.addAttribute("teachers_e", teacherRepository.findAll());
+        model.addAttribute("typesE", typeKrujokRepository.findAll());
+        return "spec/creative-association :: edit-kruj";
+    }
+
+
+    @GetMapping("/spec/kruj-edit/{id}/{name}/{vozrast}/{type}")
+    public String saveEditedKruj(Model model,
+                                 @PathVariable("id") Long id,
+                                 @PathVariable("name") String name,
+                                 @PathVariable("vozrast") String vozrast,
+                                 @PathVariable("type") Long type) {
+        Krujok k = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
+        TypeKrujok tk = typeKrujokRepository.findById(type).orElseThrow(() -> new NotFoundException("Type kryjok with id = " + type + " not found on server!"));
+        k.setName(name);
+        k.setVozrast(vozrast);
+        k.setTypeKrujok(tk);
+        krujokRepository.save(k);
+        model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(k.getCreativeAssociation().getId()));
+        return "spec/creative-association :: kruj-table";
+    }
+
+
+    @GetMapping("/spec/kruj-edit/{id}/{name}/{vozrast}/{type}/list-ids/{list}")
+    public String saveEditedKrujWithTeachers(Model model,
+                                             @PathVariable("id") Long id,
+                                             @PathVariable("name") String name,
+                                             @PathVariable("vozrast") String vozrast,
+                                             @PathVariable("type") Long type,
+                                             @PathVariable("list") List<String> ids) {
+        Krujok k = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
+        TypeKrujok tk = typeKrujokRepository.findById(type).orElseThrow(() -> new NotFoundException("Type kryjok with id = " + type + " not found on server!"));
+        List<Teacher> teachers = ids.stream()
+                .map(Long::valueOf)
+                .map(teacherRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        k.setName(name);
+        k.setVozrast(vozrast);
+        k.setTypeKrujok(tk);
+        k.setTeachers(teachers);
+        krujokRepository.save(k);
+        model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(k.getCreativeAssociation().getId()));
+        return "spec/creative-association :: kruj-table";
+    }
+
+    @GetMapping("/spec/del-kruj/{id}")
+    public String delKruj(Model model, @PathVariable("id") Long id) {
+        Krujok k = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
+        Long id_ca = k.getCreativeAssociation().getId();
+        krujokRepository.deleteById(id);
+        model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(id_ca));
         return "spec/creative-association :: kruj-table";
     }
     //---------------

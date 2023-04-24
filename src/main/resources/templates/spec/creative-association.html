@@ -7,8 +7,13 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <style>
         tr.selected {
-            background-color: MediumAquamarine;
+            background-color: green;
         }
+
+        .highlight{
+            background-color:LightBlue;
+        }
+
     </style>
 </head>
 <body>
@@ -89,7 +94,7 @@
                 <div class="mb-3">
                     <label for="typeK" class="form-label">Тип</label>
                     <select class="form-control" id="typeK" name="typeK" required>
-                        <option value disabled="0">-- Выберите --</option>
+                        <option value="0" disabled>-- Выберите --</option>
                         <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.name}"></option>
                     </select>
                 </div>
@@ -102,16 +107,18 @@
                     </div>
                 </div>
 
-                <div class="mb-3" id="teachersTableContainer" style="display: none; max-height: 200px; overflow-y: scroll;">
+                <div class="mb-3" id="teachersTableContainer"
+                     style="display: none; max-height: 200px; overflow-y: scroll;">
                     <div class="mb-3">
                         <input type="text" class="form-control" id="teachersSearch" placeholder="Поиск по ФИО">
                     </div>
-                    <table class="table table-hover" id="teachersTable">
+                    <table class="table table-sm table-hover" id="teachersTable">
                         <tbody>
                         <tr th:each="t : ${teachers}">
                             <td>
                                 <div class="form-check">
-                                    <input class="form-check-input teacher-checkbox" type="checkbox" value="" id="teacherCheckbox_"
+                                    <input class="form-check-input teacher-checkbox" type="checkbox" value=""
+                                           id="teacherCheckbox_"
                                            th:id="${t.id}">
                                     <label class="form-check-label" for="teacherCheckbox_">
                                         <span th:text="${t.getShortFIO}"></span>
@@ -132,6 +139,76 @@
         </div>
     </div>
 </div>
+
+<!-- Modal window for edit kruj -->
+<div class="edit-kruj"
+     th:fragment="edit-kruj">
+    <div class="modal fade" id="edit-kruj-modal">
+        <div class="modal-dialog">
+            <div class="modal-content" th:object="${krujok}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактирование кружка</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nameKr" class="form-label">Наименование</label>
+                        <input type="text" class="form-control" th:field="*{name}" id="nameKr" name="nameKr">
+                    </div>
+                    <div class="mb-3">
+                        <label for="vozrastKr" class="form-label">Возрастная группа</label>
+                        <input type="text" class="form-control" th:field="*{vozrast}" id="vozrastKr" name="vozrastKr">
+                    </div>
+                    <div class="mb-3">
+                        <label for="typeKr" class="form-label">Тип</label>
+                        <select class="form-control" id="typeKr" name="typeKr" th:field="*{typeKrujok.id}"  required>
+                            <option value="0" disabled>-- Выберите --</option>
+                            <option th:each="te : ${typesE}" th:value="${te.id}" th:text="${te.name}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="teachersCheckbox" onchange="showTeachers(this)">
+                            <label class="form-check-label" for="teachersCheckbox">
+                                Преподаватели
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="teachersTableContainerE"
+                         style="display: none; max-height: 200px; overflow-y: scroll;">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="teachersSearchE" onkeyup="searchTeachers(this)" placeholder="Поиск по ФИО">
+                        </div>
+                        <table class="table table-sm table-hover" id="teachersTableE">
+                            <tbody>
+                            <tr th:each="t : ${teachers_e}">
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input teacher-checkbox-e" type="checkbox" value=""
+                                               id="teacherCheckbox_E"
+                                               th:id="${t.id}" th:checked="${krujok.teachers.contains(t)}">
+                                        <label class="form-check-label" for="teacherCheckbox_">
+                                            <span th:text="${t.getShortFIO}"></span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                            th:onclick="'javascript:saveKruj(\'' + *{id} + '\');'">Сохранить
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="container main-content">
     <!--    <h1 class="text-center mb-4">Творческие объединения</h1>-->
@@ -168,7 +245,6 @@
                         <tbody>
                         <tr th:each="c : ${cas}" th:id="${c.id}">
                             <td th:text="${c.name}" th:onclick="'javascript:rowClicked(\'' + ${c.id} + '\');'"></td>
-                            <td class="text-md-end" th:onclick="'javascript:rowClicked(\'' + ${c.id} + '\');'"></td>
                             <td class="text-md-end">
                                 <button class="btn btn-outline-warning"
                                         th:onclick="'javascript:openEditCA(\'' + ${c.id} + '\');'"
@@ -271,9 +347,8 @@
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script>
-
-function addCA(){
-    $('#new-ca-modal').modal('show');
+function addCA() {
+	$('#new-ca-modal').modal('show');
 }
 
 function saveCA() {
@@ -302,7 +377,18 @@ function closeModalWindow() {
 }
 
 function deleteObject() {
-	post('/spec/ca-delete/' + id_del);
+    if (del_kruj){
+	$.ajax({
+			type: 'get',
+			url: '/spec/del-kruj/' + id_del_kruj,
+			success: function(data) {
+				$('.kruj-table').html(data);
+				$("#deleteAccept").modal('hide');
+				del_kruj = false;
+			},
+		})
+} else {
+	post('/spec/ca-delete/' + id_del);}
 }
 
 function post(path, method = 'post') {
@@ -316,25 +402,25 @@ function post(path, method = 'post') {
 	form.submit();
 }
 
-function openEditCA(id){
-$.ajax({
+function openEditCA(id) {
+	$.ajax({
 		type: 'get',
 		url: '/spec/ca-edit/' + id,
 		success: function(data) {
 			$('.ca-edit').html(data);
 			console.log(data);
-			 $('#edit-ca-modal').modal('show');
+			$('#edit-ca-modal').modal('show');
 		},
 	})
 }
 
 function saveEditedCA(id) {
 	var nameCA = document.getElementById("nameCA").value;
-    console.log(id);
-    console.log(nameCA);
+	console.log(id);
+	console.log(nameCA);
 	$.ajax({
 		type: 'get',
-		url: '/spec/ca-save-edit/' + id +'/' + nameCA,
+		url: '/spec/ca-save-edit/' + id + '/' + nameCA,
 		success: function(data) {
 			$('.ca-table').html(data);
 			$('#edit-ca-modal').modal('hide');
@@ -343,20 +429,25 @@ function saveEditedCA(id) {
 }
 //-----------------------------------------------------
 var id_ca;
+
 function rowClicked(id) {
 	id_ca = id;
 	document.getElementById("add-btn-kruj").disabled = false;
 	var rows = document.getElementsByTagName("tr");
-    for (var i = 0; i < rows.length; i++) {
-        rows[i].classList.remove("selected");
-    }
-    var row = document.getElementById(id);
-    row.classList.add("selected");
+	for (var i = 0; i < rows.length; i++) {
+		rows[i].classList.remove("selected");
+	}
+	var row = document.getElementById(id);
+	row.classList.add("selected");
 	updateKrujForCA(id);
 };
 
-function updateKrujForCA(id){
-    $.ajax({
+$('#tb').on('click', 'tbody tr', function(event) {
+	$(this).addClass('highlight').siblings().removeClass('highlight');
+});
+
+function updateKrujForCA(id) {
+	$.ajax({
 		type: 'get',
 		url: '/spec/kruj-load-for/' + id,
 		success: function(data) {
@@ -365,68 +456,184 @@ function updateKrujForCA(id){
 	})
 }
 
-function addKruj(){
-    $('#new-kruj-modal').modal('show');
+function addKruj() {
+	$('#new-kruj-modal').modal('show');
+	clearModal();
 }
 
 function saveKruj() {
 	var nameK = document.getElementById("nameK").value;
-    var vozrast = document.getElementById("vozrast").value;
-    var typeK = document.getElementById("typeK").value;
-    console.log("teachers:");
-    console.log(getSelectedTeachers());
-	$.ajax({
-		type: 'get',
-		url: '/spec/kruj-add-new/' + nameK + '/' + id_ca+'/'+vozrast+'/'+typeK,
-		success: function(data) {
-			$('.kruj-table').html(data);
-			$('#new-kruj-modal').modal('hide');
-		},
-	})
+	var vozrast = document.getElementById("vozrast").value;
+	var typeK = document.getElementById("typeK").value;
+	if (assignTeachersCheckbox.checked === true) {
+		$.ajax({
+			type: 'get',
+			url: '/spec/kruj-add-new/' + nameK + '/' + id_ca + '/' + vozrast + '/' + typeK + '/list-ids/' + getSelectedTeachers(),
+			success: function(data) {
+				$('.kruj-table').html(data);
+				$('#new-kruj-modal').modal('hide');
+			},
+		})
+	} else {
+		$.ajax({
+			type: 'get',
+			url: '/spec/kruj-add-new/' + nameK + '/' + id_ca + '/' + vozrast + '/' + typeK,
+			success: function(data) {
+				$('.kruj-table').html(data);
+				$('#new-kruj-modal').modal('hide');
+			},
+		})
+	}
 }
 //----- -----------------
-    const assignTeachersCheckbox = document.getElementById("assignTeachersCheckbox");
-    const teachersTableContainer = document.getElementById("teachersTableContainer");
-    const teacherCheckboxes = document.querySelectorAll(".teacher-checkbox");
+const assignTeachersCheckbox = document.getElementById("assignTeachersCheckbox");
+const teachersTableContainer = document.getElementById("teachersTableContainer");
+const teacherCheckboxes = document.querySelectorAll(".teacher-checkbox");
 
-    assignTeachersCheckbox.addEventListener("change", function() {
-        if (this.checked) {
-            teachersTableContainer.style.display = "block";
-        } else {
-            teachersTableContainer.style.display = "none";
-            teacherCheckboxes.forEach(function(checkbox) {
-                checkbox.checked = false;
-            });
-        }
-    });
+assignTeachersCheckbox.addEventListener("change", function() {
+	if (this.checked) {
+		teachersTableContainer.style.display = "block";
+	} else {
+		teachersTableContainer.style.display = "none";
+		teacherCheckboxes.forEach(function(checkbox) {
+			checkbox.checked = false;
+		});
+	}
+});
 
-    const teachersSearch = document.getElementById("teachersSearch");
-    teachersSearch.addEventListener("keyup", function() {
-        const filter = this.value.toUpperCase();
-        const tableRows = teachersTableContainer.querySelectorAll("tr");
-        tableRows.forEach(function(row) {
-            const nameCell = row.querySelector("td span");
-            if (nameCell.textContent.toUpperCase().indexOf(filter) > -1) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
-    });
+const teachersSearch = document.getElementById("teachersSearch");
+teachersSearch.addEventListener("keyup", function() {
+	const filter = this.value.toUpperCase();
+	const tableRows = teachersTableContainer.querySelectorAll("tr");
+	tableRows.forEach(function(row) {
+		const nameCell = row.querySelector("td span");
+		if (nameCell.textContent.toUpperCase().indexOf(filter) > -1) {
+			row.style.display = "";
+		} else {
+			row.style.display = "none";
+		}
+	});
+});
 
 function getSelectedTeachers() {
-  const selectedTeachers = [];
-  const table = document.getElementById('teachersTable');
-  const checkboxes = table.querySelectorAll('input[type="checkbox"]');
-  for (let i = 0; i < checkboxes.length; i++) {
-    const checkbox = checkboxes[i];
-    if (checkbox.checked) {
-      selectedTeachers.push(checkbox.dataset.id);
-    }
-  }
-  return selectedTeachers;
+	const selectedTeachers = [];
+	const table = document.getElementById('teachersTable');
+	const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+	for (let i = 0; i < checkboxes.length; i++) {
+		const checkbox = checkboxes[i];
+		if (checkbox.checked) {
+			console.log();
+			selectedTeachers.push(checkbox.id);
+		}
+	}
+	return selectedTeachers;
 }
 //------------------------------------------------
+function clearModal() {
+	// Находим все текстовые поля в модальном окне и очищаем их
+	const textInputs = document.querySelectorAll('#nameK, #vozrast');
+	textInputs.forEach((input) => {
+		input.value = '';
+	});
+
+	// Сбрасываем выбранные преподавателей
+	const teacherCheckboxes = document.querySelectorAll('.teacher-checkbox');
+	teacherCheckboxes.forEach((checkbox) => {
+		checkbox.checked = false;
+	});
+	const assignTeachersCheckbox = document.getElementById("assignTeachersCheckbox");
+	assignTeachersCheckbox.checked = false;
+	// Если таблица преподавателей открыта, то скрываем ее и сбрасываем поиск
+	const teachersTableContainer = document.querySelector('#teachersTableContainer');
+	if (teachersTableContainer.style.display !== 'none') {
+		const teachersSearchInput = document.querySelector('#teachersSearch');
+		teachersSearchInput.value = '';
+		teachersTableContainer.style.display = 'none';
+	}
+}
+//------------------------------------------------------
+function openEditKruj(id) {
+	$.ajax({
+			type: 'get',
+			url: '/spec/kruj-edit/' + id,
+			success: function(data) {
+				$('.edit-kruj').html(data);
+				$('#edit-kruj-modal').modal('show');
+			},
+		})
+}
+
+function showTeachers(val){
+    if (val.checked) {
+	console.log("select");
+		document.getElementById("teachersTableContainerE").style.display = "block";
+	} else {
+		document.getElementById("teachersTableContainerE").style.display = "none";
+	}
+}
+
+function searchTeachers(val){
+  const filter = val.value.toUpperCase();
+	const tableRows = document.getElementById("teachersTableContainerE").querySelectorAll("tr");
+	tableRows.forEach(function(row) {
+		const nameCell = row.querySelector("td span");
+		if (nameCell.textContent.toUpperCase().indexOf(filter) > -1) {
+			row.style.display = "";
+		} else {
+			row.style.display = "none";
+		}
+	});
+}
+
+function getSelectedTeachersE() {
+	const selectedTeachers = [];
+	const table = document.getElementById('teachersTableE');
+	const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+	for (let i = 0; i < checkboxes.length; i++) {
+		const checkbox = checkboxes[i];
+		if (checkbox.checked) {
+			console.log();
+			selectedTeachers.push(checkbox.id);
+		}
+	}
+	return selectedTeachers;
+}
+
+function saveKruj(id) {
+	var nameKr = document.getElementById("nameKr").value;
+	var vozrastKr = document.getElementById("vozrastKr").value;
+	var typeKr = document.getElementById("typeKr").value;
+	if (document.getElementById("teachersCheckbox").checked === true) {
+		$.ajax({
+			type: 'get',
+			url: '/spec/kruj-edit/' + id + '/' + nameKr + '/' + vozrastKr + '/' + typeKr + '/list-ids/' + getSelectedTeachersE(),
+			success: function(data) {
+				$('.kruj-table').html(data);
+				$('#edit-kruj-modal').modal('hide');
+			},
+		})
+	} else {
+		$.ajax({
+			type: 'get',
+			url: '/spec/kruj-edit/' + id + '/' + nameKr + '/' + vozrastKr + '/' + typeKr,
+			success: function(data) {
+				$('.kruj-table').html(data);
+				$('#edit-kruj-modal').modal('hide');
+			},
+		})
+	}
+}
+
+//----------------
+var id_del_kruj;
+var del_kruj = false;
+
+function showDeleteKrujModalWindow(id) {
+	id_del_kruj = id;
+	del_kruj = true;
+	document.getElementById("delete-object").innerHTML = "Вы точно хотите удалить?";
+	$("#deleteAccept").modal('show');
+}
 
 </script>
 </body>
