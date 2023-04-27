@@ -4,6 +4,12 @@
     <meta charset="utf-8">
     <title>Форма редактирования данных воспитанника</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        :root {
+            --bs-body-color: #000000;
+        }
+
+    </style>
 </head>
 <body>
 <header th:insert="blocks/header2 :: header2"></header>
@@ -104,7 +110,7 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6 ">
-            <div class="alert alert-info" style="box-shadow: 0px 0px 4px;">
+            <div class="alert" style="box-shadow: 0px 0px 4px;">
                 <h3 class="text-center mb-5">Данные воспитанника</h3>
                 <form th:object="${kid}" method="post">
                     <div class="mb-3">
@@ -164,7 +170,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="alert alert-info" style="box-shadow: 0px 0px 4px;">
+            <div class="alert" style="box-shadow: 0px 0px 4px;">
                 <h3 class="text-center mb-5">Законные представители</h3>
                 <button class="btn btn-outline-info" id="add-btn" title="Добавить законного представителя" th:onclick="'javascript:newParent();'">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -32 576 576" width="1em" height="1em" fill="currentColor" style="width: 25px;height: 25px;">

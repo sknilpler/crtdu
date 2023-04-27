@@ -2,7 +2,7 @@
 <div th:fragment="header2">
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm" style="background: linear-gradient(45deg, #92b1cd 0%, white 100%);">
 
-        <h5 sec:authorize="hasRole('ROLE_USER')" class="my-0 mr-md-auto font-weight-normal"><a sec:authentication="name"/></h5>
+        <h5 class="my-0 mr-md-auto font-weight-normal"><a sec:authentication="name"/></h5>
         <h5 sec:authorize="!isAuthenticated()" class="my-0 mr-md-auto font-weight-normal">Гость</h5>
 
         <ul class="navbar-nav flex-row flex-wrap ms-md-auto">

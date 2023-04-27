@@ -26,11 +26,15 @@ public class Zanyatie {
     @ManyToOne
     private Krujok krujok;
 
-    @ManyToMany
-    @JoinTable(name = "kid_zanyatie",
-            joinColumns = @JoinColumn(name = "zanyatie_id"),
-            inverseJoinColumns = @JoinColumn(name = "kid_id"))
-    private List<Kid> kids;
+//    @ManyToMany
+//    @JoinTable(name = "kid_zanyatie",
+//            joinColumns = @JoinColumn(name = "zanyatie_id"),
+//            inverseJoinColumns = @JoinColumn(name = "kid_id"))
+//    private List<Kid> kids;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "zanyatie_id")
+    private List<KidZanyatie> kidZanyatia;
 
     /**
      * Объект занятие

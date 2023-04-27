@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface DostijenieRepository extends CrudRepository<Dostijenie,Long> {
     List<Dostijenie> findByMeropriyatieId(Long id);
+    List<Dostijenie> findByKidId(Long id);
 }

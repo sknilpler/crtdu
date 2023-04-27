@@ -56,11 +56,15 @@ public class Kid {
             inverseJoinColumns = @JoinColumn(name = "krujok_id"))
     private List<Krujok> krujki;
 
-    @ManyToMany
-    @JoinTable(name = "kid_zanyatie",
-            joinColumns = @JoinColumn(name = "kid_id"),
-            inverseJoinColumns = @JoinColumn(name = "zanyatie_id"))
-    private List<Zanyatie> zanyatiya;
+//    @ManyToMany
+//    @JoinTable(name = "kid_zanyatie",
+//            joinColumns = @JoinColumn(name = "kid_id"),
+//            inverseJoinColumns = @JoinColumn(name = "zanyatie_id"))
+//    private List<Zanyatie> zanyatiya;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "kid_id")
+    private List<KidZanyatie> kidZanyatia;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "kid_id")

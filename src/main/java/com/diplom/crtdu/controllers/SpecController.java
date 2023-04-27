@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Controller
@@ -39,6 +40,8 @@ public class SpecController {
     private Meropriyatie editedMerop;
     private Long meropIDForDost;
     private Long krujok_id;
+
+    private Long portfolioKidId;
 
     @Autowired
     private KidRepository kidRepository;
@@ -64,6 +67,10 @@ public class SpecController {
     private TypeKrujokRepository typeKrujokRepository;
     @Autowired
     private CreativeAssociationRepository caRepository;
+    @Autowired
+    private ZanyatieRepository zanyatieRepository;
+    @Autowired
+    private KidZanyatieRepository kidZanyatieRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -534,7 +541,7 @@ public class SpecController {
                            @RequestParam Long meropriyatie,
                            @RequestParam Long teacher,
                            Model model) {
-        Meropriyatie m = meropriyatieRepository.findById(meropIDForDost).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropIDForDost + " not found on server!"));
+        Meropriyatie m = meropriyatieRepository.findById(meropriyatie).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropriyatie + " not found on server!"));
         Kid k = kidRepository.findById(kid).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
         Teacher t = teacherRepository.findById(teacher).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
         Dostijenie d = dostijenieRepository.save(new Dostijenie(name, place, m, k, t));
@@ -771,7 +778,74 @@ public class SpecController {
         model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(id_ca));
         return "spec/creative-association :: kruj-table";
     }
-    //---------------
+    //--------------- portfolio-----------------
+
+    @GetMapping("/spec/get-portfolio/{id}")
+    public String getPortfolio(@PathVariable("id") Long id, Model model) {
+        Kid k = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
+        portfolioKidId = id;
+        List<Parents> parents = parentsRepository.findByKidsId(id);
+        List<Dostijenie> dostijenies = dostijenieRepository.findByKidId(id);
+        List<Krujok> krujoks = krujokRepository.findByKidId(id);
+        Map<String, Double> marks = new HashMap<>();
+        krujoks.forEach(krujok -> {
+            List<KidZanyatie> kidZanyaties = kidZanyatieRepository.findByKidIdAndKrujokId(id, krujok.getId());
+            int size = 0;
+            double summ = 0.0;
+            for (KidZanyatie zanyatie : kidZanyaties) {
+                if (zanyatie.getOtsenka() > 0) {
+                    size++;
+                    summ += zanyatie.getOtsenka();
+                }
+            }
+            double average = size > 0 ? summ / size : 0.0;
+            marks.put(krujok.getName(), average);
+        });
+
+        model.addAttribute("kid", k);
+        model.addAttribute("parents", parents);
+        model.addAttribute("dost", dostijenies);
+        model.addAttribute("marks", marks);
+        model.addAttribute("krujki", StreamSupport.stream(krujokRepository.findAll().spliterator(), false)
+                .filter(item -> !krujoks.contains(item))
+                .collect(Collectors.toList()));
+        model.addAttribute("kr",krujoks);
+
+        return "spec/portfolio";
+    }
+
+
+    @GetMapping("/spec/portfolio/add-to-kruj/{id}")
+    public String addKidToKrujok(@PathVariable("id") Long id, Model model){
+        Krujok kr = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
+        Kid kid = kidRepository.findById(portfolioKidId).orElseThrow(() -> new NotFoundException("Kid with id = " + portfolioKidId + " not found on server!"));
+        List<Kid> kids = kr.getKids();
+        kids.add(kid);
+        kr.setKids(kids);
+        krujokRepository.save(kr);
+        log.warn("Saved new krujok-kid: {}", kr);
+        List<Krujok> krujoks = krujokRepository.findByKidId(portfolioKidId);
+        model.addAttribute("krujki", StreamSupport.stream(krujokRepository.findAll().spliterator(), false)
+                .filter(item -> !krujoks.contains(item))
+                .collect(Collectors.toList()));
+
+        return "spec/portfolio :: kruj-table";
+    }
+
+    @GetMapping("/spec/portfolio/del-from-kruj/{id}")
+    public String delKidFromKrujok(@PathVariable("id") Long id, Model model){
+        Krujok kr = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
+        Kid kid = kidRepository.findById(portfolioKidId).orElseThrow(() -> new NotFoundException("Kid with id = " + portfolioKidId + " not found on server!"));
+        List<Kid> kids = kr.getKids();
+        kids.remove(kid);
+        kr.setKids(kids);
+        krujokRepository.save(kr);
+        log.warn("Deleted krujok-kid: {}", kr);
+        List<Krujok> krujoks = krujokRepository.findByKidId(portfolioKidId);
+        model.addAttribute("kr",krujoks);
+
+        return "spec/portfolio :: kruj-table-vih";
+    }
 
 }
 

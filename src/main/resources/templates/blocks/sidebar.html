@@ -1,41 +1,45 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<div  th:fragment="sidebar">
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" data-bs-keyboard="false" data-bs-backdrop="false" style="width: 250px">
-    <div class="offcanvas-header">
-      <h6 class="offcanvas-title d-none d-sm-block">Специалист</h6>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body px-0">
-      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
-        <li class="nav-item">
-          <a href="/spec/list-kids" class="nav-link text-truncate">
-            <span class="ms-1 d-none d-sm-inline">Воспитанники</span>
-          </a>
-        </li>
-        <li>
-          <a href="/spec/list-teachers" class="nav-link text-truncate">
-            <span class="ms-1 d-none d-sm-inline">Преподаватели</span> </a>
-        </li>
-        <li>
-          <a href="/spec/list-meropriyatiya" class="nav-link text-truncate">
-            <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Мероприятия</span></a>
-        </li>
-        <li>
-          <a href="/spec/dost-list" class="nav-link text-truncate">
-            <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Достижения</span></a>
-        </li>
-        <li>
-        <a class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
-          Кружки
-        </a>
-        <div class="collapse ml-4" id="dashboard-collapse" >
-          <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-            <li><a href="/spec/kruj-ca" class="link-dark d-inline-flex text-decoration-none rounded">Творческие объединениия</a></li>
-            <li><a href="/spec/kruj-type-list" class="link-dark d-inline-flex text-decoration-none rounded">Типы кружков</a></li>
-          </ul>
+<div th:fragment="sidebar">
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" data-bs-keyboard="false"
+         data-bs-backdrop="false" style="width: 250px">
+        <div class="offcanvas-header">
+            <h6 class="offcanvas-title d-none d-sm-block">Специалист</h6>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        </li>
-      </ul>
+        <div class="offcanvas-body px-0">
+            <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+                <li class="nav-item">
+                    <a href="/spec/list-kids" class="nav-link text-truncate">
+                        <span class="ms-1 d-none d-sm-inline">Воспитанники</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/spec/list-teachers" class="nav-link text-truncate">
+                        <span class="ms-1 d-none d-sm-inline">Преподаватели</span> </a>
+                </li>
+                <li>
+                    <a href="/spec/list-meropriyatiya" class="nav-link text-truncate">
+                        <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Мероприятия</span></a>
+                </li>
+                <li>
+                    <a href="/spec/dost-list" class="nav-link text-truncate">
+                        <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Достижения</span></a>
+                </li>
+                <li class="ml-4">
+                    <a class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                       data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
+                        Кружки
+                    </a>
+                    <div class="collapse ml-4" id="dashboard-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="/spec/kruj-ca" class="link-dark d-inline-flex text-decoration-none rounded">Творческие
+                                объединениия</a></li>
+                            <li><a href="/spec/kruj-type-list"
+                                   class="link-dark d-inline-flex text-decoration-none rounded">Типы кружков</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
-  </div>
 </div>
