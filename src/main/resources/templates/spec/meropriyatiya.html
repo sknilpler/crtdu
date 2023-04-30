@@ -70,15 +70,15 @@
     </div>
     <div class="table-merop"
          th:fragment="table-merop">
-        <table class="table table-striped">
+        <table class="table table-striped" id="myTable">
             <thead>
             <tr>
-                <th>Наименование</th>
-                <th>Дата проведения</th>
-                <th>Место</th>
-                <th>Тип</th>
-                <th>Уровень</th>
-                <th>Ответственный</th>
+                <th onclick="sortTable(0);">Наименование</th>
+                <th onclick="sortTable(1);">Дата проведения</th>
+                <th onclick="sortTable(2);">Место</th>
+                <th onclick="sortTable(3);">Тип</th>
+                <th onclick="sortTable(4);">Уровень</th>
+                <th onclick="sortTable(5);">Ответственный</th>
             </tr>
             </thead>
             <tbody>
@@ -257,8 +257,8 @@ typeInput.addEventListener('change', filterTable);
 levelInput.addEventListener('change', filterTable);
 
 function filterTable() {
-    const startDate = new Date(startDateInput.value);
-    const endDate = new Date(endDateInput.value);
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
     const type = typeInput.value;
     const level = levelInput.value
 
@@ -271,21 +271,27 @@ function filterTable() {
 	})
 }
 
-//function filterTable() {
-//  const startDate = new Date(startDateInput.value);
-//  const endDate = new Date(endDateInput.value);
-//  const rows = document.querySelectorAll('tbody tr');
-//
-//  rows.forEach((row) => {
-//    const date = new Date(row.cells[1].textContent);
-//    if (date >= startDate && date <= endDate) {
-//      row.style.display = '';
-//    } else {
-//      row.style.display = 'none';
-//    }
-//  });
-//}
 
+function sortTable(colIndex) {
+  const table = document.getElementById("myTable");
+  const tbody = table.getElementsByTagName("tbody")[0];
+  const rows = Array.from(tbody.getElementsByTagName("tr"));
+
+  rows.sort((row1, row2) => {
+    const cell1 = row1.getElementsByTagName("td")[colIndex].textContent.trim();
+    const cell2 = row2.getElementsByTagName("td")[colIndex].textContent.trim();
+
+    if (!isNaN(cell1) && !isNaN(cell2)) {
+      return Number(cell1) - Number(cell2);
+    } else {
+      return cell1.localeCompare(cell2);
+    }
+  });
+
+  for (const row of rows) {
+    tbody.appendChild(row);
+  }
+}
 
 </script>
 </body>

@@ -24,6 +24,12 @@ public class Teacher {
 
     private String username;
 
+    /**
+     * true - педагог уволен (в архиве) <br>
+     * false - педагог работает
+     */
+    private boolean archive;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "teacher_id")
     private List<Dostijenie> dostList;
@@ -39,6 +45,7 @@ public class Teacher {
         this.name = name;
         this.patronymic = patronymic;
         this.doljnost = doljnost;
+        this.archive = false;
     }
 
     @Override

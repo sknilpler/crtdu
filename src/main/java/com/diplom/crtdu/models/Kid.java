@@ -28,7 +28,7 @@ public class Kid {
 
 
     /**
-     * true - мужской
+     * true - мужской <br>
      * false - женский
      */
     private boolean sex;
@@ -40,6 +40,11 @@ public class Kid {
     private String klas;
 
     private int rang;
+    /**
+     * true - воспитанник не ходит в кружки (в архиве) <br>
+     * false - воспитанник числиться
+     */
+    private boolean archive;
 
     private String username;
 
@@ -81,6 +86,7 @@ public class Kid {
         this.phone = phone;
         this.school = school;
         this.klas = klas;
+        this.archive = false;
     }
 
     public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas, String username) {
@@ -95,6 +101,7 @@ public class Kid {
         this.school = school;
         this.klas = klas;
         this.username = username;
+        this.archive = false;
     }
 
 
@@ -125,6 +132,6 @@ public class Kid {
     }
 
     public String getStudy(){
-        return "шк.: "+school+" кл.: " + klas;
+        return "ГОУ СОШ "+school+" кл.: " + klas;
     }
 }

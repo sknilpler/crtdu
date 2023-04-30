@@ -25,6 +25,7 @@ public class Parents {
     private String adres;
     private String phone;
     private String email;
+    private boolean archive;
 
     @ManyToMany
     @JoinTable(name = "kid_parent",
@@ -39,6 +40,7 @@ public class Parents {
         this.adres = adres;
         this.phone = phone;
         this.email = email;
+        this.archive = false;
     }
 
     @Override

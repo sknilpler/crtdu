@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -94,6 +95,33 @@ public class SpecController {
 //
 //        return input;
 //    }
+
+    public static String convertDate(String inputDate) {
+        try {
+            // Создание объекта для парсинга входной даты
+            //SimpleDateFormat inputFormat = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z (zzz)", Locale.ENGLISH);
+            //inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            SimpleDateFormat inputFormat = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z (zzz)", Locale.ENGLISH);
+
+
+            // Парсинг входной даты
+            Date date = inputFormat.parse(inputDate);
+
+            // Создание объекта для форматирования выходной даты
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+            outputFormat.setTimeZone(TimeZone.getTimeZone("GMT+0500"));
+
+            // Форматирование выходной даты
+            String outputDate = outputFormat.format(date);
+
+            // Возвращение выходной даты
+            return outputDate;
+        } catch (Exception e) {
+            // Обработка ошибок парсинга даты
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @GetMapping("/spec/list-kids")
     public String openKidsListPage(Model model) {
@@ -366,7 +394,7 @@ public class SpecController {
         model.addAttribute("d2", d2);
         model.addAttribute("levels", levelMeropriyatiyaRepository.findAll());
         model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
-        model.addAttribute("merop", meropriyatieRepository.findAll());
+        model.addAttribute("merop", meropriyatieRepository.findByData(d1,d2));
         return "spec/meropriyatiya";
     }
 
@@ -403,17 +431,29 @@ public class SpecController {
         return "redirect:/spec/list-meropriyatiya";
     }
 
+
     @GetMapping("/spec/meropriyatiya/filter/{type}/{level}/{startDate}/{endDate}")
     public String filterMeropriyatiya(Model model,
                                       @PathVariable("type") String type,
                                       @PathVariable("level") String level,
                                       @PathVariable("startDate") String startDate,
-                                      @PathVariable("endDate") String endDate) {
-        System.out.println(type);
-        System.out.println(level);
-        System.out.println(startDate);
-        System.out.println(endDate);
-        model.addAttribute("merop", meropriyatieRepository.findAll());
+                                      @PathVariable("endDate") String endDate) throws ParseException {
+
+        List<Meropriyatie> meropriyatieList = new ArrayList<>();
+        if (type.equals("0")) {
+            if (level.equals("0")) {
+                meropriyatieList = meropriyatieRepository.findByData(startDate, endDate);
+            } else {
+                meropriyatieList = meropriyatieRepository.findByDataAndLevel(startDate, endDate, Long.parseLong(level));
+            }
+        } else {
+            if (level.equals("0")) {
+                meropriyatieList = meropriyatieRepository.findByDataAndType(startDate, endDate, Long.parseLong(type));
+            } else {
+                meropriyatieList = meropriyatieRepository.findByDataAndLevelAndType(startDate, endDate, Long.parseLong(level), Long.parseLong(type));
+            }
+        }
+        model.addAttribute("merop", meropriyatieList);
         return "spec/meropriyatiya :: table-merop";
     }
 
@@ -809,14 +849,14 @@ public class SpecController {
         model.addAttribute("krujki", StreamSupport.stream(krujokRepository.findAll().spliterator(), false)
                 .filter(item -> !krujoks.contains(item))
                 .collect(Collectors.toList()));
-        model.addAttribute("kr",krujoks);
+        model.addAttribute("kr", krujoks);
 
         return "spec/portfolio";
     }
 
 
     @GetMapping("/spec/portfolio/add-to-kruj/{id}")
-    public String addKidToKrujok(@PathVariable("id") Long id, Model model){
+    public String addKidToKrujok(@PathVariable("id") Long id, Model model) {
         Krujok kr = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
         Kid kid = kidRepository.findById(portfolioKidId).orElseThrow(() -> new NotFoundException("Kid with id = " + portfolioKidId + " not found on server!"));
         List<Kid> kids = kr.getKids();
@@ -833,7 +873,7 @@ public class SpecController {
     }
 
     @GetMapping("/spec/portfolio/del-from-kruj/{id}")
-    public String delKidFromKrujok(@PathVariable("id") Long id, Model model){
+    public String delKidFromKrujok(@PathVariable("id") Long id, Model model) {
         Krujok kr = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
         Kid kid = kidRepository.findById(portfolioKidId).orElseThrow(() -> new NotFoundException("Kid with id = " + portfolioKidId + " not found on server!"));
         List<Kid> kids = kr.getKids();
@@ -842,7 +882,7 @@ public class SpecController {
         krujokRepository.save(kr);
         log.warn("Deleted krujok-kid: {}", kr);
         List<Krujok> krujoks = krujokRepository.findByKidId(portfolioKidId);
-        model.addAttribute("kr",krujoks);
+        model.addAttribute("kr", krujoks);
 
         return "spec/portfolio :: kruj-table-vih";
     }

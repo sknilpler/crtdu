@@ -20,6 +20,7 @@ public class Krujok {
 
     private String name;
     private String vozrast;
+    private boolean archive;
 
     @ManyToMany
     @JoinTable(name = "teacher_krujok",
@@ -47,6 +48,7 @@ public class Krujok {
         this.name = name;
         this.vozrast = vozrast;
         this.typeKrujok = type;
+        this.archive = false;
     }
 
     public Krujok(String name, String vozrast, TypeKrujok typeKrujok, CreativeAssociation creativeAssociation) {
@@ -54,6 +56,7 @@ public class Krujok {
         this.vozrast = vozrast;
         this.typeKrujok = typeKrujok;
         this.creativeAssociation = creativeAssociation;
+        this.archive = false;
     }
 
     @Override

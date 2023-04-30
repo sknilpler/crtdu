@@ -18,6 +18,7 @@ public class CreativeAssociation {
     private Long id;
 
     private String name;
+    private boolean archive;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "creative_association_id")
@@ -30,6 +31,7 @@ public class CreativeAssociation {
      */
     public CreativeAssociation(String name) {
         this.name = name;
+        this.archive = false;
     }
 
     @Override

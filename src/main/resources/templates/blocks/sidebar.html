@@ -1,6 +1,6 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <div th:fragment="sidebar">
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" data-bs-keyboard="false"
+    <div class="offcanvas offcanvas-start p-2" tabindex="-1" id="offcanvas" data-bs-keyboard="false"
          data-bs-backdrop="false" style="width: 250px">
         <div class="offcanvas-header">
             <h6 class="offcanvas-title d-none d-sm-block">Специалист</h6>
@@ -25,21 +25,26 @@
                     <a href="/spec/dost-list" class="nav-link text-truncate">
                         <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Достижения</span></a>
                 </li>
-                <li class="ml-4">
-                    <a class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
-                       data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
+                <li class="p-4">
+                    <a class="btn btn-toggle d-inline-flex align-items-center nav-link px-0 collapsed"
+                       data-bs-toggle="collapse" data-bs-target="#krujki-collapse" aria-expanded="false">
                         Кружки
                     </a>
-                    <div class="collapse ml-4" id="dashboard-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="/spec/kruj-ca" class="link-dark d-inline-flex text-decoration-none rounded">Творческие
-                                объединениия</a></li>
-                            <li><a href="/spec/kruj-type-list"
-                                   class="link-dark d-inline-flex text-decoration-none rounded">Типы кружков</a></li>
-                        </ul>
+                    <div class="collapse ml-4" id="krujki-collapse">
+                        <div class="alert">
+                            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                <li><a href="/spec/kruj-ca"
+                                       class="nav-link px-0">Творческие
+                                    объединения</a></li>
+                                <li><a href="/spec/kruj-type-list"
+                                       class="nav-link px-0">Типы кружков</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </li>
             </ul>
+
         </div>
     </div>
 </div>

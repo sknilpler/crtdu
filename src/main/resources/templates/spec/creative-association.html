@@ -18,6 +18,7 @@
             --bs-body-color: #000000;
         }
 
+
     </style>
 </head>
 <body>
@@ -165,14 +166,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="typeKr" class="form-label">Тип</label>
-                        <select class="form-control" id="typeKr" name="typeKr" th:field="*{typeKrujok.id}"  required>
+                        <select class="form-control" id="typeKr" name="typeKr" th:field="*{typeKrujok.id}" required>
                             <option value="0" disabled>-- Выберите --</option>
                             <option th:each="te : ${typesE}" th:value="${te.id}" th:text="${te.name}"></option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="teachersCheckbox" onchange="showTeachers(this)">
+                            <input class="form-check-input" type="checkbox" value="" id="teachersCheckbox"
+                                   onchange="showTeachers(this)">
                             <label class="form-check-label" for="teachersCheckbox">
                                 Преподаватели
                             </label>
@@ -182,7 +184,8 @@
                     <div class="mb-3" id="teachersTableContainerE"
                          style="display: none; max-height: 200px; overflow-y: scroll;">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="teachersSearchE" onkeyup="searchTeachers(this)" placeholder="Поиск по ФИО">
+                            <input type="text" class="form-control" id="teachersSearchE" onkeyup="searchTeachers(this)"
+                                   placeholder="Поиск по ФИО">
                         </div>
                         <table class="table table-sm table-hover" id="teachersTableE">
                             <tbody>
@@ -228,7 +231,8 @@
                     <div class="col-md-6 text-md-end">
                         <button class="btn btn-outline-success" id="add-btn" th:onclick="'javascript:addCA();'"
                                 title="Добавить объединение">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em"
+                                 fill="currentColor">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M200 344V280H136C122.7 280 112 269.3 112 256C112 242.7 122.7 232 136 232H200V168C200 154.7 210.7 144 224 144C237.3 144 248 154.7 248 168V232H312C325.3 232 336 242.7 336 256C336 269.3 325.3 280 312 280H248V344C248 357.3 237.3 368 224 368C210.7 368 200 357.3 200 344zM0 96C0 60.65 28.65 32 64 32H384C419.3 32 448 60.65 448 96V416C448 451.3 419.3 480 384 480H64C28.65 480 0 451.3 0 416V96zM48 96V416C48 424.8 55.16 432 64 432H384C392.8 432 400 424.8 400 416V96C400 87.16 392.8 80 384 80H64C55.16 80 48 87.16 48 96z"></path>
                             </svg>
@@ -284,7 +288,8 @@
                     <div class="col-md-12 text-md-end">
                         <button class="btn btn-outline-success" id="add-btn-kruj" th:onclick="'javascript:addKruj();'"
                                 title="Добавить кружок" disabled>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em"
+                                 fill="currentColor">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M200 344V280H136C122.7 280 112 269.3 112 256C112 242.7 122.7 232 136 232H200V168C200 154.7 210.7 144 224 144C237.3 144 248 154.7 248 168V232H312C325.3 232 336 242.7 336 256C336 269.3 325.3 280 312 280H248V344C248 357.3 237.3 368 224 368C210.7 368 200 357.3 200 344zM0 96C0 60.65 28.65 32 64 32H384C419.3 32 448 60.65 448 96V416C448 451.3 419.3 480 384 480H64C28.65 480 0 451.3 0 416V96zM48 96V416C48 424.8 55.16 432 64 432H384C392.8 432 400 424.8 400 416V96C400 87.16 392.8 80 384 80H64C55.16 80 48 87.16 48 96z"></path>
                             </svg>
@@ -636,6 +641,7 @@ function showDeleteKrujModalWindow(id) {
 	document.getElementById("delete-object").innerHTML = "Вы точно хотите удалить?";
 	$("#deleteAccept").modal('show');
 }
+
 
 </script>
 </body>
