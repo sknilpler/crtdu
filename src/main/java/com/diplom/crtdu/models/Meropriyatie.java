@@ -38,6 +38,18 @@ public class Meropriyatie {
     @JoinColumn(name = "meropriyatie_id")
     private List<Dostijenie> dostList;
 
+    @ManyToMany
+    @JoinTable(name = "kid_meropriyatie",
+            joinColumns = @JoinColumn(name = "meropriyatie_id"),
+            inverseJoinColumns = @JoinColumn(name = "kid_id"))
+    private List<Kid> kids;
+
+    @ManyToMany
+    @JoinTable(name = "krujok_meropriyatie",
+            joinColumns = @JoinColumn(name = "meropriyatie_id"),
+            inverseJoinColumns = @JoinColumn(name = "krujok_id"))
+    private List<Krujok> krujki;
+
 
     public Meropriyatie(String name, Date data, TypeMeropriyatiya type, String place, LevelMeropriyatiya level, String otvetstvenniy) {
         this.name = name;

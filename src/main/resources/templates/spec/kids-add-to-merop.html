@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Назначение</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        tr.selected {
+            background-color: green;
+        }
+
+        .highlight{
+            background-color:LightBlue;
+        }
+
+        :root {
+            --bs-body-color: #000000;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+
+<!-- Modal windows for accepting delete -->
+<div th:insert="blocks/accept-delete :: accept-delete"></div>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+<div class="container main-content">
+
+    <h1 class="text-center mb-4" th:text="'Добавление участников на '+${merop.name}"></h1>
+    <!--    <div class="row mb-3">-->
+    <!--        <div class="col-md-2">-->
+    <!--            <input type="text" class="form-control" id="search-input" placeholder="Поиск..."-->
+    <!--                   title="Поиск по всем полям таблицы">-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <div class="row">
+        <div class="col-md-6 alert" style="box-shadow: 0px 0px 4px;">
+            <table id="table1" class="table table-sm table-hover">
+                <thead>
+                <tr>
+                    <th>Творческое объединение</th>
+                    <th>Кружок</th>
+                    <th>Возр. группа</th>
+                    <th>Преподаватели</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="k : ${krujki}">
+                    <td th:text="${k.creativeAssociation.name}"></td>
+                    <td th:text="${k.name}"></td>
+                    <td th:text="${k.vozrast}"></td>
+                    <td>
+                        <div th:each="t: ${k.teachers}">
+                            <p th:text="${t.getShortFIO}"></p>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="col-md-6 alert" style="box-shadow: 0px 0px 4px;">
+            <table id="table3" class="table table table-sm table-hover">
+                <thead>
+                <tr>
+                    <th style="display:none;"></th>
+                    <th>
+                        <input type="checkbox" name="all-checkbox" th:onchange="'javascript:selectAllRecord(this);'">
+                    </th>
+                    <th>ФИО</th>
+                    <th>Дата рождения</th>
+                    <th>Пол</th>
+                    <th>Гражданство</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="k : ${kids}">
+                    <td style="display:none;" name="id-kid" th:text="${k.id}"></td>
+                    <td>
+                        <input type="checkbox" name="record-checkbox"
+                               th:onchange="'javascript:selectRecord(this,\'' + ${k.id} + '\');'">
+                    </td>
+                    <td th:text="${k.getFullFIO()}"></td>
+                    <td th:text="${#dates.format(k.birthday, 'dd.MM.yyyy')}"></td>
+                    <td th:text="${k.sex} ? 'Мужской' : 'Женский'"></td>
+                    <td th:text="${k.grazhdanstvo}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/xlsx.full.min.js"></script>
+<script>
+var selRecs = [];
+
+function selectAllRecord(value){
+    if (value.checked) {
+ 	    var list = [];
+        document.getElementsByName('id-kid').forEach(el => list.push(Number(el.innerText)));
+        selRecs = list;
+        rowClicked(selRecs[0]);
+	} else {
+		selRecs = [];
+	}
+	$('body input:checkbox').prop('checked',value.checked);
+}
+////////////////////////////////////////////
+
+function selectRecord(value, id) {
+	if (value.checked) {
+		selRecs.push(Number(id));
+	} else {
+		selRecs = arrayRemove(selRecs, Number(id));
+	}
+};
+
+function arrayRemove(arr, value) {
+	return arr.filter(function(ele) {
+		return ele !== value;
+	});
+}
+
+
+</script>
+</body>
+</html>

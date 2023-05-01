@@ -34,6 +34,12 @@ public class Krujok {
             inverseJoinColumns = @JoinColumn(name = "kid_id"))
     private List<Kid> kids;
 
+    @ManyToMany
+    @JoinTable(name = "krujok_meropriyatie",
+            joinColumns = @JoinColumn(name = "krujok_id"),
+            inverseJoinColumns = @JoinColumn(name = "meropriyatie_id"))
+    private List<Meropriyatie> meropriyatiya;
+
     @ManyToOne
     private TypeKrujok typeKrujok;
 

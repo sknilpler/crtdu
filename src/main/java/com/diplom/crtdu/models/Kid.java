@@ -61,6 +61,12 @@ public class Kid {
             inverseJoinColumns = @JoinColumn(name = "krujok_id"))
     private List<Krujok> krujki;
 
+    @ManyToMany
+    @JoinTable(name = "kid_meropriyatie",
+            joinColumns = @JoinColumn(name = "kid_id"),
+            inverseJoinColumns = @JoinColumn(name = "meropriyatie_id"))
+    private List<Meropriyatie> meropriyatiya;
+
 //    @ManyToMany
 //    @JoinTable(name = "kid_zanyatie",
 //            joinColumns = @JoinColumn(name = "kid_id"),

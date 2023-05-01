@@ -4,6 +4,8 @@ import com.diplom.crtdu.exception.NotFoundException;
 import com.diplom.crtdu.models.*;
 import com.diplom.crtdu.repo.*;
 import com.diplom.crtdu.services.UserService;
+import com.diplom.crtdu.utils.KidsOnMeropModel;
+import com.diplom.crtdu.utils.ThreeIdsModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.method.P;
@@ -40,6 +42,7 @@ public class SpecController {
     private Long meropEditId;
     private Meropriyatie editedMerop;
     private Long meropIDForDost;
+    private Long meropIDForKids;
     private Long krujok_id;
 
     private Long portfolioKidId;
@@ -394,7 +397,7 @@ public class SpecController {
         model.addAttribute("d2", d2);
         model.addAttribute("levels", levelMeropriyatiyaRepository.findAll());
         model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
-        model.addAttribute("merop", meropriyatieRepository.findByData(d1,d2));
+        model.addAttribute("merop", meropriyatieRepository.findByData(d1, d2));
         return "spec/meropriyatiya";
     }
 
@@ -551,6 +554,30 @@ public class SpecController {
         Dostijenie d = dostijenieRepository.save(new Dostijenie(name, place, m, k, t));
         log.warn("Save New Dostijenie: {}", d);
         return "redirect:/spec/list-meropriyatiya";
+    }
+
+    @GetMapping("/spec/meropriyatiya/kids-info/{id}")
+    public String openKidsInfoMeropriyatiya(Model model, @PathVariable("id") Long id) {
+        meropIDForKids = id;
+        List<Object[]> ids = krujokRepository.findByMeropriyatieId(id);
+        List<KidsOnMeropModel> kids = new ArrayList<>();
+        for (Object[] o: ids){
+            CreativeAssociation ca = caRepository.findById(Long.parseLong(o[0].toString())).orElseThrow(() -> new NotFoundException("CA with id = " + Long.parseLong(o[0].toString()) + " not found on server!"));
+            Krujok kr = krujokRepository.findById(Long.parseLong(o[1].toString())).orElseThrow(() -> new NotFoundException("Krujok with id = " + Long.parseLong(o[1].toString()) + " not found on server!"));
+            Kid kid = kidRepository.findById(Long.parseLong(o[2].toString())).orElseThrow(() -> new NotFoundException("Kid with id = " + Long.parseLong(o[2].toString()) + " not found on server!"));
+            kids.add(new KidsOnMeropModel(ca, kr, kid));
+        }
+
+        model.addAttribute("kids", kids);
+        return "spec/meropriyatiya :: info-kids";
+    }
+
+    @GetMapping("/spec/meropriyatiya/kids/add")
+    public String openAddKidsToMerop(Model model) {
+        Meropriyatie m = meropriyatieRepository.findById(meropIDForKids).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropIDForKids + " not found on server!"));
+        model.addAttribute("krujki",krujokRepository.findAll());
+        model.addAttribute("merop", m);
+        return "spec/kids-add-to-merop";
     }
 
     //---------------------- Достижения -------------------------
@@ -886,6 +913,7 @@ public class SpecController {
 
         return "spec/portfolio :: kruj-table-vih";
     }
+
 
 }
 

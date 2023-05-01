@@ -156,7 +156,7 @@
 
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <li><a class="dropdown-item" href="#">Экспорт</a></li>
+                                <li><button class="dropdown-item" onclick="print()">Экспорт</button></li>
                                 <li>
                                     <button class="dropdown-item" onclick="openKrujkiModal()">Записать на кружок
                                     </button>
@@ -188,7 +188,7 @@
                     </p>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6 my-html-container">
                     <h2 class="mt-4">Информация о законных представителях:</h2>
                     <div th:each="p : ${parents}">
                         <p th:inline='text'>
@@ -226,7 +226,9 @@
 </div>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+<script src="/js/jspdf.umd.min.js"></script>
 <script>
+
 function openKrujkiModal(){
     $('#zapis-modal').modal('show');
 }
@@ -264,6 +266,23 @@ function updateKrujList(){
 			$('.krujki-list').html(data);
 		},
 	})
+}
+////////////
+function print(){
+ // Создаем экземпляр jsPDF
+  const doc = new jsPDF();
+
+  // Получаем HTML контейнер, который нужно экспортировать в PDF
+  const htmlContainer = document.querySelector(".my-html-container");
+
+  // Получаем данные для экспорта из HTML контейнера
+  const exportData = htmlContainer.innerHTML;
+
+  // Добавляем данные в PDF документ
+  doc.fromHTML(exportData);
+
+  // Сохраняем PDF документ
+  doc.save("portfolio.pdf");
 }
 
 </script>
