@@ -137,7 +137,7 @@
     </div>
 </div>
 
-<div class="container my-5">
+<div class="container my-5" id="toPDF">
     <div class="row">
         <!--    <div class="col-md-4">-->
         <!--      <img src="https://placehold.it/200x200" alt="Фото воспитанника" class="img-fluid rounded">-->
@@ -146,9 +146,9 @@
 
             <div class="row">
                 <div class="col-md-6 row">
-                    <div class="col-md-10"><h1 th:text="${kid?.getFullFIO()}">ФИО воспитанника</h1></div>
+                    <div class="col-md-10"><h1 th:text="${kid?.getFullFIO()}" id="fio">ФИО воспитанника</h1></div>
 
-                    <div class="col-md-2">
+                    <div class="col-md-2" id="buttons-grp" data-html2canvas-ignore="true">
                         <div class="btn-group" role="group">
                             <button id="btnGroupDrop1" type="button"
                                     class="btn button-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"
@@ -226,7 +226,8 @@
 </div>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
-<script src="/js/jspdf.umd.min.js"></script>
+<!--<script src="/js/jspdf.umd.min.js"></script>-->
+<script src="/js/html2pdf.bundle.js"></script>
 <script>
 
 function openKrujkiModal(){
@@ -268,22 +269,43 @@ function updateKrujList(){
 	})
 }
 ////////////
+//function print(){
+// // Создаем экземпляр jsPDF
+//  const doc = new jsPDF();
+//
+//  // Получаем HTML контейнер, который нужно экспортировать в PDF
+//  const htmlContainer = document.querySelector(".my-html-container");
+//
+//  // Получаем данные для экспорта из HTML контейнера
+//  const exportData = htmlContainer.innerHTML;
+//
+//  // Добавляем данные в PDF документ
+//  doc.fromHTML(exportData);
+//
+//  // Сохраняем PDF документ
+//  doc.save("portfolio.pdf");
+//}
+
 function print(){
- // Создаем экземпляр jsPDF
-  const doc = new jsPDF();
+    const element = document.getElementById('toPDF');
 
-  // Получаем HTML контейнер, который нужно экспортировать в PDF
-  const htmlContainer = document.querySelector(".my-html-container");
+    const fio = document.getElementById('fio').textContent;
 
-  // Получаем данные для экспорта из HTML контейнера
-  const exportData = htmlContainer.innerHTML;
+  var opt = {
+  margin:       1,
+  filename:     'портфолио '+fio+'.pdf',
+  image:        { type: 'jpeg', quality: 0.98 },
+  html2canvas:  { scale: 4 },
+  jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+};
 
-  // Добавляем данные в PDF документ
-  doc.fromHTML(exportData);
-
-  // Сохраняем PDF документ
-  doc.save("portfolio.pdf");
+// New Promise-based usage:
+html2pdf().set(opt).from(element).save();
+    //html2pdf()
+    //    .from(element)
+    //    .save();
 }
+
 
 </script>
 </body>
