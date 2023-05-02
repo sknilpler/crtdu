@@ -69,7 +69,7 @@
             // Генерируем уникальный пароль, используя первые три буквы фамилии, длину имени и случайную строку из символов
             var password = transliterate(surname.slice(0, 3)) + name.length + Math.random().toString(36).slice(-8);
 
-            downloadTextFile("Логин: " + username + "\n" + "Пароль: " + password, "Логин и пароль преподавателя "+surname+".txt")
+            downloadTextFile("Логин: " + username + "\n" + "Пароль: " + password, "Логин и пароль педагога "+surname+".txt")
 
 	        post('/spec/teacher-add/'+surname+'/'+name+'/'+patronymic+'/'+doljnost+'/'+username+'/'+password);
         });

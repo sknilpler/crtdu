@@ -580,6 +580,13 @@ public class SpecController {
         return "spec/kids-add-to-merop";
     }
 
+    @GetMapping("/spec/meropriyatie/kids/add/filter-by-krujok/{id}")
+    public String filterKidsByKrujok(Model model, @PathVariable("id") Long id){
+        List<Kid> kids = kidRepository.findByKrujokOrderBySurname(id);
+        model.addAttribute("kids", kids);
+        return "spec/kids-add-to-merop :: table-kids";
+    }
+
     //---------------------- Достижения -------------------------
     @GetMapping("/spec/dost-list")
     public String openDostPage(Model model) {
