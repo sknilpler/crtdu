@@ -30,12 +30,54 @@
 <div class="container main-content">
 
     <h1 class="text-center mb-4" th:text="'Добавление участников на '+${merop.name}"></h1>
-    <!--    <div class="row mb-3">-->
-    <!--        <div class="col-md-2">-->
-    <!--            <input type="text" class="form-control" id="search-input" placeholder="Поиск..."-->
-    <!--                   title="Поиск по всем полям таблицы">-->
-    <!--        </div>-->
-    <!--    </div>-->
+    <div class="row mb-3">
+<!--        <div class="col-md-2">-->
+<!--            <input type="text" class="form-control" id="search-input" placeholder="Поиск..."-->
+<!--                   title="Поиск по всем полям таблицы">-->
+<!--        </div>-->
+        <div class="col-md-2">
+            <select class="form-select" id="type-filter" name="type-filter" title="Тип кружка">
+                <option value="0" selected>Все</option>
+                <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.name}"></option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" id="sex-filter" name="sex-filter" title="Пол воспитанников">
+                <option value="all" selected>Все</option>
+                <option value="0">Женский</option>
+                <option value="1">Мужской</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" id="age-filter" name="age-filter" title="Возраст воспитанников">
+                <option value="all" selected>Все</option>
+                <option value="1">3-5 лет</option>
+                <option value="2">6-8 лет</option>
+                <option value="3">9-11 лет</option>
+                <option value="4">12-15 лет</option>
+                <option value="5">16-17 лет</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+
+        </div>
+        <div class="col-md-2 text-md-end">
+            <a class="btn btn-outline-info" id="add-btn" href="/spec/meropriyatiya-add" title="Добавить мероприятие">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em"
+                     fill="currentColor">
+                    <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                    <path d="M200 344V280H136C122.7 280 112 269.3 112 256C112 242.7 122.7 232 136 232H200V168C200 154.7 210.7 144 224 144C237.3 144 248 154.7 248 168V232H312C325.3 232 336 242.7 336 256C336 269.3 325.3 280 312 280H248V344C248 357.3 237.3 368 224 368C210.7 368 200 357.3 200 344zM0 96C0 60.65 28.65 32 64 32H384C419.3 32 448 60.65 448 96V416C448 451.3 419.3 480 384 480H64C28.65 480 0 451.3 0 416V96zM48 96V416C48 424.8 55.16 432 64 432H384C392.8 432 400 424.8 400 416V96C400 87.16 392.8 80 384 80H64C55.16 80 48 87.16 48 96z"></path>
+                </svg>
+            </a>
+            <button class="btn btn-outline-success" id="export-btn" title="Экспорт таблицы в Excel">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="-64 0 512 512" width="1em" height="1em"
+                     fill="currentColor" style="width: 25px;height: 25px;">
+                    <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                    <path d="M224 128L224 0H48C21.49 0 0 21.49 0 48v416C0 490.5 21.49 512 48 512h288c26.51 0 48-21.49 48-48V160h-127.1C238.3 160 224 145.7 224 128zM272.1 264.4L224 344l48.99 79.61C279.6 434.3 271.9 448 259.4 448h-26.43c-5.557 0-10.71-2.883-13.63-7.617L192 396l-27.31 44.38C161.8 445.1 156.6 448 151.1 448H124.6c-12.52 0-20.19-13.73-13.63-24.39L160 344L111 264.4C104.4 253.7 112.1 240 124.6 240h26.43c5.557 0 10.71 2.883 13.63 7.613L192 292l27.31-44.39C222.2 242.9 227.4 240 232.9 240h26.43C271.9 240 279.6 253.7 272.1 264.4zM256 0v128h128L256 0z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-6 alert" style="box-shadow: 0px 0px 4px;">
             <table id="tb" class="table table-sm table-hover">
