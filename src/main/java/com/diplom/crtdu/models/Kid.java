@@ -1,6 +1,5 @@
 package com.diplom.crtdu.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -61,11 +60,11 @@ public class Kid {
             inverseJoinColumns = @JoinColumn(name = "krujok_id"))
     private List<Krujok> krujki;
 
-    @ManyToMany
-    @JoinTable(name = "kid_meropriyatie",
-            joinColumns = @JoinColumn(name = "kid_id"),
-            inverseJoinColumns = @JoinColumn(name = "meropriyatie_id"))
-    private List<Meropriyatie> meropriyatiya;
+//    @ManyToMany
+//    @JoinTable(name = "kid_meropriyatie",
+//            joinColumns = @JoinColumn(name = "kid_id"),
+//            inverseJoinColumns = @JoinColumn(name = "meropriyatie_id"))
+//    private List<Meropriyatie> meropriyatiya;
 
 //    @ManyToMany
 //    @JoinTable(name = "kid_zanyatie",
@@ -80,6 +79,10 @@ public class Kid {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "kid_id")
     private List<Dostijenie> dostList;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "kid_id")
+    private List<Uchastnik> meropriyatiya;
 
     public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas) {
         this.surname = surname;

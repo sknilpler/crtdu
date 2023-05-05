@@ -5,10 +5,8 @@ import com.diplom.crtdu.models.*;
 import com.diplom.crtdu.repo.*;
 import com.diplom.crtdu.services.UserService;
 import com.diplom.crtdu.utils.KidsOnMeropModel;
-import com.diplom.crtdu.utils.ThreeIdsModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,17 +15,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -75,6 +68,8 @@ public class SpecController {
     private ZanyatieRepository zanyatieRepository;
     @Autowired
     private KidZanyatieRepository kidZanyatieRepository;
+    @Autowired
+    private UchastnikRepository uchastnikRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -559,15 +554,21 @@ public class SpecController {
     @GetMapping("/spec/meropriyatiya/kids-info/{id}")
     public String openKidsInfoMeropriyatiya(Model model, @PathVariable("id") Long id) {
         meropIDForKids = id;
-        List<Object[]> ids = krujokRepository.findByMeropriyatieId(id);
+        //List<Object[]> ids = krujokRepository.findByMeropriyatieId(id);
+        List<Uchastnik> uchstniki = uchastnikRepository.findByMeropriyatieId(id);
         List<KidsOnMeropModel> kids = new ArrayList<>();
-        for (Object[] o: ids){
-            CreativeAssociation ca = caRepository.findById(Long.parseLong(o[0].toString())).orElseThrow(() -> new NotFoundException("CA with id = " + Long.parseLong(o[0].toString()) + " not found on server!"));
-            Krujok kr = krujokRepository.findById(Long.parseLong(o[1].toString())).orElseThrow(() -> new NotFoundException("Krujok with id = " + Long.parseLong(o[1].toString()) + " not found on server!"));
-            Kid kid = kidRepository.findById(Long.parseLong(o[2].toString())).orElseThrow(() -> new NotFoundException("Kid with id = " + Long.parseLong(o[2].toString()) + " not found on server!"));
+//        for (Object[] o: ids){
+//            CreativeAssociation ca = caRepository.findById(Long.parseLong(o[0].toString())).orElseThrow(() -> new NotFoundException("CA with id = " + Long.parseLong(o[0].toString()) + " not found on server!"));
+//            Krujok kr = krujokRepository.findById(Long.parseLong(o[1].toString())).orElseThrow(() -> new NotFoundException("Krujok with id = " + Long.parseLong(o[1].toString()) + " not found on server!"));
+//            Kid kid = kidRepository.findById(Long.parseLong(o[2].toString())).orElseThrow(() -> new NotFoundException("Kid with id = " + Long.parseLong(o[2].toString()) + " not found on server!"));
+//            kids.add(new KidsOnMeropModel(ca, kr, kid));
+//        }
+        for (Uchastnik u: uchstniki) {
+            CreativeAssociation ca = u.getKrujok().getCreativeAssociation();
+            Krujok kr = u.getKrujok();
+            Kid kid = u.getKid();
             kids.add(new KidsOnMeropModel(ca, kr, kid));
         }
-
         model.addAttribute("kids", kids);
         return "spec/meropriyatiya :: info-kids";
     }
@@ -582,9 +583,57 @@ public class SpecController {
 
     @GetMapping("/spec/meropriyatie/kids/add/filter-by-krujok/{id}")
     public String filterKidsByKrujok(Model model, @PathVariable("id") Long id){
-        List<Kid> kids = kidRepository.findByKrujokOrderBySurname(id);
+        List<Kid> kids = kidRepository.findNotIncludedByKrujokAndMeripriyatie(id,meropIDForKids);
+        System.out.println(id+" : "+meropIDForKids);
+        //List<Kid> kids = kidRepository.findByKrujokOrderBySurname(id);
         model.addAttribute("kids", kids);
         return "spec/kids-add-to-merop :: table-kids";
+    }
+
+    @PostMapping("/spec/meropriyatie/kids/add/list-kid/{list}")
+    public String getListKidsToMerop(@PathVariable("list") List<String> ids){
+        Meropriyatie m = meropriyatieRepository.findById(meropIDForKids).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropIDForKids + " not found on server!"));
+        ids.forEach(s -> {
+            String[] parts = s.split(":");
+            long num1 = Long.parseLong(parts[0]);
+            long num2 = Long.parseLong(parts[1]);
+            Krujok kr = krujokRepository.findById(num2).orElseThrow(() -> new NotFoundException("Krujok with id = " + num2 + " not found on server!"));
+            Kid kid = kidRepository.findById(num1).orElseThrow(() -> new NotFoundException("Kid with id = " + num1 + " not found on server!"));
+            Uchastnik u = uchastnikRepository.save(new Uchastnik(kid,kr,m));
+            log.warn("Saved new uchastnik : {}", u);
+        });
+//          Типо быстрее обработает запрос, но пока нет необходимости
+//        List<Long> num1List = new ArrayList<>();
+//        List<Long> num2List = new ArrayList<>();
+//
+//        ids.forEach(s -> {
+//            String[] parts = s.split(":");
+//            long num1 = Long.parseLong(parts[0]);
+//            long num2 = Long.parseLong(parts[1]);
+//            num1List.add(num1);
+//            num2List.add(num2);
+//        });
+//
+//        Iterable<Krujok> krujoks = krujokRepository.findAllById(num2List);
+//        Iterable<Kid> kids = kidRepository.findAllById(num1List);
+//
+//        ids.forEach(s -> {
+//            String[] parts = s.split(":");
+//            long num1 = Long.parseLong(parts[0]);
+//            long num2 = Long.parseLong(parts[1]);
+//            Krujok kr = StreamSupport.stream(krujoks.spliterator(), false)
+//                    .filter(k -> k.getId() == num2)
+//                    .findFirst()
+//                    .orElseThrow(() -> new NotFoundException("Krujok with id = " + num2 + " not found on server!"));
+//            Kid kid = StreamSupport.stream(kids.spliterator(), false)
+//                    .filter(k -> k.getId() == num1)
+//                    .findFirst()
+//                    .orElseThrow(() -> new NotFoundException("Kid with id = " + num1 + " not found on server!"));
+//            Uchastnik uchastnik = uchastnikRepository.save(new Uchastnik(kid, kr, m));
+//            log.warn("Saved new uchastnik : {}", u);
+//        });
+
+        return "redirect:/spec/list-meropriyatiya";
     }
 
     //---------------------- Достижения -------------------------

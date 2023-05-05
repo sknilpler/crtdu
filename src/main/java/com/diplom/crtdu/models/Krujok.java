@@ -34,11 +34,11 @@ public class Krujok {
             inverseJoinColumns = @JoinColumn(name = "kid_id"))
     private List<Kid> kids;
 
-    @ManyToMany
-    @JoinTable(name = "krujok_meropriyatie",
-            joinColumns = @JoinColumn(name = "krujok_id"),
-            inverseJoinColumns = @JoinColumn(name = "meropriyatie_id"))
-    private List<Meropriyatie> meropriyatiya;
+//    @ManyToMany
+//    @JoinTable(name = "krujok_meropriyatie",
+//            joinColumns = @JoinColumn(name = "krujok_id"),
+//            inverseJoinColumns = @JoinColumn(name = "meropriyatie_id"))
+//    private List<Meropriyatie> meropriyatiya;
 
     @ManyToOne
     private TypeKrujok typeKrujok;
@@ -49,6 +49,10 @@ public class Krujok {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "krujok_id")
     private List<Zanyatie> zanyatiya;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "krujok_id")
+    private List<Uchastnik> meropriyatiya;
 
     public Krujok(String name, String vozrast, TypeKrujok type) {
         this.name = name;
