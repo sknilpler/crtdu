@@ -18,14 +18,15 @@ public interface KidRepository extends CrudRepository<Kid,Long> {
 
     @Query(value = "SELECT k.*\n" +
             "FROM kid k\n" +
-            "JOIN uchastnik u ON k.id = u.kid_id\n" +
-            "WHERE u.krujok_id = :id1\n" +
+            "JOIN kid_krujok kk ON k.id = kk.kid_id\n" +
+            "WHERE kk.krujok_id = :id1\n" +
             "AND NOT EXISTS (\n" +
-            "  SELECT *\n" +
-            "  FROM uchastnik u2\n" +
-            "  WHERE u2.kid_id = k.id\n" +
-            "  AND u2.meropriyatie_id = :id2\n" +
-            ") \n" +
+            "  SELECT 1\n" +
+            "  FROM uchastnik u\n" +
+            "  WHERE u.kid_id = k.id\n" +
+            "  AND u.krujok_id = kk.krujok_id\n" +
+            "  AND u.meropriyatie_id = :id2\n" +
+            ")" +
             "ORDER BY k.rang, k.surname", nativeQuery = true)
     List<Kid> findNotIncludedByKrujokAndMeripriyatie(@Param("id1") Long id1, @Param("id2") Long id2);
 }

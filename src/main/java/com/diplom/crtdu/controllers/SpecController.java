@@ -7,6 +7,7 @@ import com.diplom.crtdu.services.UserService;
 import com.diplom.crtdu.utils.KidsOnMeropModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -70,6 +73,8 @@ public class SpecController {
     private KidZanyatieRepository kidZanyatieRepository;
     @Autowired
     private UchastnikRepository uchastnikRepository;
+    @Autowired
+    private DocumentRepository documentRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -191,18 +196,19 @@ public class SpecController {
         return "spec/kids-edit";
     }
 
-    @PostMapping("/spec/list-kids/edit/{id}/{surname}/{name}/{patronymic}/{birthday}/{sex}/{grazhdanstvo}/{adres}/{phone}/{school}/{klas}")
+    @PostMapping("/spec/list-kids/edit/{id}")
     public String saveEditKid(Model model, @PathVariable("id") Long id,
-                              @PathVariable("surname") String surname,
-                              @PathVariable("name") String name,
-                              @PathVariable("patronymic") String patronymic,
-                              @PathVariable("birthday") String birthday,
-                              @PathVariable("sex") String sex,
-                              @PathVariable("grazhdanstvo") String grazhdanstvo,
-                              @PathVariable("adres") String adres,
-                              @PathVariable("phone") String phone,
-                              @PathVariable("school") String school,
-                              @PathVariable("klas") String klas) {
+                              @RequestParam("surname") String surname,
+                              @RequestParam("name") String name,
+                              @RequestParam("patronymic") String patronymic,
+                              @RequestParam("birthday") String birthday,
+                              @RequestParam("sex") String sex,
+                              @RequestParam("grazhdanstvo") String grazhdanstvo,
+                              @RequestParam("adres") String adres,
+                              @RequestParam("phone") String phone,
+                              @RequestParam("school") String school,
+                              @RequestParam("klas") String klas,
+                              @RequestParam("scans") MultipartFile[] scans) throws IOException {
         Kid kid = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
         kid.setSurname(surname);
         kid.setName(name);
@@ -224,6 +230,22 @@ public class SpecController {
         kid.setKlas(klas);
         kidRepository.save(kid);
         log.warn("Edit Kid: {}", kid);
+        // сохраняем сканы документов
+        for (MultipartFile file : scans) {
+            // здесь можно сохранять файлы в БД или в файловой системе
+            // например, можно использовать класс java.nio.file.Path
+            // для сохранения файлов на жесткий диск в определенной директории
+            // или можно сохранять файлы в BLOB-полях таблицы ребенка в БД
+            // ...
+            Document document = new Document();
+            document.setKid(kid);
+            document.setName(file.getOriginalFilename());
+            document.setDate(new Date());
+            document.setType(file.getContentType());
+            document.setContent(file.getBytes());
+
+            documentRepository.save(document);
+        }
         return "redirect:/spec/list-kids";
     }
 
@@ -563,7 +585,7 @@ public class SpecController {
 //            Kid kid = kidRepository.findById(Long.parseLong(o[2].toString())).orElseThrow(() -> new NotFoundException("Kid with id = " + Long.parseLong(o[2].toString()) + " not found on server!"));
 //            kids.add(new KidsOnMeropModel(ca, kr, kid));
 //        }
-        for (Uchastnik u: uchstniki) {
+        for (Uchastnik u : uchstniki) {
             CreativeAssociation ca = u.getKrujok().getCreativeAssociation();
             Krujok kr = u.getKrujok();
             Kid kid = u.getKid();
@@ -576,22 +598,21 @@ public class SpecController {
     @GetMapping("/spec/meropriyatiya/kids/add")
     public String openAddKidsToMerop(Model model) {
         Meropriyatie m = meropriyatieRepository.findById(meropIDForKids).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropIDForKids + " not found on server!"));
-        model.addAttribute("krujki",krujokRepository.findAll());
+        model.addAttribute("krujki", krujokRepository.findAll());
+        model.addAttribute("types", typeKrujokRepository.findAll());
         model.addAttribute("merop", m);
         return "spec/kids-add-to-merop";
     }
 
     @GetMapping("/spec/meropriyatie/kids/add/filter-by-krujok/{id}")
-    public String filterKidsByKrujok(Model model, @PathVariable("id") Long id){
-        List<Kid> kids = kidRepository.findNotIncludedByKrujokAndMeripriyatie(id,meropIDForKids);
-        System.out.println(id+" : "+meropIDForKids);
-        //List<Kid> kids = kidRepository.findByKrujokOrderBySurname(id);
+    public String filterKidsByKrujok(Model model, @PathVariable("id") Long id) {
+        List<Kid> kids = kidRepository.findNotIncludedByKrujokAndMeripriyatie(id, meropIDForKids);
         model.addAttribute("kids", kids);
         return "spec/kids-add-to-merop :: table-kids";
     }
 
     @PostMapping("/spec/meropriyatie/kids/add/list-kid/{list}")
-    public String getListKidsToMerop(@PathVariable("list") List<String> ids){
+    public String getListKidsToMerop(@PathVariable("list") List<String> ids) {
         Meropriyatie m = meropriyatieRepository.findById(meropIDForKids).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropIDForKids + " not found on server!"));
         ids.forEach(s -> {
             String[] parts = s.split(":");
@@ -599,7 +620,7 @@ public class SpecController {
             long num2 = Long.parseLong(parts[1]);
             Krujok kr = krujokRepository.findById(num2).orElseThrow(() -> new NotFoundException("Krujok with id = " + num2 + " not found on server!"));
             Kid kid = kidRepository.findById(num1).orElseThrow(() -> new NotFoundException("Kid with id = " + num1 + " not found on server!"));
-            Uchastnik u = uchastnikRepository.save(new Uchastnik(kid,kr,m));
+            Uchastnik u = uchastnikRepository.save(new Uchastnik(kid, kr, m));
             log.warn("Saved new uchastnik : {}", u);
         });
 //          Типо быстрее обработает запрос, но пока нет необходимости
@@ -635,6 +656,50 @@ public class SpecController {
 
         return "redirect:/spec/list-meropriyatiya";
     }
+
+    @GetMapping("/spec/meropriyatie/kids/add/filter-kruj-by-type/{type}")
+    public String filterKrujokByType(Model model, @PathVariable("type") String type) {
+        if (type.equals("0")) {
+            model.addAttribute("krujki", krujokRepository.findAll());
+        } else {
+            model.addAttribute("krujki", krujokRepository.findByTypeKrujokIdByOrderByCreativeAssociationName(Long.parseLong(type)));
+        }
+        return "spec/kids-add-to-merop :: table-kruj";
+    }
+
+    @GetMapping("/spec/meropriyatie/kids/get-info/{id}")
+    public String getPortfolioFromMerop(@PathVariable("id") Long id, Model model) {
+        Kid k = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
+        List<Dostijenie> dostijenies = dostijenieRepository.findByKidId(id);
+        List<Krujok> krujoks = krujokRepository.findByKidId(id);
+        Map<String, Double> marks = new HashMap<>();
+        krujoks.forEach(krujok -> {
+            List<KidZanyatie> kidZanyaties = kidZanyatieRepository.findByKidIdAndKrujokId(id, krujok.getId());
+            int size = 0;
+            double summ = 0.0;
+            for (KidZanyatie zanyatie : kidZanyaties) {
+                if (zanyatie.getOtsenka() > 0) {
+                    size++;
+                    summ += zanyatie.getOtsenka();
+                }
+            }
+            double average = size > 0 ? summ / size : 0.0;
+            marks.put(krujok.getName(), average);
+        });
+
+        model.addAttribute("kid", k);
+        model.addAttribute("dost", dostijenies);
+        model.addAttribute("marks", marks);
+        model.addAttribute("krujki", StreamSupport.stream(krujokRepository.findAll().spliterator(), false)
+                .filter(item -> !krujoks.contains(item))
+                .collect(Collectors.toList()));
+        model.addAttribute("kr", krujoks);
+
+        return "spec/kids-add-to-merop :: info-kid";
+    }
+
+
+
 
     //---------------------- Достижения -------------------------
     @GetMapping("/spec/dost-list")
@@ -970,6 +1035,15 @@ public class SpecController {
         return "spec/portfolio :: kruj-table-vih";
     }
 
+    @GetMapping("/documents/{id}")
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable("id") Long docId) {
+        Document document = documentRepository.findById(docId).orElseThrow(() -> new NotFoundException("Document with id = " + docId + " not found on server!"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename(document.getName()).build());
+        return new ResponseEntity<>(document.getContent(), headers, HttpStatus.OK);
+    }
 
 }
 

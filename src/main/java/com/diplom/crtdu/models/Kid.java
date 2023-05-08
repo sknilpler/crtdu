@@ -84,6 +84,10 @@ public class Kid {
     @JoinColumn(name = "kid_id")
     private List<Uchastnik> meropriyatiya;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "kid_id")
+    private List<Document> documents;
+
     public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas) {
         this.surname = surname;
         this.name = name;

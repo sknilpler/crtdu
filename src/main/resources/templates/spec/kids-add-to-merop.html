@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <style>
         tr.selected {
-            background-color: green;
+            background-color: SkyBlue;
         }
 
         .highlight{
@@ -17,6 +17,10 @@
         :root {
             --bs-body-color: #000000;
         }
+
+
+
+
 
 
 
@@ -36,20 +40,20 @@
         <!--            <input type="text" class="form-control" id="search-input" placeholder="Поиск..."-->
         <!--                   title="Поиск по всем полям таблицы">-->
         <!--        </div>-->
-        <div class="col-md-2">
+        <div class="col-md-3">
             <select class="form-select" id="type-filter" name="type-filter" title="Тип кружка">
                 <option value="0" selected>Все</option>
                 <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.name}"></option>
             </select>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <select class="form-select" id="sex-filter" name="sex-filter" title="Пол воспитанников">
                 <option value="all" selected>Все</option>
-                <option value="0">Женский</option>
-                <option value="1">Мужской</option>
+                <option value="Женский">Женский</option>
+                <option value="Мужской">Мужской</option>
             </select>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <select class="form-select" id="age-filter" name="age-filter" title="Возраст воспитанников">
                 <option value="all" selected>Все</option>
                 <option value="1">3-5 лет</option>
@@ -59,8 +63,9 @@
                 <option value="5">16-17 лет</option>
             </select>
         </div>
-        <div class="col-md-2 text-md-end">
-            <button class="btn btn-outline-info" id="add-btn" onclick="saveSelectedKids()" title="Добавить выбранных участников">
+        <div class="col-md-3 text-md-end">
+            <button class="btn btn-outline-info" id="add-btn" onclick="saveSelectedKids()"
+                    title="Добавить выбранных участников">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em"
                      fill="currentColor">
                     <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
@@ -69,74 +74,139 @@
             </button>
         </div>
     </div>
+    <hr>
     <div class="row">
-        <div class="col-md-6 alert" style="box-shadow: 0px 0px 4px;">
-            <table id="tb" class="table table-sm table-hover">
-                <thead>
-                <tr>
-                    <th>Творческое объединение</th>
-                    <th>Кружок</th>
-                    <th>Возр. группа</th>
-                    <th>Педагоги</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="k : ${krujki}" th:id="${k.id}">
-                    <td th:text="${k.creativeAssociation.name}"
-                        th:onclick="'javascript:rowClicked(\'' + ${k.id} + '\');'"></td>
-                    <td th:text="${k.name}" th:onclick="'javascript:rowClicked(\'' + ${k.id} + '\');'"></td>
-                    <td th:text="${k.vozrast}" th:onclick="'javascript:rowClicked(\'' + ${k.id} + '\');'"></td>
-                    <td th:onclick="'javascript:rowClicked(\'' + ${k.id} + '\');'">
-                        <div th:each="t: ${k.teachers}">
-                            <p th:text="${t.getShortFIO}"></p>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <div class="col-md-6">
+            <div class="alert" style="box-shadow: 0px 0px 4px;">
+
+                <div class="table-kruj" th:fragment="table-kruj">
+                    <table id="tb" class="table table-sm table-hover">
+                        <thead>
+                        <tr>
+                            <th>Творческое объединение</th>
+                            <th>Кружок</th>
+                            <th>Возр. группа</th>
+                            <th>Педагоги</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="k : ${krujki}" th:id="${k.id}">
+                            <td th:text="${k.creativeAssociation.name}"
+                                th:onclick="'javascript:rowClicked(\'' + ${k.id} + '\');'"></td>
+                            <td th:text="${k.name}" th:onclick="'javascript:rowClicked(\'' + ${k.id} + '\');'"></td>
+                            <td th:text="${k.vozrast}" th:onclick="'javascript:rowClicked(\'' + ${k.id} + '\');'"></td>
+                            <td th:onclick="'javascript:rowClicked(\'' + ${k.id} + '\');'">
+                                <div th:each="t: ${k.teachers}">
+                                    <p th:text="${t.getShortFIO}"></p>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
 
-        <div class="col-md-6 alert" style="box-shadow: 0px 0px 4px;">
-            <div class="table-kids" th:fragment="table-kids">
-                <table id="table3" class="table table-striped table-hover">
-                    <thead>
-                    <tr>
-                        <th style="display:none;"></th>
-                        <th>
-                            <input type="checkbox" name="all-checkbox"
-                                   th:onchange="'javascript:selectAllRecord(this);'">
-                        </th>
-                        <th>ФИО</th>
-                        <th>Дата рождения</th>
-                        <th>Пол</th>
-                        <th>Гражданство</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="k : ${kids}">
-                        <td style="display:none;" name="id-kid" th:text="${k.id}"></td>
-                        <td>
-                            <input type="checkbox" name="record-checkbox"
-                                   th:onchange="'javascript:selectRecord(this,\'' + ${k.id} + '\');'">
-                        </td>
-                        <td th:text="${k.getFullFIO()}"></td>
-                        <td th:text="${#dates.format(k.birthday, 'dd.MM.yyyy')}"></td>
-                        <td th:text="${k.sex} ? 'Мужской' : 'Женский'"></td>
-                        <td th:text="${k.grazhdanstvo}"></td>
-                        <td class="text-md-end">
-                            <button class="btn btn-outline-info btn-sm" th:href="'/spec/meropriyatie/kids/get-info/'+${k.id}"
-                                    title="Портфолио">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="-64 0 512 512" width="1em" height="1em"
-                                     fill="currentColor">
-                                    <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
-                                    <path d="M336 64h-53.88C268.9 26.8 233.7 0 192 0S115.1 26.8 101.9 64H48C21.5 64 0 85.48 0 112v352C0 490.5 21.5 512 48 512h288c26.5 0 48-21.48 48-48v-352C384 85.48 362.5 64 336 64zM192 64c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S160 113.7 160 96C160 78.33 174.3 64 192 64zM192 192c35.35 0 64 28.65 64 64s-28.65 64-64 64S128 291.3 128 256S156.7 192 192 192zM288 448H96c-8.836 0-16-7.164-16-16C80 387.8 115.8 352 160 352h64c44.18 0 80 35.82 80 80C304 440.8 296.8 448 288 448z"></path>
-                                </svg>
-                            </button>
-                        </td>
-                    </tr>
-                </table>
+        <div class="col-md-6">
+            <div class="alert" style="box-shadow: 0px 0px 4px;">
+                <div class="table-kids" th:fragment="table-kids">
+                    <table id="table3" class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th style="display:none;"></th>
+                            <th>
+                                <input type="checkbox" name="all-checkbox"
+                                       th:onchange="'javascript:selectAllRecord(this);'">
+                            </th>
+                            <th>ФИО</th>
+                            <th>Дата рождения</th>
+                            <th>Пол</th>
+                            <th>Гражданство</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="k : ${kids}">
+                            <td style="display:none;" name="id-kid" th:text="${k.id}"></td>
+                            <td>
+                                <input type="checkbox" name="record-checkbox"
+                                       th:onchange="'javascript:selectRecord(this,\'' + ${k.id} + '\');'">
+                            </td>
+                            <td th:text="${k.getFullFIO()}"></td>
+                            <td th:text="${#dates.format(k.birthday, 'dd.MM.yyyy')}"></td>
+                            <td th:text="${k.sex} ? 'Мужской' : 'Женский'"></td>
+                            <td th:text="${k.grazhdanstvo}"></td>
+                            <td class="text-md-end">
+                                <button class="btn btn-outline-info btn-sm"
+                                        th:onclick="'javascript:openInfo(\'' + ${k.id} + '\');'"
+                                        title="Портфолио">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-64 0 512 512" width="1em"
+                                         height="1em"
+                                         fill="currentColor">
+                                        <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                        <path d="M336 64h-53.88C268.9 26.8 233.7 0 192 0S115.1 26.8 101.9 64H48C21.5 64 0 85.48 0 112v352C0 490.5 21.5 512 48 512h288c26.5 0 48-21.48 48-48v-352C384 85.48 362.5 64 336 64zM192 64c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S160 113.7 160 96C160 78.33 174.3 64 192 64zM192 192c35.35 0 64 28.65 64 64s-28.65 64-64 64S128 291.3 128 256S156.7 192 192 192zM288 448H96c-8.836 0-16-7.164-16-16C80 387.8 115.8 352 160 352h64c44.18 0 80 35.82 80 80C304 440.8 296.8 448 288 448z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно с подробной информацией -->
+<div class="info-kid" th:fragment="info-kid">
+    <div class="modal fade" id="info-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="${kid?.getFullFIO()}">Подробная информация о воспитаннике</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 row">
+                            <p th:inline='text'>
+                                <strong>Дата рождения:</strong>
+                                [[${#dates.format(kid?.birthday, 'dd.MM.yyyy')}]]
+                            </p>
+                            <p th:inline='text'>
+                                <strong>Пол:</strong>
+                                [[${kid?.sex} ? 'Мужской' : 'Женский']]
+                            </p>
+                            <p th:inline='text'>
+                                <strong>Гражданство:</strong>
+                                [[${kid?.grazhdanstvo}]]
+                            </p>
+                            <p th:inline='text'>
+                                <strong>Адрес:</strong>
+                                [[${kid?.adres}]]
+                            </p>
+                            <p th:inline='text'>
+                                <strong>Телефон:</strong>
+                                [[${kid?.phone}]]
+                            </p>
+                        </div>
+                    </div>
+                    <h5 class="mt-4">Кружки и успеваемость:</h5>
+                    <div class="krujki-list" th:fragment="krujki-list">
+                        <ul>
+                            <li th:each="krujok : ${marks}"
+                                th:text="${krujok.key} + ' ср. оценка: ' + ${krujok.value}"></li>
+                        </ul>
+                    </div>
+                    <h5 class="mt-4">Достижения и призовые места:</h5>
+                    <ul>
+                        <li th:each="d : ${dost}"
+                            th:text="${d.meropriyatie.name}+': '+${d.name}+' '+${d.winPlace}"></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
             </div>
         </div>
     </div>
@@ -146,6 +216,7 @@
 <script src="/js/xlsx.full.min.js"></script>
 <script>
 var selRecs = [];
+
 function selectAllRecord(value){
     if (value.checked) {
  	    var list = [];
@@ -193,6 +264,11 @@ function rowClicked(id) {
 	}
 	var row = document.getElementById(id);
 	row.classList.add("selected");
+	const selectElementAge = document.getElementById('age-filter');
+	const selectElementSex = document.getElementById('sex-filter');
+    // Устанавливаем значение select в первоначальное default
+    selectElementAge.selectedIndex = 0;
+    selectElementSex.selectedIndex = 0;
 	updateKidForKruj(id);
 };
 
@@ -240,6 +316,121 @@ function post(path, method = 'post') {
 	document.body.appendChild(form);
 	form.submit();
 }
+const typeInput = document.getElementById('type-filter');
+typeInput.addEventListener('change', filterByType);
+
+function filterByType(){
+const type = typeInput.value;
+    $.ajax({
+		type: 'get',
+		url: '/spec/meropriyatie/kids/add/filter-kruj-by-type/' + type,
+		success: function(data) {
+			$('.table-kruj').html(data);
+		},
+	})
+}
+
+//function filterTableBySex() {
+//  const sexInput = document.getElementById('sex-filter');
+//  const sex = sexInput.value.toLowerCase();
+//  const tableRows = document.querySelectorAll('#table3 tbody tr');
+//  tableRows.forEach(row => {
+//    const rowSex = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+//    if (sex === 'all' || sex === rowSex) {
+//      row.style.display = '';
+//    } else {
+//      row.style.display = 'none';
+//    }
+//  });
+//}
+
+function filterTable() {
+  var sexFilter = document.getElementById("sex-filter").value;
+  var ageFilter = document.getElementById("age-filter").value;
+  var table = document.getElementById("table3");
+  var rows = table.getElementsByTagName("tr");
+  for (var i = 1; i < rows.length; i++) {
+    var row = rows[i];
+    var cells = row.getElementsByTagName("td");
+    var age = calculateAge(cells[3].textContent); // я предположил что возраст указан в 3-й ячейке
+    var sex = cells[4].textContent.trim();
+    if ((sexFilter === "all" || sex === sexFilter) &&
+        (ageFilter === "all" || age >= getMinAge(ageFilter) && age <= getMaxAge(ageFilter))) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  }
+}
+
+function calculateAge(birthdayString) {
+  var birthday = new Date(birthdayString);
+  var ageDifMs = Date.now() - birthday.getTime();
+  var ageDate = new Date(ageDifMs);
+  return Math.abs(ageDate.getUTCFullYear() - 1970);
+}
+
+function getMinAge(ageFilter) {
+  switch (ageFilter) {
+    case "1":
+      return 3;
+    case "2":
+      return 6;
+    case "3":
+      return 9;
+    case "4":
+      return 12;
+    case "5":
+      return 16;
+    default:
+      return 0;
+  }
+}
+
+function getMaxAge(ageFilter) {
+  switch (ageFilter) {
+    case "1":
+      return 5;
+    case "2":
+      return 8;
+    case "3":
+      return 11;
+    case "4":
+      return 15;
+    case "5":
+      return 17;
+    default:
+      return Infinity;
+  }
+}
+
+document.getElementById('sex-filter').addEventListener('change', filterTable);
+document.getElementById('age-filter').addEventListener('change', filterTable);
+
+function clearKidTable(){
+        $.ajax({
+		type: 'get',
+		url: '/spec/meropriyatie/kids/add/clear-kid',
+		success: function(data) {
+			$('.table-kids').html(data);
+		},
+	})
+}
+//*----------------------------------
+
+function openInfo(id){
+    $.ajax({
+		type: 'get',
+		url: '/spec/meropriyatie/kids/get-info/'+ id,
+		success: function(data) {
+			$('.info-kid').html(data);
+			$('#info-modal').modal('show');
+		},
+	})
+
+}
+
+
 </script>
 </body>
 </html>

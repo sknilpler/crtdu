@@ -221,6 +221,27 @@
             <ul>
                 <li th:each="d : ${dost}" th:text="${d.meropriyatie.name}+': '+${d.name}+' '+${d.winPlace}"></li>
             </ul>
+            <h3 class="mt-4">Сертификаты и грамоты:</h3>
+            <table class="table table-sm">
+                <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Дата выдачи</th>
+                    <th>Тип документа</th>
+                    <th>Файл</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="doc : ${kid.documents}">
+                    <td th:text="${doc.name}"></td>
+                    <td th:text="${doc.date}"></td>
+                    <td th:text="${doc.type}"></td>
+                    <td>
+                        <a th:href="@{'/documents/' + ${doc.id}}">Скачать</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -163,6 +163,10 @@
                         <label for="klas" class="form-label">Класс</label>
                         <input type="text" th:field="*{klas}" class="form-control" id="klas" name="klas">
                     </div>
+                    <div class="form-group">
+                        <label for="file">Сертификаты и грамоты:</label>
+                        <input type="file" id="file" name="file" class="form-control-file" required>
+                    </div>
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
                         <button type="button" class="btn btn-primary" th:onclick="'javascript:save(\'' + *{id} + '\');'"
@@ -227,19 +231,19 @@
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/jquery.min.js"></script>
 <script>
-function save(id) {
-	var surname = document.getElementById("surname").value;
-	var name = document.getElementById("name").value;
-	var patronymic = document.getElementById("patronymic").value;
-	var birthday = document.getElementById("birthday").value;
-	var sex = document.getElementById("sex").value;
-	var grazhdanstvo = document.getElementById("grazhdanstvo").value;
-	var adres = document.getElementById("adres").value;
-	var phone = document.getElementById("phone").value;
-	var school = document.getElementById("school").value;
-	var klas = document.getElementById("klas").value;
+//function save(id) {
+//	var surname = document.getElementById("surname").value;
+//	var name = document.getElementById("name").value;
+//	var patronymic = document.getElementById("patronymic").value;
+//	var birthday = document.getElementById("birthday").value;
+//	var sex = document.getElementById("sex").value;
+//	var grazhdanstvo = document.getElementById("grazhdanstvo").value;
+//	var adres = document.getElementById("adres").value;
+//	var phone = document.getElementById("phone").value;
+//	var school = document.getElementById("school").value;
+//	var klas = document.getElementById("klas").value;
 
-	post('/spec/list-kids/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + birthday + '/' + sex + '/' + grazhdanstvo + '/' + adres + '/' + phone + '/' + replaceChar(school, "/", "-") + '/' + klas);
+//	post('/spec/list-kids/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + birthday + '/' + sex + '/' + grazhdanstvo + '/' + adres + '/' + phone + '/' + replaceChar(school, "/", "-") + '/' + klas);
 
 	//console.log(surname
 	//console.log(name
@@ -251,7 +255,7 @@ function save(id) {
 	//console.log(phone
 	//console.log(school
 	//console.log(klas
-}
+//}
 
 function post(path, method = 'post') {
 	const form = document.createElement('form');
@@ -354,6 +358,53 @@ document.getElementById("clear-btn").addEventListener("click", function() {
 	document.getElementById("school").value = "";
 	document.getElementById("klas").value = "";
 });
+
+
+function postWithFiles(path, method = 'post', formData) {
+  const form = document.createElement('form');
+  form.method = method;
+  form.action = path;
+  form.enctype = "multipart/form-data"; // необходимо указать тип кодирования формы
+  form.appendChild(formData);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+// пример использования
+function save(id) {
+var formData = new FormData();
+var surname = document.getElementById("surname").value;
+var name = document.getElementById("name").value;
+var patronymic = document.getElementById("patronymic").value;
+var birthday = document.getElementById("birthday").value;
+var sex = document.getElementById("sex").value;
+var grazhdanstvo = document.getElementById("grazhdanstvo").value;
+var adres = document.getElementById("adres").value;
+var phone = document.getElementById("phone").value;
+var school = document.getElementById("school").value;
+var klas = document.getElementById("klas").value;
+
+formData.append('surname', surname);
+formData.append('name', name);
+formData.append('patronymic', patronymic);
+formData.append('birthday', birthday);
+formData.append('sex', sex);
+formData.append('grazhdanstvo', grazhdanstvo);
+formData.append('adres', adres);
+formData.append('phone', phone);
+formData.append('school', school);
+formData.append('klas', klas);
+
+// добавляем файлы
+var scansInput = document.getElementById("file"); // поле для выбора файлов
+var scansFiles = scansInput.files;
+for (var i = 0; i < scansFiles.length; i++) {
+  formData.append('scans', scansFiles[i]);
+}
+
+// отправляем данные на сервер
+postWithFiles('/spec/list-kids/edit/' + id, 'POST', formData);
+}
 </script>
 </body>
 </html>
