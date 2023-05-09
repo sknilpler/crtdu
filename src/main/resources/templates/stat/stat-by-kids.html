@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Статистика по детям</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <style>
+        :root {
+            --bs-body-color: #000000;
+        }
+
+    </style>
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+
+<!-- Modal windows for accepting delete -->
+<div th:insert="blocks/accept-delete :: accept-delete"></div>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+<div class="container main-content">
+
+  <h1 class="text-center mb-4">Статистика по учащимся</h1>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <canvas id="chartByGender"></canvas>
+      </div>
+      <div class="col-md-6">
+        <canvas id="chartByCitizenship"></canvas>
+      </div>
+    </div>
+    <hr>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>ПДО</th>
+        <th>Название объединения</th>
+        <th>Всего</th>
+        <th>М</th>
+        <th>Д</th>
+        <th>РФ</th>
+        <th>РК</th>
+        <th>Другое</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="t : ${total}">
+        <td th:text="${t.pdo}"></td>
+        <td th:text="${t.caName}"></td>
+        <td th:text="${t.total}"></td>
+        <td th:text="${t.m}"></td>
+        <td th:text="${t.f}"></td>
+        <td th:text="${t.rf}"></td>
+        <td th:text="${t.rk}"></td>
+        <td th:text="${t.o}"></td>
+      </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/chart.js"></script>
+<script th:inline="javascript">
+ var listGender = /*[[${dataByGender}]]*/ '';
+ var listCitizenship = /*[[${dataByCitizenship}]]*/ '';
+
+      // Данные для первой диаграммы (количество детей по полу)
+      const dataByGender = {
+        labels: ['Мальчики', 'Девочки'],
+        datasets: [
+          {
+            label: 'Количество детей по полу',
+            data: listGender,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.5)',
+              'rgba(54, 162, 235, 0.5)',
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      };
+
+      // Конфигурация первой диаграммы
+      const configByGender = {
+        type: 'pie',
+        data: dataByGender,
+      };
+
+      // Отрисовка первой диаграммы на странице
+      const chartByGender = new Chart(
+        document.getElementById('chartByGender'),
+        configByGender
+      );
+
+      // Данные для второй диаграммы (количество детей по гражданству)
+      const dataByCitizenship = {
+        labels: ['Граждане РФ', 'Граждане РК', 'Другое гражданство'],
+        datasets: [
+          {
+            label: 'Количество детей по гражданству',
+            data: listCitizenship,
+            backgroundColor: [
+              'rgba(255, 206, 86, 0.5)',
+              'rgba(75, 192, 192, 0.5)',
+              'rgba(153, 102, 255, 0.5)',
+            ],
+            borderColor: [
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      };
+
+      // Конфигурация второй диаграммы
+      const configByCitizenship = {
+        type: 'pie',
+        data: dataByCitizenship,
+      };
+
+      // Отрисовка второй диаграммы на странице
+const chartByCitizenship = new Chart(
+document.getElementById('chartByCitizenship'),
+configByCitizenship
+);
+</script>
+
+</body>
+</html>
+</body>
+</html>

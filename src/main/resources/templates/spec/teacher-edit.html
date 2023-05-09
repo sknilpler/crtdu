@@ -24,20 +24,20 @@
             <form th:object="${teacher}" method="post">
                 <div class="mb-3">
                     <label for="surname" class="form-label">Фамилия</label>
-                    <input type="text" th:field="*{surname}" class="form-control" id="surname" name="surname">
+                    <input type="text" th:field="*{surname}" class="form-control" id="surname" name="surname" oninput="allowLettersOnly(this)">
                 </div>
                 <div class="mb-3">
                     <label for="name" class="form-label">Имя</label>
-                    <input type="text" th:field="*{name}" class="form-control" id="name" name="name">
+                    <input type="text" th:field="*{name}" class="form-control" id="name" name="name" oninput="allowLettersOnly(this)">
                 </div>
                 <div class="mb-3">
                     <label for="patronymic" class="form-label">Отчество</label>
-                    <input type="text" th:field="*{patronymic}" class="form-control" id="patronymic"
+                    <input type="text" th:field="*{patronymic}" class="form-control" id="patronymic" oninput="allowLettersOnly(this)"
                            name="patronymic">
                 </div>
                 <div class="mb-3">
                     <label for="doljnost" class="form-label">Должность</label>
-                    <input type="text" th:field="*{doljnost}" class="form-control" id="doljnost"
+                    <input type="text" th:field="*{doljnost}" class="form-control" id="doljnost"=
                            name="doljnost">
                 </div>
                 <div class="d-grid gap-2">
@@ -86,7 +86,10 @@ document.getElementById("clear-btn").addEventListener("click", function() {
 	document.getElementById("patronymic").value = "";
 	document.getElementById("doljnost").value = "";
 });
-
+function allowLettersOnly(input) {
+  // заменяем все символы, кроме букв, на пустую строку
+  input.value = input.value.replace(/[^a-zA-Zа-яА-Я]/g, '');
+}
 </script>
 </body>
 </html>

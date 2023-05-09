@@ -22,15 +22,15 @@
             <div>
                 <div class="mb-3">
                     <label for="surname" class="form-label">Фамилия</label>
-                    <input type="text" class="form-control" id="surname" name="surname" required>
+                    <input type="text" class="form-control" id="surname" name="surname" oninput="allowLettersOnly(this)" required>
                 </div>
                 <div class="mb-3">
                     <label for="name" class="form-label">Имя</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                    <input type="text" class="form-control" id="name" name="name" required oninput="allowLettersOnly(this)">
                 </div>
                 <div class="mb-3">
                     <label for="patronymic" class="form-label">Отчество</label>
-                    <input type="text" class="form-control" id="patronymic" name="patronymic">
+                    <input type="text" class="form-control" id="patronymic" name="patronymic" oninput="allowLettersOnly(this)">
                 </div>
 
                 <div class="mb-3">
@@ -58,7 +58,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="phone" class="form-label">Телефон</label>
-                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                    <input type="tel" class="form-control tel" id="phone" name="phone" required oninput="allowPhoneNumber(this)">
                 </div>
                 <div class="mb-3">
                     <label for="school" class="form-label">Школа</label>
@@ -178,6 +178,48 @@ function post(path, method = 'post') {
 	document.body.appendChild(form);
 	form.submit();
 }
+
+function allowLettersOnly(input) {
+  // заменяем все символы, кроме букв, на пустую строку
+  input.value = input.value.replace(/[^a-zA-Zа-яА-Я]/g, '');
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+    [].forEach.call( document.querySelectorAll('.tel'), function(input) {
+    var keyCode;
+    function mask(event) {
+        event.keyCode && (keyCode = event.keyCode);
+        var pos = this.selectionStart;
+        if (pos < 3) event.preventDefault();
+        var matrix = "+7 (___) ___ ____",
+            i = 0,
+            def = matrix.replace(/\D/g, ""),
+            val = this.value.replace(/\D/g, ""),
+            new_value = matrix.replace(/[_\d]/g, function(a) {
+                return i < val.length ? val.charAt(i++) || def.charAt(i) : a
+            });
+        i = new_value.indexOf("_");
+        if (i != -1) {
+            i < 5 && (i = 3);
+            new_value = new_value.slice(0, i)
+        }
+        var reg = matrix.substr(0, this.value.length).replace(/_+/g,
+            function(a) {
+                return "\\d{1," + a.length + "}"
+            }).replace(/[+()]/g, "\\$&");
+        reg = new RegExp("^" + reg + "$");
+        if (!reg.test(this.value) || this.value.length < 5 || keyCode > 47 && keyCode < 58) this.value = new_value;
+        if (event.type == "blur" && this.value.length < 5)  this.value = ""
+    }
+
+    input.addEventListener("input", mask, false);
+    input.addEventListener("focus", mask, false);
+    input.addEventListener("blur", mask, false);
+    input.addEventListener("keydown", mask, false)
+
+  });
+
+});
 	</script>
 </body>
 </html>

@@ -21,15 +21,15 @@
             <div>
                 <div class="mb-3">
                     <label for="surname" class="form-label">Фамилия</label>
-                    <input type="text" class="form-control" id="surname" name="surname" required>
+                    <input type="text" class="form-control" id="surname" name="surname" required oninput="allowLettersOnly(this)">
                 </div>
                 <div class="mb-3">
                     <label for="name" class="form-label">Имя</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                    <input type="text" class="form-control" id="name" name="name" required oninput="allowLettersOnly(this)">
                 </div>
                 <div class="mb-3">
                     <label for="patronymic" class="form-label">Отчество</label>
-                    <input type="text" class="form-control" id="patronymic" name="patronymic">
+                    <input type="text" class="form-control" id="patronymic" name="patronymic" oninput="allowLettersOnly(this)">
                 </div>
 
                 <div class="mb-3">
@@ -142,6 +142,11 @@ function post(path, method='post') {
   form.appendChild(hiddenField);
   document.body.appendChild(form);
   form.submit();
+}
+
+function allowLettersOnly(input) {
+  // заменяем все символы, кроме букв, на пустую строку
+  input.value = input.value.replace(/[^a-zA-Zа-яА-Я]/g, '');
 }
 	</script>
 </body>

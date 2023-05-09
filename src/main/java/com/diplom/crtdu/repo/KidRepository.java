@@ -29,4 +29,21 @@ public interface KidRepository extends CrudRepository<Kid,Long> {
             ")" +
             "ORDER BY k.rang, k.surname", nativeQuery = true)
     List<Kid> findNotIncludedByKrujokAndMeripriyatie(@Param("id1") Long id1, @Param("id2") Long id2);
+
+    List<Kid> findByGrazhdanstvo(String gr);
+    List<Kid> findBySex(Boolean sex);
+
+    @Query(value = "SELECT ca.name AS 'creative_association', CONCAT(ca.pdo_surname, ' ', LEFT(ca.pdo_name, 1), '.', LEFT(ca.pdo_patronymic, 1), '.') AS full_name, COUNT(*) AS 'total_kids',\n" +
+            "       SUM(CASE WHEN kid.sex = 1 THEN 1 ELSE 0 END) AS 'boys',\n" +
+            "       SUM(CASE WHEN kid.sex = 0 THEN 1 ELSE 0 END) AS 'girls',\n" +
+            "       SUM(CASE WHEN kid.grazhdanstvo = 'РФ' THEN 1 ELSE 0 END) AS 'RF',\n" +
+            "       SUM(CASE WHEN kid.grazhdanstvo = 'РК' THEN 1 ELSE 0 END) AS 'RK',\n" +
+            "       SUM(CASE WHEN kid.grazhdanstvo = 'Другое' THEN 1 ELSE 0 END) AS 'other'\n" +
+            "FROM creative_association ca\n" +
+            "JOIN krujok k ON ca.id = k.creative_association_id\n" +
+            "JOIN kid_krujok kk ON k.id = kk.krujok_id\n" +
+            "JOIN kid kid ON kk.kid_id = kid.id\n" +
+            "WHERE k.archive = 0\n" +
+            "GROUP BY ca.name, ca.pdo_surname, ca.pdo_name, ca.pdo_patronymic;", nativeQuery = true)
+    List<Object[]> getStatByKids();
 }

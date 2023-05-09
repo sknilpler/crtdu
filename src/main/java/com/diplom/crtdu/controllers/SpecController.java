@@ -5,17 +5,17 @@ import com.diplom.crtdu.models.*;
 import com.diplom.crtdu.repo.*;
 import com.diplom.crtdu.services.UserService;
 import com.diplom.crtdu.utils.KidsOnMeropModel;
+import com.diplom.crtdu.utils.StatKids;
+import com.diplom.crtdu.utils.StatTeacher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -208,7 +208,7 @@ public class SpecController {
                               @RequestParam("phone") String phone,
                               @RequestParam("school") String school,
                               @RequestParam("klas") String klas,
-                              @RequestParam("scans") MultipartFile[] scans) throws IOException {
+                              @RequestParam("scans") MultipartFile file) throws IOException {
         Kid kid = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
         kid.setSurname(surname);
         kid.setName(name);
@@ -231,21 +231,21 @@ public class SpecController {
         kidRepository.save(kid);
         log.warn("Edit Kid: {}", kid);
         // сохраняем сканы документов
-        for (MultipartFile file : scans) {
-            // здесь можно сохранять файлы в БД или в файловой системе
-            // например, можно использовать класс java.nio.file.Path
-            // для сохранения файлов на жесткий диск в определенной директории
-            // или можно сохранять файлы в BLOB-полях таблицы ребенка в БД
-            // ...
-            Document document = new Document();
-            document.setKid(kid);
-            document.setName(file.getOriginalFilename());
-            document.setDate(new Date());
-            document.setType(file.getContentType());
-            document.setContent(file.getBytes());
+        //for (MultipartFile file : scans) {
+        // здесь можно сохранять файлы в БД или в файловой системе
+        // например, можно использовать класс java.nio.file.Path
+        // для сохранения файлов на жесткий диск в определенной директории
+        // или можно сохранять файлы в BLOB-полях таблицы ребенка в БД
+        // ...
+        Document document = new Document();
+        document.setKid(kid);
+        document.setName(file.getOriginalFilename());
+        document.setDate(new Date());
+        document.setType(file.getContentType());
+        document.setContent(file.getBytes());
 
-            documentRepository.save(document);
-        }
+        documentRepository.save(document);
+        // }
         return "redirect:/spec/list-kids";
     }
 
@@ -317,6 +317,19 @@ public class SpecController {
         if (userService.deleteUser(user.getId())) log.warn("\tDeleted user: {}", user);
         kidRepository.deleteById(id);
         return "redirect:/spec/list-kids";
+    }
+
+    @PostMapping("/spec/list-kids/edit/upload-file")
+    public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes attributes) throws IOException {
+        Kid kid = kidRepository.findById(kidEditId).orElseThrow(() -> new NotFoundException("Kid with id = " + kidEditId + " not found on server!"));
+        Document document = new Document();
+        document.setKid(kid);
+        document.setName(file.getOriginalFilename());
+        document.setDate(new Date());
+        document.setType(file.getContentType());
+        document.setContent(file.getBytes());
+        documentRepository.save(document);
+        return "redirect:/spec/list-kids/edit/" + kidEditId;
     }
 
 
@@ -699,8 +712,6 @@ public class SpecController {
     }
 
 
-
-
     //---------------------- Достижения -------------------------
     @GetMapping("/spec/dost-list")
     public String openDostPage(Model model) {
@@ -824,9 +835,12 @@ public class SpecController {
         return "spec/creative-association";
     }
 
-    @GetMapping("/spec/ca-add-new/{name}")
-    public String addNewCA(Model model, @PathVariable("name") String name) {
-        caRepository.save(new CreativeAssociation(name));
+    @GetMapping("/spec/ca-add-new/{name}/{pdoSurname}/{pdoName}/{pdoPatronymic}")
+    public String addNewCA(Model model, @PathVariable("name") String name,
+                           @PathVariable("pdoSurname") String pdoSurname,
+                           @PathVariable("pdoName") String pdoName,
+                           @PathVariable("pdoPatronymic") String pdoPatronymic) {
+        caRepository.save(new CreativeAssociation(name, pdoSurname, pdoName, pdoPatronymic));
         model.addAttribute("cas", caRepository.findAllByOrderByName());
         return "spec/creative-association :: ca-table";
     }
@@ -845,10 +859,17 @@ public class SpecController {
         return "spec/creative-association :: ca-edit";
     }
 
-    @GetMapping("/spec/ca-save-edit/{id}/{name}")
-    public String saveEditCA(Model model, @PathVariable("id") Long id, @PathVariable("name") String name) {
+    @GetMapping("/spec/ca-save-edit/{id}/{name}/{pdoSurname}/{pdoName}/{pdoPatronymic}")
+    public String saveEditCA(Model model, @PathVariable("id") Long id,
+                             @PathVariable("name") String name,
+                             @PathVariable("pdoSurname") String pdoSurname,
+                             @PathVariable("pdoName") String pdoName,
+                             @PathVariable("pdoPatronymic") String pdoPatronymic) {
         CreativeAssociation ca = caRepository.findById(id).orElseThrow(() -> new NotFoundException("Creative Association with id = " + id + " not found on server!"));
         ca.setName(name);
+        ca.setPdoSurname(pdoSurname);
+        ca.setPdoName(pdoName);
+        ca.setPdoPatronymic(pdoPatronymic);
         caRepository.save(ca);
         model.addAttribute("cas", caRepository.findAllByOrderByName());
         return "spec/creative-association :: ca-table";
@@ -1035,7 +1056,7 @@ public class SpecController {
         return "spec/portfolio :: kruj-table-vih";
     }
 
-    @GetMapping("/documents/{id}")
+    @GetMapping("/spec/documents/{id}")
     public ResponseEntity<byte[]> downloadDocument(@PathVariable("id") Long docId) {
         Document document = documentRepository.findById(docId).orElseThrow(() -> new NotFoundException("Document with id = " + docId + " not found on server!"));
         HttpHeaders headers = new HttpHeaders();
@@ -1044,6 +1065,50 @@ public class SpecController {
                 .filename(document.getName()).build());
         return new ResponseEntity<>(document.getContent(), headers, HttpStatus.OK);
     }
+
+    //------------------------------- statistiks by kids ---------------------
+
+    @GetMapping("/spec/stat-kids")
+    public String showDiagram(Model model) {
+        int kidRF = kidRepository.findByGrazhdanstvo("РФ").size();
+        int kidRK = kidRepository.findByGrazhdanstvo("РК").size();
+        int kidOther = kidRepository.findByGrazhdanstvo("Другое").size();
+
+        int kidM = kidRepository.findBySex(true).size();
+        int kidW = kidRepository.findBySex(false).size();
+
+        int[] dataByGender = {kidM, kidW}; // количество мальчиков и девочек
+        int[] dataByCitizenship = {kidRF, kidRK, kidOther}; // количество по гражданству
+
+
+        //таблица с подробными данными
+        List<StatKids> list = new ArrayList<>();
+        List<Object[]> objectList = kidRepository.getStatByKids();
+
+        for (Object[] obj : objectList) {
+            list.add(new StatKids((String) obj[0], (String) obj[1], Integer.parseInt(obj[2].toString()), Integer.parseInt(obj[3].toString()), Integer.parseInt(obj[4].toString()), Integer.parseInt(obj[5].toString()), Integer.parseInt(obj[6].toString()), Integer.parseInt(obj[7].toString())));
+        }
+
+        model.addAttribute("dataByGender", dataByGender);
+        model.addAttribute("dataByCitizenship", dataByCitizenship);
+        model.addAttribute("total",list);
+        return "stat/stat-by-kids";
+    }
+
+    @GetMapping("/spec/stat-teacher")
+    public String showTeacherStat(Model model) {
+
+        //таблица с подробными данными
+        List<StatTeacher> list = new ArrayList<>();
+        List<Object[]> objectList = teacherRepository.getStatByDost();
+
+        for (Object[] obj : objectList) {
+            list.add(new StatTeacher((String) obj[1],Integer.parseInt(obj[2].toString()),Integer.parseInt(obj[3].toString()),Integer.parseInt(obj[4].toString()),Integer.parseInt(obj[5].toString()),Integer.parseInt(obj[6].toString()), teacherRepository.getNumKidsByTeacher(Long.parseLong(obj[0].toString()))));
+        }
+        model.addAttribute("total",list);
+        return "stat/stat-by-teacher";
+    }
+
 
 }
 
