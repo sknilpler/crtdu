@@ -12,6 +12,7 @@
 
 
 
+
     </style>
 </head>
 <body>
@@ -60,7 +61,8 @@
                                 <td class="text-md-end">
                                     <button class="btn btn-outline-success" title="Записаться"
                                             th:onclick="'javascript:addKidToKrujok(\'' + ${k.id} + '\');'">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em"
+                                             height="1em" fill="currentColor" style="font-size: 15px;">
                                             <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                             <path d="M384 32C419.3 32 448 60.65 448 96V416C448 451.3 419.3 480 384 480H64C28.65 480 0 451.3 0 416V96C0 60.65 28.65 32 64 32H384zM224 368C237.3 368 248 357.3 248 344V280H312C325.3 280 336 269.3 336 256C336 242.7 325.3 232 312 232H248V168C248 154.7 237.3 144 224 144C210.7 144 200 154.7 200 168V232H136C122.7 232 112 242.7 112 256C112 269.3 122.7 280 136 280H200V344C200 357.3 210.7 368 224 368z"></path>
                                         </svg>
@@ -118,7 +120,8 @@
                                 <td class="text-md-end">
                                     <button class="btn btn-outline-danger" title="Отписаться"
                                             th:onclick="'javascript:delKidFromKrujok(\'' + ${k.id} + '\');'">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -64 640 640" width="1em" height="1em" fill="currentColor" style="font-size: 15px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -64 640 640" width="1em"
+                                             height="1em" fill="currentColor" style="font-size: 15px;">
                                             <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                             <path d="M274.7 304H173.3C77.61 304 0 381.6 0 477.3C0 496.5 15.52 512 34.66 512h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304zM224 256c70.7 0 128-57.31 128-128S294.7 0 224 0C153.3 0 96 57.31 96 128S153.3 256 224 256zM616 200h-144C458.8 200 448 210.8 448 224s10.75 24 24 24h144C629.3 248 640 237.3 640 224S629.3 200 616 200z"></path>
                                         </svg>
@@ -156,12 +159,17 @@
 
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <li><button class="dropdown-item" onclick="print()">Экспорт</button></li>
+                                <li>
+                                    <button class="dropdown-item" onclick="print()">Экспорт</button>
+                                </li>
                                 <li>
                                     <button class="dropdown-item" onclick="openKrujkiModal()">Записать на кружок
                                     </button>
                                 </li>
-                                <li><button class="dropdown-item" onclick="openDelKrujkiModal()">Выход из кружка</button></li>
+                                <li>
+                                    <button class="dropdown-item" onclick="openDelKrujkiModal()">Выход из кружка
+                                    </button>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -211,33 +219,45 @@
                     </div>
                 </div>
             </div>
-            <h3 class="mt-4">Кружки и успеваемость:</h3>
-            <div class="krujki-list" th:fragment="krujki-list">
-                <ul>
-                    <li th:each="krujok : ${marks}" th:text="${krujok.key} + ' ср. оценка: ' + ${krujok.value}"></li>
-                </ul>
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="mt-4">Кружки и успеваемость:</h3>
+                    <div class="krujki-list" th:fragment="krujki-list">
+                        <ul>
+                            <li th:each="krujok : ${marks}" th:text="${krujok.key} + ' балл: ' + ${krujok.value}"></li>
+                        </ul>
+                    </div>
+                    <h3 class="mt-4">Достижения и призовые места:</h3>
+                    <ul>
+                        <li th:each="d : ${dost}"
+                            th:text="${d.meropriyatie.name}+': '+${d.name}+' '+${d.meropriyatie.level.name}+' '+${d.winPlace}"></li>
+                    </ul>
+
+                </div>
+                <div class="col-md-6" data-html2canvas-ignore="true">
+                    <canvas id="marksChart"></canvas>
+                </div>
+                <div data-html2canvas-ignore="true">
+                    <h3 class="mt-4">Сертификаты и грамоты:</h3>
+                    <table class="table table-sm">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Файл</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="doc : ${kid.documents}">
+                            <td th:text="${doc.name}"></td>
+                            <td>
+                                <a th:href="@{'/spec/documents/' + ${doc.id}}">Скачать</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <h3 class="mt-4">Достижения и призовые места:</h3>
-            <ul>
-                <li th:each="d : ${dost}" th:text="${d.meropriyatie.name}+': '+${d.name}+' '+${d.winPlace}"></li>
-            </ul>
-            <h3 class="mt-4">Сертификаты и грамоты:</h3>
-            <table class="table table-sm">
-                <thead>
-                <tr>
-                    <th>Название</th>
-                    <th>Файл</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="doc : ${kid.documents}">
-                    <td th:text="${doc.name}"></td>
-                    <td>
-                        <a th:href="@{'/spec/documents/' + ${doc.id}}">Скачать</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+
         </div>
     </div>
 </div>
@@ -245,7 +265,8 @@
 <script src="/js/bootstrap.min.js"></script>
 <!--<script src="/js/jspdf.umd.min.js"></script>-->
 <script src="/js/html2pdf.bundle.js"></script>
-<script>
+<script src="/js/chart.js"></script>
+<script th:inline="javascript">
 
 function openKrujkiModal(){
     $('#zapis-modal').modal('show');
@@ -309,11 +330,11 @@ function print(){
     const fio = document.getElementById('fio').textContent;
 
   var opt = {
-  margin:       1,
+  margin:       0,
   filename:     'портфолио '+fio+'.pdf',
   image:        { type: 'jpeg', quality: 0.98 },
   html2canvas:  { scale: 4 },
-  jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+  jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
 };
 
 // New Promise-based usage:
@@ -322,6 +343,81 @@ html2pdf().set(opt).from(element).save();
     //    .from(element)
     //    .save();
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+      // Данные для графика
+     // var dates = ["2023-01-01", "2023-04-01", "2023-07-01"]; // Даты поставленных оценок
+     // var subjects = ["Математика", "Физика", "Химия", "История"]; // Названия предметов
+     // var grades = [
+     //   [8, 7, 9], // Оценки по Математике
+     //   [6, 8, 7], // Оценки по Физике
+     //   [9, 9, 8], // Оценки по Химии
+     //   [7, 7, 6]  // Оценки по Истории
+     // ];
+
+var dates = /*[[${dates}]]*/ [];
+var subjects = /*[[${subjects}]]*/ [];
+var grades = /*[[${grades}]]*/ [];
+
+
+    console.log(dates);
+    console.log(subjects);
+    console.log(grades);
+      // Создание графика
+      var ctx = document.getElementById("marksChart").getContext("2d");
+      var chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: dates,
+          datasets: createDatasets()
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              display: true,
+              title: {
+                display: true,
+                text: ""
+              }
+            },
+            y: {
+              display: true,
+              title: {
+                display: true,
+                text: "Оценка"
+              },
+              suggestedMin: 1,
+              suggestedMax: 10
+            }
+          }
+        }
+      });
+
+      // Функция для создания наборов данных для графика
+      function createDatasets() {
+        var datasets = [];
+        for (var i = 0; i < subjects.length; i++) {
+          datasets.push({
+            label: subjects[i],
+            data: grades[i],
+            borderColor: getRandomColor(),
+            fill: false
+          });
+        }
+        return datasets;
+      }
+
+      // Функция для генерации случайного цвета
+      function getRandomColor() {
+        var letters = "0123456789ABCDEF";
+        var color = "#";
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+    });
 
 
 </script>

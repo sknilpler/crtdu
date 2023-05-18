@@ -28,5 +28,8 @@ public interface KrujokRepository extends CrudRepository<Krujok,Long> {
     @Query(value = "select krujok.* from krujok where krujok.type_krujok_id = :id order by krujok.creative_association_id",nativeQuery = true)
     List<Krujok> findByTypeKrujokIdByOrderByCreativeAssociationName(@Param("id") Long id);
 
+    @Query(value = "select krujok.* from krujok order by krujok.creative_association_id, krujok.name", nativeQuery = true)
+    List<Krujok> findAllByOrderByCreativeAssociationNameAndKrujokName();
+
 
 }

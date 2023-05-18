@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -18,6 +19,8 @@ public class Dostijenie {
 
     private String name;
     private String winPlace;
+    private String napravlenie;
+    private Date data;
 
     @ManyToOne
     private Meropriyatie meropriyatie;
@@ -28,16 +31,19 @@ public class Dostijenie {
     @ManyToOne
     private Teacher teacher;
 
-    public Dostijenie(String name, String winPlace, Meropriyatie meropriyatie, Kid kid, Teacher teacher) {
+    @ManyToOne
+    private Krujok krujok;
+
+
+    public Dostijenie(String name, String winPlace, String napravlenie, Date data, Meropriyatie meropriyatie, Kid kid, Teacher teacher, Krujok krujok) {
         this.name = name;
         this.winPlace = winPlace;
+        this.napravlenie = napravlenie;
+        this.data = data;
         this.meropriyatie = meropriyatie;
         this.kid = kid;
         this.teacher = teacher;
-    }
-
-    public Dostijenie(String name) {
-        this.name = name;
+        this.krujok = krujok;
     }
 
     @Override
@@ -46,9 +52,11 @@ public class Dostijenie {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", winPlace='" + winPlace + '\'' +
-                ", meropriyatiye=" + meropriyatie.getName() +
-                ", kid=" + kid.getShortFIO() +
-                ", teacher=" + teacher.getShortFIO() +
+                ", napravlenie='" + napravlenie + '\'' +
+                ", data=" + data +
+                ", meropriyatie=" + meropriyatie +
+                ", kid=" + kid +
+                ", teacher=" + teacher +
                 '}';
     }
 }

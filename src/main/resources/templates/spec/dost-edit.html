@@ -27,14 +27,53 @@
                     <input type="text" class="form-control" th:field="*{name}" id="name" name="name" required>
                 </div>
                 <div class="mb-3">
+                    <label for="data" class="form-label">Дата получения достижения</label>
+                    <input type="date" class="form-control" th:field="*{data}" id="data" name="data">
+                </div>
+                <div class="mb-3">
                     <label for="place" class="form-label">Занятое место</label>
                     <input type="text" class="form-control" th:field="*{winPlace}" id="place" name="place">
+                </div>
+                <div class="mb-3">
+                    <label for="napravlenie" class="form-label">Направление</label>
+                    <select class="form-control" th:field="*{napravlenie}" id="napravlenie" name="napravlenie" required>
+                        <option value="Вокал">Вокал</option>
+                        <option value="Декоративное искусство">Декоративное искусство</option>
+                        <option value="Дизайн">Дизайн</option>
+                        <option value="Живопись">Живопись</option>
+                        <option value="Звукозапись">Звукозапись</option>
+                        <option value="Игры">Игры</option>
+                        <option value="Кино">Кино</option>
+                        <option value="Кулинария">Кулинария</option>
+                        <option value="Литература">Литература</option>
+                        <option value="Мода">Мода</option>
+                        <option value="Мультимедиа">Мультимедиа</option>
+                        <option value="Музыка">Музыка</option>
+                        <option value="Ремесла">Ремесла</option>
+                        <option value="Скульптура">Скульптура</option>
+                        <option value="Танцы">Танцы</option>
+                        <option value="Театр">Театр</option>
+                        <option value="Фольклор">Фольклор</option>
+                        <option value="Фотография">Фотография</option>
+                        <option value="Хореография">Хореография</option>
+                        <option value="Цирк">Цирк</option>
+                        <option value="Экспериментальное искусство">Экспериментальное искусство</option>
+                        <option value="Графическое искусство">Графическое искусство</option>
+                        <option value="Иллюстрация">Иллюстрация</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="meropriyatie" class="form-label">Мероприятие</label>
                     <select class="form-control" id="meropriyatie" th:field="*{meropriyatie.id}" name="meropriyatie" required>
                         <option value="0" disabled selected>-- Выберите --</option>
                         <option th:each="m : ${meropriyaties}" th:value="${m.id}" th:text="${m.name}"></option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="krujok" class="form-label">Кружок</label>
+                    <select class="form-select" id="krujok" th:field="*{krujok.id}" name="krujok">
+                        <option disabled value="0" selected>-- Выберите --</option>
+                        <option th:each="k : ${krujki}" th:value="${k.id}" th:text="${k.creativeAssociation.name} + ' | ' + ${k.name}"></option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -68,11 +107,14 @@
 function save(id) {
 	var name = document.getElementById("name").value;
     var place = document.getElementById("place").value;
+    var napravlenie = document.getElementById("napravlenie").value;
     var meropriyatie = document.getElementById("meropriyatie").value;
     var kid = document.getElementById("kid").value;
     var teacher = document.getElementById("teacher").value;
+    var krujok = document.getElementById("krujok").value;
+    var data = document.getElementById("data").value;
 
-	post('/spec/dost/edit/' + id + '/' + name+'/'+ place+'/'+ meropriyatie +'/'+ kid+'/'+ teacher);
+	post('/spec/dost/edit/' + id + '/' + name+'/'+ place+'/'+ meropriyatie +'/'+ kid+'/'+ teacher+'/'+napravlenie+'/'+data+'/'+krujok);
 }
 
 function post(path, method = 'post') {

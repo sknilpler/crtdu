@@ -22,6 +22,11 @@ public class Teacher {
     private String patronymic;
     private String doljnost;
 
+    private String napravlenie;
+    private String kvalif;
+    private String staj;
+    private String stajSpec;
+
     private String username;
 
     /**
@@ -33,6 +38,10 @@ public class Teacher {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "teacher_id")
     private List<Dostijenie> dostList;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "teacher_id")
+    private List<TeacherDoc> documents;
 
     @ManyToMany
     @JoinTable(name = "teacher_krujok",
@@ -48,6 +57,17 @@ public class Teacher {
         this.archive = false;
     }
 
+    public Teacher(String surname, String name, String patronymic, String doljnost, String napravlenie, String kvalif, String staj, String stajSpec) {
+        this.surname = surname;
+        this.name = name;
+        this.patronymic = patronymic;
+        this.doljnost = doljnost;
+        this.napravlenie = napravlenie;
+        this.kvalif = kvalif;
+        this.staj = staj;
+        this.stajSpec = stajSpec;
+    }
+
     @Override
     public String toString() {
         return "Teacher{" +
@@ -56,7 +76,12 @@ public class Teacher {
                 ", name='" + name + '\'' +
                 ", patronymic='" + patronymic + '\'' +
                 ", doljnost='" + doljnost + '\'' +
+                ", napravlenie='" + napravlenie + '\'' +
+                ", kvalif='" + kvalif + '\'' +
+                ", staj='" + staj + '\'' +
+                ", stajSpec='" + stajSpec + '\'' +
                 ", username='" + username + '\'' +
+                ", archive=" + archive +
                 '}';
     }
 

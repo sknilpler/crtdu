@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Статистика по педагогам</title>
-  <link rel="stylesheet" href="/css/bootstrap.min.css">
-  <style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Статистика по педагогам</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
         :root {
             --bs-body-color: #000000;
         }
+
+
 
     </style>
 </head>
@@ -18,43 +20,107 @@
 <!-- Modal windows for accepting delete -->
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
 <div th:insert="blocks/sidebar :: sidebar"></div>
-<div class="container main-content">
+<div class="container-fluid">
 
-  <h1 class="text-center mb-4">Статистика по педагогам</h1>
+    <h1 class="text-center mb-4">Статистическая информация о педагогах</h1>
 
-  <div class="container">
 
-    <table class="table table-striped">
-      <thead>
-      <tr>
-        <th>ФИО</th>
-        <th>Всего учеников</th>
-        <th>Всего участий в мероприятиях</th>
-        <th>Международные участия</th>
-        <th>Первые места</th>
-        <th>Вторые места</th>
-        <th>Третьи места</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="t : ${total}">
-        <td th:text="${t.fio}"></td>
-        <td th:text="${t.numKids}"></td>
-        <td th:text="${t.numMerop}"></td>
-        <td th:text="${t.numTopMerop}"></td>
-        <td th:text="${t.numFirst}"></td>
-        <td th:text="${t.numSecond}"></td>
-        <td th:text="${t.numThird}"></td>
-      </tr>
-      </tbody>
-    </table>
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="input-group">
+                <label for="startDate" class="input-group-text">С:</label>
+                <input type="date" onchange="filter()" class="form-control" id="startDate" th:value="${d1}"
+                       title="Начальная точка фильтрации по дате">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <label for="endDate" class="input-group-text">По:</label>
+                <input type="date" onchange="filter()" class="form-control" id="endDate" th:value="${d2}"
+                       title="Конечная точка фильтрации по дате">
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="table-stat" th:fragment="table-stat">
 
-  </div>
+
+        <table class="table table-striped" id="myTable">
+            <thead>
+            <tr>
+                <th>ФИО</th>
+                <th onclick="sortTable(1);">Кол-во кружков</th>
+                <th onclick="sortTable(2);">Всего воспитанников</th>
+                <th onclick="sortTable(3);" title="Участия в мероприятиях">Всего участий</th>
+                <th onclick="sortTable(4);" title="Уровень мероприятий">Международный</th>
+                <th onclick="sortTable(5);" title="Уровень мероприятий">Национальный</th>
+                <th onclick="sortTable(6);" title="Уровень мероприятий">Региональный</th>
+                <th onclick="sortTable(7);" title="Уровень мероприятий">Городской</th>
+                <th onclick="sortTable(8);" title="Уровень мероприятий">Районный</th>
+                <th onclick="sortTable(9);" title="Занятые места">I</th>
+                <th onclick="sortTable(10);" title="Занятые места">II</th>
+                <th onclick="sortTable(11);" title="Занятые места">III</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${total}">
+                <td th:text="${t.fio}"></td>
+                <td th:text="${t.numKrujki}"></td>
+                <td th:text="${t.numKids}"></td>
+                <td th:text="${t.numMerop}"></td>
+                <td th:text="${t.numTopMerop}"></td>
+                <td th:text="${t.numNacMerop}"></td>
+                <td th:text="${t.numRegMerop}"></td>
+                <td th:text="${t.numCityMerop}"></td>
+                <td th:text="${t.numRajonMerop}"></td>
+                <td th:text="${t.numFirst}"></td>
+                <td th:text="${t.numSecond}"></td>
+                <td th:text="${t.numThird}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 
 </div>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/chart.js"></script>
+<script>
+function filter(){
+var startDate = document.getElementById('startDate').value;
+var endDate = document.getElementById('endDate').value;
+
+$.ajax({
+type: 'get',
+url: '/spec/stat-teacher/' + startDate + '/' + endDate,
+success: function(data) {
+$('.table-stat').html(data);
+},
+})
+}
+
+function sortTable(colIndex) {
+  const table = document.getElementById("myTable");
+  const tbody = table.getElementsByTagName("tbody")[0];
+  const rows = Array.from(tbody.getElementsByTagName("tr"));
+
+  rows.sort((row1, row2) => {
+    const cell1 = row1.getElementsByTagName("td")[colIndex].textContent.trim();
+    const cell2 = row2.getElementsByTagName("td")[colIndex].textContent.trim();
+
+    if (!isNaN(cell1) && !isNaN(cell2)) {
+      return Number(cell1) - Number(cell2);
+    } else {
+      return cell1.localeCompare(cell2);
+    }
+  });
+
+  for (const row of rows) {
+    tbody.appendChild(row);
+  }
+}
+</script>
 </body>
 </html>
 </body>

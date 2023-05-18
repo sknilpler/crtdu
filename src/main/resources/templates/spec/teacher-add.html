@@ -36,6 +36,46 @@
                     <label for="doljnost" class="form-label">Должность</label>
                     <input type="text" class="form-control" id="doljnost" name="doljnost" required>
                 </div>
+                <div class="mb-3">
+                    <label for="napravlenie" class="form-label">Направление</label>
+                    <select class="form-control" id="napravlenie" name="napravlenie" required>
+                        <option value="Вокал">Вокал</option>
+                        <option value="Декоративное искусство">Декоративное искусство</option>
+                        <option value="Дизайн">Дизайн</option>
+                        <option value="Живопись">Живопись</option>
+                        <option value="Звукозапись">Звукозапись</option>
+                        <option value="Игры">Игры</option>
+                        <option value="Кино">Кино</option>
+                        <option value="Кулинария">Кулинария</option>
+                        <option value="Литература">Литература</option>
+                        <option value="Мода">Мода</option>
+                        <option value="Мультимедиа">Мультимедиа</option>
+                        <option value="Музыка">Музыка</option>
+                        <option value="Ремесла">Ремесла</option>
+                        <option value="Скульптура">Скульптура</option>
+                        <option value="Танцы">Танцы</option>
+                        <option value="Театр">Театр</option>
+                        <option value="Фольклор">Фольклор</option>
+                        <option value="Фотография">Фотография</option>
+                        <option value="Хореография">Хореография</option>
+                        <option value="Цирк">Цирк</option>
+                        <option value="Экспериментальное искусство">Экспериментальное искусство</option>
+                        <option value="Графическое искусство">Графическое искусство</option>
+                        <option value="Иллюстрация">Иллюстрация</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="kvalif" class="form-label">Квалификация</label>
+                    <input type="text" class="form-control" id="kvalif" name="kvalif" required>
+                </div>
+                <div class="mb-3">
+                    <label for="staj" class="form-label">Стаж работы</label>
+                    <input type="number" class="form-control" id="staj" name="staj" required>
+                </div>
+                <div class="mb-3">
+                    <label for="stajSpec" class="form-label">Стаж работы по специализации</label>
+                    <input type="number" class="form-control" id="stajSpec" name="stajSpec" required>
+                </div>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
                     <button type="submit" class="btn btn-primary" id="save-btn">Сохранить</button>
@@ -62,6 +102,10 @@
             var name = document.getElementById("name").value;
             var patronymic = document.getElementById("patronymic").value;
             var doljnost = document.getElementById("doljnost").value;
+            var napravlenie = document.getElementById("napravlenie").value;
+            var kvalif = document.getElementById("kvalif").value;
+            var staj = document.getElementById("staj").value;
+            var stajSpec = document.getElementById("stajSpec").value;
 
 			// Генерируем уникальный логин, используя первую букву имени, полностью фамилию и случайное число от 0 до 9999
             var username = transliterate(surname) + transliterate(name) + Math.floor(Math.random() * 10000);
@@ -71,7 +115,7 @@
 
             downloadTextFile("Логин: " + username + "\n" + "Пароль: " + password, "Логин и пароль педагога "+surname+".txt")
 
-	        post('/spec/teacher-add/'+surname+'/'+name+'/'+patronymic+'/'+doljnost+'/'+username+'/'+password);
+	        post('/spec/teacher-add/'+surname+'/'+name+'/'+patronymic+'/'+doljnost+'/'+username+'/'+password+'/'+napravlenie+'/'+kvalif+'/'+staj+'/'+stajSpec);
         });
 
 		function transliterate(str) {

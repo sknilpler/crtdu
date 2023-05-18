@@ -20,7 +20,7 @@
 <!-- Modal windows for accepting delete -->
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
 <div th:insert="blocks/sidebar :: sidebar"></div>
-<div class="container main-content">
+<div class="container-fluid">
 
     <h1 class="text-center mb-4">Мероприятия</h1>
     <div class="row mb-3">
@@ -148,6 +148,7 @@
                         <tr>
                             <th>Достижение</th>
                             <th>Занятое место</th>
+                            <th>Направление</th>
                             <th>Воспитанник</th>
                             <th>Педагог</th>
                         </tr>
@@ -156,6 +157,7 @@
                         <tr th:each="d : ${dost}">
                             <td th:text="${d.name}"></td>
                             <td th:text="${d.winPlace}"></td>
+                            <td th:text="${d.napravlenie}"></td>
                             <td th:text="${d.kid.getShortFIO()}"></td>
                             <td th:text="${d.teacher.getShortFIO()}"></td>
                         </tr>

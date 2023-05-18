@@ -40,6 +40,10 @@ public class Krujok {
 //            inverseJoinColumns = @JoinColumn(name = "meropriyatie_id"))
 //    private List<Meropriyatie> meropriyatiya;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "krujok_id")
+    private List<Ocenka> marks;
+
     @ManyToOne
     private TypeKrujok typeKrujok;
 
@@ -53,6 +57,10 @@ public class Krujok {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "krujok_id")
     private List<Uchastnik> meropriyatiya;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "krujok_id")
+    private List<Dostijenie> dostList;
 
     public Krujok(String name, String vozrast, TypeKrujok type) {
         this.name = name;

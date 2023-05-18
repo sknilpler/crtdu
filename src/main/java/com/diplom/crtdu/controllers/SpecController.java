@@ -7,10 +7,13 @@ import com.diplom.crtdu.services.UserService;
 import com.diplom.crtdu.utils.KidsOnMeropModel;
 import com.diplom.crtdu.utils.StatKids;
 import com.diplom.crtdu.utils.StatTeacher;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -75,6 +78,10 @@ public class SpecController {
     private UchastnikRepository uchastnikRepository;
     @Autowired
     private DocumentRepository documentRepository;
+    @Autowired
+    private OcenkaRepository ocenkaRepository;
+    @Autowired
+    private TeacherDocRepository teacherDocRepository;
 
 
 //    public static String cyrillicToLatin(String input) {
@@ -346,13 +353,17 @@ public class SpecController {
         return "spec/teacher-add";
     }
 
-    @PostMapping("/spec/teacher-add/{surname}/{name}/{patronymic}/{doljnost}/{username}/{password}")
+    @PostMapping("/spec/teacher-add/{surname}/{name}/{patronymic}/{doljnost}/{username}/{password}/{napravlenie}/{kvalif}/{staj}/{stajSpec}")
     public String addTeacher(@PathVariable("surname") String surname,
                              @PathVariable("name") String name,
                              @PathVariable("patronymic") String patronymic,
                              @PathVariable("doljnost") String doljnost,
                              @PathVariable("username") String username,
                              @PathVariable("password") String password,
+                             @PathVariable("napravlenie") String napravlenie,
+                             @PathVariable("kvalif") String kvalif,
+                             @PathVariable("staj") String staj,
+                             @PathVariable("stajSpec") String stajSpec,
                              Authentication authentication) {
 
         Role role = roleRepository.findByName("ROLE_TEACHER");
@@ -360,7 +371,7 @@ public class SpecController {
         user.setRoles(Collections.singleton(role));
         userService.saveUser(user);
         log.warn("ADD new User: {}", user);
-        Teacher teach = new Teacher(surname, name, patronymic, doljnost);
+        Teacher teach = new Teacher(surname, name, patronymic, doljnost, napravlenie, kvalif, staj, stajSpec);
         teach.setUsername(username);
         teacherRepository.save(teach);
         log.warn("ADD new Teach: {}", teach);
@@ -396,21 +407,53 @@ public class SpecController {
         return "spec/teacher-list :: info-teacher";
     }
 
-    @PostMapping("/spec/list-teachers/edit/{id}/{surname}/{name}/{patronymic}/{doljnost}")
+    @PostMapping("/spec/list-teachers/edit/{id}/{surname}/{name}/{patronymic}/{doljnost}/{napravlenie}/{kvalif}/{staj}/{stajSpec}")
     public String saveEditTeacher(Model model, @PathVariable("id") Long id,
                                   @PathVariable("surname") String surname,
                                   @PathVariable("name") String name,
                                   @PathVariable("patronymic") String patronymic,
+                                  @PathVariable("napravlenie") String napravlenie,
+                                  @PathVariable("kvalif") String kvalif,
+                                  @PathVariable("staj") String staj,
+                                  @PathVariable("stajSpec") String stajSpec,
                                   @PathVariable("doljnost") String doljnost) {
         Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new NotFoundException("Teacher with id = " + id + " not found on server!"));
         teacher.setSurname(surname);
         teacher.setName(name);
         teacher.setPatronymic(patronymic);
         teacher.setDoljnost(doljnost);
+        teacher.setNapravlenie(napravlenie);
+        teacher.setKvalif(kvalif);
+        teacher.setStaj(staj);
+        teacher.setStajSpec(stajSpec);
         teacherRepository.save(teacher);
         log.warn("Edit Teacher: {}", teacher);
         return "redirect:/spec/list-teachers";
     }
+
+    @GetMapping("/spec/teacher-documents/{id}")
+    public ResponseEntity<byte[]> downloadDocumentForTeacher(@PathVariable("id") Long docId) {
+        TeacherDoc document = teacherDocRepository.findById(docId).orElseThrow(() -> new NotFoundException("Document with id = " + docId + " not found on server!"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename(document.getName()).build());
+        return new ResponseEntity<>(document.getContent(), headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/spec/list-teachers/edit/upload-file")
+    public String uploadFileFromTeacher(@RequestParam("file") MultipartFile file, RedirectAttributes attributes) throws IOException {
+        Teacher teacher = teacherRepository.findById(teachEditId).orElseThrow(() -> new NotFoundException("Teacher with id = " + teachEditId + " not found on server!"));
+        TeacherDoc document = new TeacherDoc();
+        document.setTeacher(teacher);
+        document.setName(file.getOriginalFilename());
+        document.setDate(new Date());
+        document.setType(file.getContentType());
+        document.setContent(file.getBytes());
+        teacherDocRepository.save(document);
+        return "redirect:/spec/list-teachers/edit/" + teachEditId;
+    }
+
 
     //------------------------------- мероприятия---------------
 
@@ -548,16 +591,22 @@ public class SpecController {
     public String saveDostAddPageForMerop(@PathVariable("id") Long id,
                                           @RequestParam String name,
                                           @RequestParam String place,
+                                          @RequestParam String napravlenie,
                                           //@RequestParam String meropriyatie,
                                           @RequestParam String kid,
+                                          @RequestParam String data,
+                                          @RequestParam String krujok,
                                           @RequestParam String teacher,
-                                          Model model) {
+                                          Model model) throws ParseException {
         System.out.println(id);
         Meropriyatie m = meropriyatieRepository.findById(id).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + id + " not found on server!"));
         Kid k = kidRepository.findById(Long.valueOf(kid)).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
         Teacher t = teacherRepository.findById(Long.valueOf(teacher)).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
-        Dostijenie d = dostijenieRepository.save(new Dostijenie(name, place, m, k, t));
-        log.warn("Save New Dostijenie: {}", d);
+        Krujok kr = krujokRepository.findById(Long.valueOf(krujok)).orElseThrow(() -> new NotFoundException("Teacher with id = " + krujok + " not found on server!"));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = dateFormat.parse(data);
+        Dostijenie dost = dostijenieRepository.save(new Dostijenie(name, place, napravlenie, d, m, k, t, kr));
+        log.warn("Save New Dostijenie: {}", dost);
         return "redirect:/spec/list-meropriyatiya";
     }
 
@@ -574,15 +623,21 @@ public class SpecController {
     @PostMapping("/spec/meropriyatiya/dost/add")
     public String saveDostAddPage(@RequestParam String name,
                                   @RequestParam String place,
+                                  @RequestParam String napravlenie,
                                   // @RequestParam String meropriyatie,
                                   @RequestParam String kid,
                                   @RequestParam String teacher,
-                                  Model model) {
+                                  @RequestParam String data,
+                                  @RequestParam String krujok,
+                                  Model model) throws ParseException {
         Meropriyatie m = meropriyatieRepository.findById(meropIDForDost).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropIDForDost + " not found on server!"));
         Kid k = kidRepository.findById(Long.valueOf(kid)).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
         Teacher t = teacherRepository.findById(Long.valueOf(teacher)).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
-        Dostijenie d = dostijenieRepository.save(new Dostijenie(name, place, m, k, t));
-        log.warn("Save New Dostijenie: {}", d);
+        Krujok kr = krujokRepository.findById(Long.valueOf(krujok)).orElseThrow(() -> new NotFoundException("Teacher with id = " + krujok + " not found on server!"));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = dateFormat.parse(data);
+        Dostijenie dost = dostijenieRepository.save(new Dostijenie(name, place, napravlenie, d, m, k, t, kr));
+        log.warn("Save New Dostijenie: {}", dost);
         return "redirect:/spec/list-meropriyatiya";
     }
 
@@ -730,22 +785,29 @@ public class SpecController {
         model.addAttribute("meropriyaties", meropriyatieRepository.findAll());
         model.addAttribute("kids", kidRepository.findAll());
         model.addAttribute("teachers", teacherRepository.findAll());
+        model.addAttribute("krujki", krujokRepository.findAllByOrderByCreativeAssociationNameAndKrujokName());
         return "spec/dost-add";
     }
 
     @PostMapping("/spec/dost-add")
     public String saveDost(@RequestParam String name,
                            @RequestParam String place,
+                           @RequestParam String napravlenie,
                            @RequestParam Long kid,
                            @RequestParam Long meropriyatie,
                            @RequestParam Long teacher,
-                           Model model) {
+                           @RequestParam String data,
+                           @RequestParam Long krujok,
+                           Model model) throws ParseException {
         Meropriyatie m = meropriyatieRepository.findById(meropriyatie).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropriyatie + " not found on server!"));
         Kid k = kidRepository.findById(kid).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
         Teacher t = teacherRepository.findById(teacher).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
-        Dostijenie d = dostijenieRepository.save(new Dostijenie(name, place, m, k, t));
-        log.warn("Save New Dostijenie: {}", d);
-        return "redirect:/spec/list-meropriyatiya";
+        Krujok kr = krujokRepository.findById(krujok).orElseThrow(() -> new NotFoundException("Teacher with id = " + krujok + " not found on server!"));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = dateFormat.parse(data);
+        Dostijenie dost = dostijenieRepository.save(new Dostijenie(name, place, napravlenie, d, m, k, t, kr));
+        log.warn("Save New Dostijenie: {}", dost);
+        return "redirect:/spec/dost-list";
     }
 
     @GetMapping("/spec/dost/edit/{id}")
@@ -754,29 +816,39 @@ public class SpecController {
         model.addAttribute("meropriyaties", meropriyatieRepository.findAll());
         model.addAttribute("kids", kidRepository.findAll());
         model.addAttribute("teachers", teacherRepository.findAll());
+        model.addAttribute("krujki", krujokRepository.findAllByOrderByCreativeAssociationNameAndKrujokName());
         model.addAttribute("dost", d);
         return "spec/dost-edit";
     }
 
-    @PostMapping("/spec/dost/edit/{id}/{name}/{place}/{meropriyatie}/{kid}/{teacher}")
+    @PostMapping("/spec/dost/edit/{id}/{name}/{place}/{meropriyatie}/{kid}/{teacher}/{napravlenie}/{data}/{krujok}")
     public String saveDostAfterEditing(@PathVariable("id") Long id,
                                        @PathVariable("name") String name,
+                                       @PathVariable("napravlenie") String napravlenie,
                                        @PathVariable("place") String place,
                                        @PathVariable("kid") Long kid,
                                        @PathVariable("meropriyatie") Long meropriyatie,
                                        @PathVariable("teacher") Long teacher,
-                                       Model model) {
+                                       @PathVariable("data") String data,
+                                       @PathVariable("krujok") Long krujok,
+                                       Model model) throws ParseException {
         Meropriyatie m = meropriyatieRepository.findById(meropriyatie).orElseThrow(() -> new NotFoundException("Meropriyatie with id = " + meropriyatie + " not found on server!"));
         Kid k = kidRepository.findById(kid).orElseThrow(() -> new NotFoundException("Kid with id = " + kid + " not found on server!"));
         Teacher t = teacherRepository.findById(teacher).orElseThrow(() -> new NotFoundException("Teacher with id = " + teacher + " not found on server!"));
-        Dostijenie d = dostijenieRepository.findById(id).orElseThrow(() -> new NotFoundException("Dostijenie with id = " + id + " not found on server!"));
-        d.setName(name);
-        d.setWinPlace(place);
-        d.setKid(k);
-        d.setMeropriyatie(m);
-        d.setTeacher(t);
-        dostijenieRepository.save(d);
-        log.warn("Save edited Dostijenie: {}", d);
+        Dostijenie dost = dostijenieRepository.findById(id).orElseThrow(() -> new NotFoundException("Dostijenie with id = " + id + " not found on server!"));
+        Krujok kr = krujokRepository.findById(krujok).orElseThrow(() -> new NotFoundException("Teacher with id = " + krujok + " not found on server!"));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = dateFormat.parse(data);
+        dost.setName(name);
+        dost.setWinPlace(place);
+        dost.setKid(k);
+        dost.setMeropriyatie(m);
+        dost.setTeacher(t);
+        dost.setNapravlenie(napravlenie);
+        dost.setData(d);
+        dost.setKrujok(kr);
+        dostijenieRepository.save(dost);
+        log.warn("Save edited Dostijenie: {}", dost);
         return "redirect:/spec/dost-list";
     }
 
@@ -866,6 +938,10 @@ public class SpecController {
                              @PathVariable("pdoName") String pdoName,
                              @PathVariable("pdoPatronymic") String pdoPatronymic) {
         CreativeAssociation ca = caRepository.findById(id).orElseThrow(() -> new NotFoundException("Creative Association with id = " + id + " not found on server!"));
+        System.out.println(pdoName);
+        System.out.println(pdoSurname);
+        System.out.println(pdoPatronymic);
+
         ca.setName(name);
         ca.setPdoSurname(pdoSurname);
         ca.setPdoName(pdoName);
@@ -990,27 +1066,73 @@ public class SpecController {
     //--------------- portfolio-----------------
 
     @GetMapping("/spec/get-portfolio/{id}")
-    public String getPortfolio(@PathVariable("id") Long id, Model model) {
+    public String getPortfolio(@PathVariable("id") Long id, Model model) throws JsonProcessingException {
         Kid k = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
         portfolioKidId = id;
         List<Parents> parents = parentsRepository.findByKidsId(id);
         List<Dostijenie> dostijenies = dostijenieRepository.findByKidId(id);
         List<Krujok> krujoks = krujokRepository.findByKidId(id);
-        Map<String, Double> marks = new HashMap<>();
+        Map<String, Integer> marks = new HashMap<>();
+        List<String> s = new ArrayList<>();
+        List<List<Integer>> g = new ArrayList<>();
         krujoks.forEach(krujok -> {
-            List<KidZanyatie> kidZanyaties = kidZanyatieRepository.findByKidIdAndKrujokId(id, krujok.getId());
-            int size = 0;
-            double summ = 0.0;
-            for (KidZanyatie zanyatie : kidZanyaties) {
-                if (zanyatie.getOtsenka() > 0) {
-                    size++;
-                    summ += zanyatie.getOtsenka();
+            //List<KidZanyatie> kidZanyaties = kidZanyatieRepository.findByKidIdAndKrujokId(id, krujok.getId());
+            //int size = 0;
+            //double summ = 0.0;
+            //for (KidZanyatie zanyatie : kidZanyaties) {
+            //    if (zanyatie.getOtsenka() > 0) {
+            //        size++;
+            //        summ += zanyatie.getOtsenka();
+            //    }
+            //}
+            //double average = size > 0 ? summ / size : 0.0;
+            s.add(krujok.getName());
+            List<Ocenka> ocenki = ocenkaRepository.findByKidIdAndKrujokId(id, krujok.getId());
+            List<Integer> bally = new ArrayList<>();
+            int size = ocenki.size();
+            if (size > 0) {
+                marks.put(krujok.getName(), ocenki.get(size - 1).getBall());
+                for (Ocenka o : ocenki) {
+                    bally.add(o.getBall());
                 }
+            } else {
+                marks.put(krujok.getName(), 0);
             }
-            double average = size > 0 ? summ / size : 0.0;
-            marks.put(krujok.getName(), average);
+            g.add(bally);
+
+
         });
 
+
+        // Определение размеров двумерного массива
+        int rowCount = g.size();
+        int colCount = 0;
+
+// Нахождение максимальной длины внутренних списков
+        for (List<Integer> row : g) {
+            colCount = Math.max(colCount, row.size());
+        }
+
+// Создание и заполнение двумерного массива
+        int[][] grades = new int[rowCount][colCount];
+        for (int i = 0; i < rowCount; i++) {
+
+            List<Integer> row = g.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                grades[i][j] = row.get(j);
+            }
+        }
+        int[] dates = new int[colCount];
+        for (int i = 0; i < colCount; i++) {
+            dates[i] = i + 1;
+        }
+        String[] subjects = s.toArray(new String[0]);
+
+
+// Передача строк JSON в модель
+        model.addAttribute("dates", dates);
+        model.addAttribute("subjects", subjects);
+        model.addAttribute("grades", grades);
         model.addAttribute("kid", k);
         model.addAttribute("parents", parents);
         model.addAttribute("dost", dostijenies);
@@ -1066,20 +1188,64 @@ public class SpecController {
         return new ResponseEntity<>(document.getContent(), headers, HttpStatus.OK);
     }
 
+
     //------------------------------- statistiks by kids ---------------------
 
     @GetMapping("/spec/stat-kids")
     public String showDiagram(Model model) {
-        int kidRF = kidRepository.findByGrazhdanstvo("РФ").size();
-        int kidRK = kidRepository.findByGrazhdanstvo("РК").size();
-        int kidOther = kidRepository.findByGrazhdanstvo("Другое").size();
+        int kidRF = kidRepository.findByGrazhdanstvoAndArchive("РФ", false).size();
+        int kidRK = kidRepository.findByGrazhdanstvoAndArchive("РК", false).size();
+        int kidOther = kidRepository.findByGrazhdanstvoAndArchive("Другое", false).size();
 
-        int kidM = kidRepository.findBySex(true).size();
-        int kidW = kidRepository.findBySex(false).size();
+        int kidM = kidRepository.findBySexAndArchive(true, false).size();
+        int kidW = kidRepository.findBySexAndArchive(false, false).size();
 
         int[] dataByGender = {kidM, kidW}; // количество мальчиков и девочек
         int[] dataByCitizenship = {kidRF, kidRK, kidOther}; // количество по гражданству
 
+        List<Kid> kidsAll = kidRepository.findByArchive(false);
+        int from3to5m = 0;
+        int from6to8m = 0;
+        int from9to11m = 0;
+        int from12to15m = 0;
+        int from16to17m = 0;
+
+        int from3to5f = 0;
+        int from6to8f = 0;
+        int from9to11f = 0;
+        int from12to15f = 0;
+        int from16to17f = 0;
+
+        for (Kid kid : kidsAll) {
+            int age = kid.getAge();
+            if (kid.isSex()) {
+                if (age >= 3 && age <= 5) {
+                    from3to5m++;
+                } else if (age >= 6 && age <= 8) {
+                    from6to8m++;
+                } else if (age >= 9 && age <= 11) {
+                    from9to11m++;
+                } else if (age >= 12 && age <= 15) {
+                    from12to15m++;
+                } else if (age >= 16 && age <= 17) {
+                    from16to17m++;
+                }
+            } else {
+                if (age >= 3 && age <= 5) {
+                    from3to5f++;
+                } else if (age >= 6 && age <= 8) {
+                    from6to8f++;
+                } else if (age >= 9 && age <= 11) {
+                    from9to11f++;
+                } else if (age >= 12 && age <= 15) {
+                    from12to15f++;
+                } else if (age >= 16 && age <= 17) {
+                    from16to17f++;
+                }
+            }
+        }
+        int[] dataByAgesM = {from3to5m, from6to8m, from9to11m, from12to15m, from16to17m};
+        int[] dataByAgesF = {from3to5f, from6to8f, from9to11f, from12to15f, from16to17f};
 
         //таблица с подробными данными
         List<StatKids> list = new ArrayList<>();
@@ -1088,25 +1254,96 @@ public class SpecController {
         for (Object[] obj : objectList) {
             list.add(new StatKids((String) obj[0], (String) obj[1], Integer.parseInt(obj[2].toString()), Integer.parseInt(obj[3].toString()), Integer.parseInt(obj[4].toString()), Integer.parseInt(obj[5].toString()), Integer.parseInt(obj[6].toString()), Integer.parseInt(obj[7].toString())));
         }
+        List<String> napravleniya = new ArrayList<>();
+        List<Integer> numNapr = new ArrayList<>();
+        Iterable<TypeKrujok> types = typeKrujokRepository.findAll();
+        for (TypeKrujok t : types) {
+            napravleniya.add(t.getName());
+            int count = 0;
+            List<Krujok> krujki = krujokRepository.findByTypeKrujokIdByOrderByCreativeAssociationName(t.getId());
+            for (Krujok k : krujki) {
+                count = count + k.getKids().size();
+            }
+            numNapr.add(count);
+        }
+        String[] labelNapr = napravleniya.toArray(new String[0]);
+        int[] arrNapr = numNapr.stream().mapToInt(Integer::intValue).toArray();
 
+        List<Dostijenie> dostijeniya = new ArrayList<>();
+        kidsAll.forEach(kid -> {
+            dostijeniya.addAll(dostijenieRepository.findByKidId(kid.getId()));
+        });
+        List<String> napravleniya2 = dostijenieRepository.getNapravlenie();
+        int[] numdost = new int[napravleniya2.size()];
+        int i = 0;
+        for (String s : napravleniya2) {
+            int k = 0;
+            for (Dostijenie d : dostijeniya) {
+                if (d.getNapravlenie().equals(s)) {
+                    k++;
+                }
+            }
+            numdost[i] = k;
+            i++;
+        }
+        String[] labelNapr2 = napravleniya2.toArray(new String[0]);
         model.addAttribute("dataByGender", dataByGender);
         model.addAttribute("dataByCitizenship", dataByCitizenship);
-        model.addAttribute("total",list);
+        model.addAttribute("total", list);
+        model.addAttribute("dataByAgesM", dataByAgesM);
+        model.addAttribute("dataByAgesF", dataByAgesF);
+        model.addAttribute("labelNapr", labelNapr);
+        model.addAttribute("arrNapr", arrNapr);
+        model.addAttribute("labelNapr2", labelNapr2);
+        model.addAttribute("numDost", numdost);
         return "stat/stat-by-kids";
     }
 
     @GetMapping("/spec/stat-teacher")
     public String showTeacherStat(Model model) {
+        int year = LocalDate.now().getYear(); // текущий год
+        // дата 1 января текущего года
+        String d1 = LocalDate.of(year, 1, 1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        //текущая дата
+        String d2 = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        // дата 31 декабря текущего года
+        //String d2 = LocalDate.of(year, 12, 31).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        model.addAttribute("d1", d1);
+        model.addAttribute("d2", d2);
+        //таблица с подробными данными
+        List<StatTeacher> list = new ArrayList<>();
+        List<Object[]> objectList = teacherRepository.getStatByDost(d1, d2);
+
+        for (Object[] obj : objectList) {
+            list.add(new StatTeacher((String) obj[1], Integer.parseInt(obj[2].toString()), Integer.parseInt(obj[3].toString()),
+                    Integer.parseInt(obj[4].toString()), Integer.parseInt(obj[5].toString()), Integer.parseInt(obj[6].toString()),
+                    Integer.parseInt(obj[7].toString()), Integer.parseInt(obj[8].toString()), Integer.parseInt(obj[9].toString()),
+                    Integer.parseInt(obj[10].toString()), teacherRepository.getNumKidsByTeacher(Long.parseLong(obj[0].toString())),
+                    Objects.requireNonNull(teacherRepository.findById(Long.parseLong(obj[0].toString())).orElse(null)).getKrujki().size()));
+        }
+        model.addAttribute("total", list);
+        return "stat/stat-by-teacher";
+    }
+
+    @GetMapping("/spec/stat-teacher/{d1}/{d2}")
+    public String filterTeacherStat(Model model, @PathVariable("d1") String d1,
+                                    @PathVariable("d2") String d2) {
 
         //таблица с подробными данными
         List<StatTeacher> list = new ArrayList<>();
-        List<Object[]> objectList = teacherRepository.getStatByDost();
+
+        List<Object[]> objectList = teacherRepository.getStatByDost(d1, d2);
 
         for (Object[] obj : objectList) {
-            list.add(new StatTeacher((String) obj[1],Integer.parseInt(obj[2].toString()),Integer.parseInt(obj[3].toString()),Integer.parseInt(obj[4].toString()),Integer.parseInt(obj[5].toString()),Integer.parseInt(obj[6].toString()), teacherRepository.getNumKidsByTeacher(Long.parseLong(obj[0].toString()))));
+            list.add(new StatTeacher((String) obj[1], Integer.parseInt(obj[2].toString()), Integer.parseInt(obj[3].toString()),
+                    Integer.parseInt(obj[4].toString()), Integer.parseInt(obj[5].toString()), Integer.parseInt(obj[6].toString()),
+                    Integer.parseInt(obj[7].toString()), Integer.parseInt(obj[8].toString()), Integer.parseInt(obj[9].toString()),
+                    Integer.parseInt(obj[10].toString()), teacherRepository.getNumKidsByTeacher(Long.parseLong(obj[0].toString())),
+                    Objects.requireNonNull(teacherRepository.findById(Long.parseLong(obj[0].toString())).orElse(null)).getKrujki().size()));
         }
-        model.addAttribute("total",list);
-        return "stat/stat-by-teacher";
+        model.addAttribute("total", list);
+
+        return "stat/stat-by-teacher :: table-stat";
     }
 
 

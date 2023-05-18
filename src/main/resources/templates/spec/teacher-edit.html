@@ -19,7 +19,10 @@
 
 <div class="container py-5">
     <div class="justify-content-center">
-        <div class="alert alert-info" style="box-shadow: 0px 0px 4px;">
+        <div class="row">
+
+
+        <div class="alert alert-info col-md-6" style="box-shadow: 0px 0px 4px;">
             <h3 class="text-center mb-5">Данные педагога</h3>
             <form th:object="${teacher}" method="post">
                 <div class="mb-3">
@@ -37,8 +40,48 @@
                 </div>
                 <div class="mb-3">
                     <label for="doljnost" class="form-label">Должность</label>
-                    <input type="text" th:field="*{doljnost}" class="form-control" id="doljnost"=
+                    <input type="text" th:field="*{doljnost}" class="form-control" id="doljnost"
                            name="doljnost">
+                </div>
+                <div class="mb-3">
+                    <label for="napravlenie" class="form-label">Направление</label>
+                    <select class="form-control" th:field="*{napravlenie}" id="napravlenie" name="napravlenie" required>
+                        <option value="Вокал">Вокал</option>
+                        <option value="Декоративное искусство">Декоративное искусство</option>
+                        <option value="Дизайн">Дизайн</option>
+                        <option value="Живопись">Живопись</option>
+                        <option value="Звукозапись">Звукозапись</option>
+                        <option value="Игры">Игры</option>
+                        <option value="Кино">Кино</option>
+                        <option value="Кулинария">Кулинария</option>
+                        <option value="Литература">Литература</option>
+                        <option value="Мода">Мода</option>
+                        <option value="Мультимедиа">Мультимедиа</option>
+                        <option value="Музыка">Музыка</option>
+                        <option value="Ремесла">Ремесла</option>
+                        <option value="Скульптура">Скульптура</option>
+                        <option value="Танцы">Танцы</option>
+                        <option value="Театр">Театр</option>
+                        <option value="Фольклор">Фольклор</option>
+                        <option value="Фотография">Фотография</option>
+                        <option value="Хореография">Хореография</option>
+                        <option value="Цирк">Цирк</option>
+                        <option value="Экспериментальное искусство">Экспериментальное искусство</option>
+                        <option value="Графическое искусство">Графическое искусство</option>
+                        <option value="Иллюстрация">Иллюстрация</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="kvalif" class="form-label">Квалификация</label>
+                    <input type="text" class="form-control" th:field="*{kvalif}" id="kvalif" name="kvalif" required>
+                </div>
+                <div class="mb-3">
+                    <label for="staj" class="form-label">Стаж работы</label>
+                    <input type="number" class="form-control" th:field="*{staj}" id="staj" name="staj" required>
+                </div>
+                <div class="mb-3">
+                    <label for="stajSpec" class="form-label">Стаж работы по специализации</label>
+                    <input type="number" class="form-control" th:field="*{stajSpec}" id="stajSpec" name="stajSpec" required>
                 </div>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
@@ -47,8 +90,36 @@
                     </button>
                 </div>
             </form>
-        </div>
 
+        </div>
+        <div class="col-md-6">
+            <div class="alert" style="box-shadow: 0px 0px 4px;">
+                <h3 class="text-center mb-5">Сертификаты и грамоты</h3>
+                <form method="post" th:action="@{/spec/list-teachers/edit/upload-file}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="file" id="fileInput" name="file" class="form-control-file">
+                        <button type="submit" id="uploadButton" class="btn btn-primary mt-2" disabled>Загрузить</button>
+                    </div>
+                </form>
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Файл</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="doc : ${teacher.documents}">
+                        <td th:text="${doc.name}"></td>
+                        <td>
+                            <a th:href="@{'/spec/teacher-documents/' + ${doc.id}}">Скачать</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
     </div>
 </div>
 
@@ -60,8 +131,12 @@ function save(id) {
 	var name = document.getElementById("name").value;
 	var patronymic = document.getElementById("patronymic").value;
 	var doljnost = document.getElementById("doljnost").value;
+	            var napravlenie = document.getElementById("napravlenie").value;
+            var kvalif = document.getElementById("kvalif").value;
+            var staj = document.getElementById("staj").value;
+            var stajSpec = document.getElementById("stajSpec").value;
 
-	post('/spec/list-teachers/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + doljnost);
+	post('/spec/list-teachers/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + doljnost +'/'+napravlenie+'/'+kvalif+'/'+staj+'/'+stajSpec);
 }
 
 function post(path, method = 'post') {
@@ -85,11 +160,27 @@ document.getElementById("clear-btn").addEventListener("click", function() {
 	document.getElementById("name").value = "";
 	document.getElementById("patronymic").value = "";
 	document.getElementById("doljnost").value = "";
+	document.getElementById("napravlenie").value = "";
+    document.getElementById("kvalif").value= "";
+    document.getElementById("staj").value= "";
+    document.getElementById("stajSpec").value= "";
 });
 function allowLettersOnly(input) {
   // заменяем все символы, кроме букв, на пустую строку
   input.value = input.value.replace(/[^a-zA-Zа-яА-Я]/g, '');
 }
+
+
+const fileInput = document.getElementById('fileInput');
+    const uploadButton = document.getElementById('uploadButton');
+
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) {
+            uploadButton.disabled = false;
+        } else {
+            uploadButton.disabled = true;
+        }
+    });
 </script>
 </body>
 </html>

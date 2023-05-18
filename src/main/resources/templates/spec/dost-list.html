@@ -18,7 +18,7 @@
 <!-- Modal windows for accepting delete -->
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
 <div th:insert="blocks/sidebar :: sidebar"></div>
-<div class="container main-content">
+<div class="container-fluid">
 
     <h1 class="text-center mb-4">Список достижений</h1>
     <div class="row mb-3">
@@ -44,20 +44,26 @@
         <thead>
         <tr>
             <th onclick="sortTable(0);">Мероприятие</th>
-            <th onclick="sortTable(1);">Достижение</th>
-            <th onclick="sortTable(2);">Занятое место</th>
-            <th onclick="sortTable(3);">Воспитанник</th>
-            <th onclick="sortTable(4);">Педагог</th>
+            <th onclick="sortTable(1);">Дата получения</th>
+            <th onclick="sortTable(2);">Достижение</th>
+            <th onclick="sortTable(3);">Направление</th>
+            <th onclick="sortTable(4);">Занятое место</th>
+            <th onclick="sortTable(5);">Кружок</th>
+            <th onclick="sortTable(6);">Воспитанник</th>
+            <th onclick="sortTable(7);">Педагог</th>
             <th></th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="d : ${dost}">
             <td th:text="${d.meropriyatie.name}"></td>
+            <td th:text="${#dates.format(d?.data, 'dd.MM.yyyy')}"></td>
             <td th:text="${d.name}"></td>
+            <td th:text="${d.napravlenie}"></td>
             <td th:text="${d.winPlace}"></td>
-            <td th:text="${d.kid.getShortFIO()}"></td>
-            <td th:text="${d.teacher.getShortFIO()}"></td>
+            <td th:text="${d.krujok?.name}"></td>
+            <td th:text="${d.kid?.getShortFIO()}"></td>
+            <td th:text="${d.teacher?.getShortFIO()}"></td>
             <td class="text-md-end">
                 <a class="btn btn-outline-warning btn-sm" th:href="'/spec/dost/edit/'+${d.id}"
                    title="Редактировать">

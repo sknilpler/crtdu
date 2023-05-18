@@ -18,7 +18,7 @@
 <!-- Modal windows for accepting delete -->
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
 <div th:insert="blocks/sidebar :: sidebar"></div>
-<div class="container main-content">
+<div class="container-fluid">
 
     <h1 class="text-center mb-4">Список педагогов</h1>
     <div class="row mb-3">
@@ -45,6 +45,7 @@
         <tr>
             <th onclick="sortTable(0);">ФИО</th>
             <th onclick="sortTable(1);">Должность</th>
+            <th onclick="sortTable(2);">Направление</th>
             <th></th>
         </tr>
         </thead>
@@ -52,6 +53,7 @@
         <tr th:each="t : ${teachers}">
             <td th:text="${t.getFullFIO()}"></td>
             <td th:text="${t.doljnost}"></td>
+            <td th:text="${t.napravlenie}"></td>
             <td class="text-md-end">
                 <button class="btn btn-outline-info btn-sm" th:onclick="'javascript:openInfo(\'' + ${t.id} + '\');'" title="Подробнее">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor">
@@ -95,6 +97,22 @@
                         <strong>Должность:</strong>
                         [[${teacher?.doljnost}]]
                     </p>
+                    <p th:inline='text'>
+                        <strong>Направление:</strong>
+                        [[${teacher?.napravlenie}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Квалификация:</strong>
+                        [[${teacher?.kvalif}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Стаж работы, лет:</strong>
+                        [[${teacher?.staj}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Стаж работы по специальности, лет:</strong>
+                        [[${teacher?.stajSpec}]]
+                    </p>
                     <hr>
                     <h6>Ведет кружки</h6>
                     <div th:each="k : ${krujki}">
@@ -103,6 +121,23 @@
                         </p>
                         <br>
                     </div>
+                    <h6 class="mt-4">Сертификаты и грамоты:</h6>
+                    <table class="table table-sm">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Файл</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="doc : ${teacher?.documents}">
+                            <td th:text="${doc.name}"></td>
+                            <td>
+                                <a th:href="@{'/spec/teacher-documents/' + ${doc.id}}">Скачать</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="modal-footer">

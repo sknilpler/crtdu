@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Статистика по детям</title>
-  <link rel="stylesheet" href="/css/bootstrap.min.css">
-  <style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Статистика по детям</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
         :root {
             --bs-body-color: #000000;
         }
 
+
     </style>
+
 </head>
 <body>
 <header th:insert="blocks/header2 :: header2"></header>
@@ -20,46 +22,57 @@
 <div th:insert="blocks/sidebar :: sidebar"></div>
 <div class="container main-content">
 
-  <h1 class="text-center mb-4">Статистика по учащимся</h1>
+    <h1 class="text-center mb-4">Статистическая информация о воспитанниках</h1>
 
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <canvas id="chartByGender"></canvas>
-      </div>
-      <div class="col-md-6">
-        <canvas id="chartByCitizenship"></canvas>
-      </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <!--        <canvas id="chartByGender"></canvas>-->
+                <canvas id="gender-chart" class="chart" style="height: 100%"></canvas>
+            </div>
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-4">
+                <canvas id="chartByCitizenship"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="napr-chart" class="chart"></canvas>
+            </div>
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-4">
+                <canvas id="chartByDost"></canvas>
+            </div>
+        </div>
+        <hr>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ПДО</th>
+                <th>Название объединения</th>
+                <th>Всего</th>
+                <th>М</th>
+                <th>Д</th>
+                <th>РФ</th>
+                <th>РК</th>
+                <th>Другое</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${total}">
+                <td th:text="${t.pdo}"></td>
+                <td th:text="${t.caName}"></td>
+                <td th:text="${t.total}"></td>
+                <td th:text="${t.m}"></td>
+                <td th:text="${t.f}"></td>
+                <td th:text="${t.rf}"></td>
+                <td th:text="${t.rk}"></td>
+                <td th:text="${t.o}"></td>
+            </tr>
+            </tbody>
+        </table>
+
     </div>
-    <hr>
-    <table class="table table-striped">
-      <thead>
-      <tr>
-        <th>ПДО</th>
-        <th>Название объединения</th>
-        <th>Всего</th>
-        <th>М</th>
-        <th>Д</th>
-        <th>РФ</th>
-        <th>РК</th>
-        <th>Другое</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="t : ${total}">
-        <td th:text="${t.pdo}"></td>
-        <td th:text="${t.caName}"></td>
-        <td th:text="${t.total}"></td>
-        <td th:text="${t.m}"></td>
-        <td th:text="${t.f}"></td>
-        <td th:text="${t.rf}"></td>
-        <td th:text="${t.rk}"></td>
-        <td th:text="${t.o}"></td>
-      </tr>
-      </tbody>
-    </table>
-
-  </div>
 
 </div>
 <script src="/js/jquery.min.js"></script>
@@ -68,6 +81,8 @@
 <script th:inline="javascript">
  var listGender = /*[[${dataByGender}]]*/ '';
  var listCitizenship = /*[[${dataByCitizenship}]]*/ '';
+ var listNapr = /*[[${labelNapr2}]]*/ '';
+ var listDostNum = /*[[${numDost}]]*/ '';
 
       // Данные для первой диаграммы (количество детей по полу)
       const dataByGender = {
@@ -96,10 +111,10 @@
       };
 
       // Отрисовка первой диаграммы на странице
-      const chartByGender = new Chart(
-        document.getElementById('chartByGender'),
-        configByGender
-      );
+     // const chartByGender = new Chart(
+     //   document.getElementById('chartByGender'),
+     //   configByGender
+     // );
 
       // Данные для второй диаграммы (количество детей по гражданству)
       const dataByCitizenship = {
@@ -130,10 +145,124 @@
       };
 
       // Отрисовка второй диаграммы на странице
-const chartByCitizenship = new Chart(
-document.getElementById('chartByCitizenship'),
-configByCitizenship
-);
+        const chartByCitizenship = new Chart(
+        document.getElementById('chartByCitizenship'),
+        configByCitizenship
+        );
+
+// Данные для третей диаграммы (количество достижений по направлениям)
+      const dataByDost = {
+        labels: listNapr,
+        datasets: [
+          {
+            label: 'Количество достижений по направлениям',
+            data: listDostNum,
+ backgroundColor: generateColorsWithAlpha(listDostNum.length, 0.5),
+      borderColor: generateColorsWithAlpha(listDostNum.length, 1),
+            borderWidth: 1,
+          },
+        ],
+      };
+// Конфигурация третей диаграммы
+      const configByDost = {
+        type: 'pie',
+        data: dataByDost,
+      };
+
+      // Отрисовка третей диаграммы на странице
+        const chartByDost = new Chart(
+        document.getElementById('chartByDost'),
+        configByDost
+        );
+
+// Функция для генерации случайного цвета с указанным альфа-каналом
+function generateRandomColorWithAlpha(alpha) {
+  const letters = '0123456789ABCDEF';
+  let color = 'rgba(';
+  for (let i = 0; i < 3; i++) {
+    color += Math.floor(Math.random() * 256) + ',';
+  }
+  color += alpha + ')';
+  return color;
+}
+
+// Функция для генерации массива случайных цветов с указанным альфа-каналом
+function generateColorsWithAlpha(count, alpha) {
+  const colors = [];
+  for (let i = 0; i < count; i++) {
+    colors.push(generateRandomColorWithAlpha(alpha));
+  }
+  return colors;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+var listMAges = /*[[${dataByAgesM}]]*/ '';
+var listFAges = /*[[${dataByAgesF}]]*/ '';
+var labelNapr = /*[[${labelNapr}]]*/ '';
+var arrNapr =  /*[[${arrNapr}]]*/ '';
+            var ctx = document.getElementById('gender-chart').getContext('2d');
+            var ctx2 = document.getElementById('napr-chart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['3-5 лет', '6-8 лет', '9-11 лет', '12-15 лет', '16-17 лет'],
+                    datasets: [{
+                        label: 'Мальчики',
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        data: listMAges
+                    }, {
+                        label: 'Девочки',
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        data: listFAges
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            stacked: true
+                        },
+                        y: {
+                            beginAtZero: true,
+                            stacked: true
+                        }
+                    }
+                }
+            });
+
+            var chart2 = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: labelNapr,
+                    datasets: [{
+                        label: 'Воспитанники',
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        data: arrNapr
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            stacked: true
+                        },
+                        y: {
+                            beginAtZero: true,
+                            stacked: true
+                        }
+                    }
+                }
+            });
+        });
+
 </script>
 
 </body>

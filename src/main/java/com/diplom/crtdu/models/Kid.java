@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -88,6 +91,10 @@ public class Kid {
     @JoinColumn(name = "kid_id")
     private List<Document> documents;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "kid_id")
+    private List<Ocenka> marks;
+
     public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas) {
         this.surname = surname;
         this.name = name;
@@ -146,5 +153,17 @@ public class Kid {
 
     public String getStudy(){
         return "ГОУ СОШ "+school+" кл.: " + klas;
+    }
+
+    /**
+     * Метод возвращает возраст в целых годах
+     *
+     * @return int возраст (лет)
+     */
+    public int getAge() {
+        LocalDate cDate = LocalDate.now();
+        LocalDate bDate = birthday.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Period period = Period.between(bDate, cDate);
+        return period.getYears();
     }
 }
