@@ -82,37 +82,14 @@ public class SpecController {
     private OcenkaRepository ocenkaRepository;
     @Autowired
     private TeacherDocRepository teacherDocRepository;
+    @Autowired
+    private NormaRepository normaRepository;
 
-
-//    public static String cyrillicToLatin(String input) {
-//        // Массив для хранения заменяемых символов
-//        String[][] replacements = {
-//                {"а", "a"}, {"б", "b"}, {"в", "v"}, {"г", "g"}, {"д", "d"}, {"е", "e"}, {"ё", "yo"}, {"ж", "zh"},
-//                {"з", "z"}, {"и", "i"}, {"й", "y"}, {"к", "k"}, {"л", "l"}, {"м", "m"}, {"н", "n"}, {"о", "o"},
-//                {"п", "p"}, {"р", "r"}, {"с", "s"}, {"т", "t"}, {"у", "u"}, {"ф", "f"}, {"х", "h"}, {"ц", "c"},
-//                {"ч", "ch"}, {"ш", "sh"}, {"щ", "sch"}, {"ъ", ""}, {"ы", "y"}, {"ь", ""}, {"э", "e"}, {"ю", "yu"},
-//                {"я", "ya"}, {"А", "A"}, {"Б", "B"}, {"В", "V"}, {"Г", "G"}, {"Д", "D"}, {"Е", "E"}, {"Ё", "Yo"},
-//                {"Ж", "Zh"}, {"З", "Z"}, {"И", "I"}, {"Й", "Y"}, {"К", "K"}, {"Л", "L"}, {"М", "M"}, {"Н", "N"},
-//                {"О", "O"}, {"П", "P"}, {"Р", "R"}, {"С", "S"}, {"Т", "T"}, {"У", "U"}, {"Ф", "F"}, {"Х", "H"},
-//                {"Ц", "C"}, {"Ч", "Ch"}, {"Ш", "Sh"}, {"Щ", "Sch"}, {"Ъ", ""}, {"Ы", "Y"}, {"Ь", ""}, {"Э", "E"},
-//                {"Ю", "Yu"}, {"Я", "Ya"}
-//        };
-//
-//        // Заменяем символы в строке
-//        for (String[] replacement : replacements) {
-//            input = input.replace(replacement[0], replacement[1]);
-//        }
-//
-//        return input;
-//    }
 
     public static String convertDate(String inputDate) {
         try {
             // Создание объекта для парсинга входной даты
-            //SimpleDateFormat inputFormat = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z (zzz)", Locale.ENGLISH);
-            //inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             SimpleDateFormat inputFormat = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z (zzz)", Locale.ENGLISH);
-
 
             // Парсинг входной даты
             Date date = inputFormat.parse(inputDate);
@@ -1344,6 +1321,62 @@ public class SpecController {
         model.addAttribute("total", list);
 
         return "stat/stat-by-teacher :: table-stat";
+    }
+
+    //-------------------------- нормы -----------------------
+
+    @GetMapping("/spec/norma-list")
+    public String openNormaPage(Model model) {
+        model.addAttribute("norma", new Norma());
+        model.addAttribute("types", typeKrujokRepository.findAll());
+        model.addAttribute("norms", normaRepository.findAll());
+        return "spec/norms";
+    }
+
+    @PostMapping("/spec/norma/save-new/{type}/{age}/{hoursPreWeek}/{hoursPerDay}")
+    public String saveNorma(Model model,
+                            @PathVariable("type") Long id_type,
+                            @PathVariable("age") int age,
+                            @PathVariable("hoursPreWeek") int hoursPreWeek,
+                            @PathVariable("hoursPerDay") int hoursPerDay) {
+        TypeKrujok type = typeKrujokRepository.findById(id_type).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id_type + " not found on server!"));
+        Norma norma = normaRepository.save(new Norma(age+"",hoursPreWeek,hoursPerDay,type));
+
+        log.warn("Save new norma: {}", norma);
+        return "redirect:/spec/norma-list";
+    }
+
+    @GetMapping("/spec/norma/edit/{id}")
+    public String editNorma(Model model,
+                               @PathVariable("id") Long id) {
+        Norma norma = normaRepository.findById(id).orElseThrow(() -> new NotFoundException("Norma with id = " + id + " not found on server!"));
+        model.addAttribute("norma", norma);
+        model.addAttribute("types", typeKrujokRepository.findAll());
+        return "spec/norms :: form-norma";
+    }
+
+    @PostMapping("/spec/norma/edit/{id}/{type}/{age}/{hoursPreWeek}/{hoursPerDay}")
+    public String saveEditedNorma(Model model,
+                                     @PathVariable("id") Long id,
+                                  @PathVariable("type") Long id_type,
+                                  @PathVariable("age") int age,
+                                  @PathVariable("hoursPreWeek") int hoursPreWeek,
+                                  @PathVariable("hoursPerDay") int hoursPerDay) {
+        TypeKrujok t = typeKrujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id + " not found on server!"));
+        Norma norma = normaRepository.findById(id).orElseThrow(() -> new NotFoundException("Norma with id = " + id + " not found on server!"));
+        norma.setAge(age+"");
+        norma.setHoursPerWeek(hoursPreWeek);
+        norma.setHoursPerDay(hoursPerDay);
+        norma.setTypeKrujok(t);
+        normaRepository.save(norma);
+        return "redirect:/spec/norma-list";
+    }
+
+    @PostMapping("/spec/norma/del/{id}")
+    public String delNorma(@PathVariable("id") Long id) {
+        normaRepository.deleteById(id);
+        log.warn("Deleted norma with id: {}", id);
+        return "redirect:/spec/norma-list";
     }
 
 

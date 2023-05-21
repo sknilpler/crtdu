@@ -24,6 +24,10 @@ public class TypeKrujok {
     @JoinColumn(name = "type_krujok_id")
     private List<Krujok> krujki;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "type_krujok_id")
+    private List<Norma> norma;
+
     public TypeKrujok(String name) {
         this.name = name;
     }
