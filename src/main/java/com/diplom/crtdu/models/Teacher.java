@@ -49,6 +49,14 @@ public class Teacher {
             inverseJoinColumns = @JoinColumn(name = "krujok_id"))
     private List<Krujok> krujki;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "teacher_id")
+    private List<WorkTime> workTimes;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "teacher_id")
+    private List<Raspisanie> raspisanie;
+
     public Teacher(String surname, String name, String patronymic, String doljnost) {
         this.surname = surname;
         this.name = name;

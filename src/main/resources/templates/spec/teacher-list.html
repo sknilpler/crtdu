@@ -17,6 +17,7 @@
 
 <!-- Modal windows for accepting delete -->
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
+<div th:insert="blocks/teacher-raspisanie :: teacher-raspisanie"></div>
 <div th:insert="blocks/sidebar :: sidebar"></div>
 <div class="container-fluid">
 
@@ -55,6 +56,12 @@
             <td th:text="${t.doljnost}"></td>
             <td th:text="${t.napravlenie}"></td>
             <td class="text-md-end">
+                <button class="btn btn-outline-success btn-sm" th:onclick="'javascript:openRasp(\'' + ${t.id} + '\');'" title="Расписание работы">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor">
+                        <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                        <path d="M152 64H296V24C296 10.75 306.7 0 320 0C333.3 0 344 10.75 344 24V64H384C419.3 64 448 92.65 448 128V448C448 483.3 419.3 512 384 512H64C28.65 512 0 483.3 0 448V128C0 92.65 28.65 64 64 64H104V24C104 10.75 114.7 0 128 0C141.3 0 152 10.75 152 24V64zM48 248H128V192H48V248zM48 296V360H128V296H48zM176 296V360H272V296H176zM320 296V360H400V296H320zM400 192H320V248H400V192zM400 408H320V464H384C392.8 464 400 456.8 400 448V408zM272 408H176V464H272V408zM128 408H48V448C48 456.8 55.16 464 64 464H128V408zM272 192H176V248H272V192z"></path>
+                    </svg>
+                </button>
                 <button class="btn btn-outline-info btn-sm" th:onclick="'javascript:openInfo(\'' + ${t.id} + '\');'" title="Подробнее">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor">
                         <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
@@ -68,7 +75,7 @@
                     </svg>
                 </a>
                 <button class="btn btn-outline-danger btn-sm" th:onclick="'javascript:showDeleteModalWindow(\'' + ${t.id} + '\');'" title="Удалить">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor">
                         <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                         <path d="M160 400C160 408.8 152.8 416 144 416C135.2 416 128 408.8 128 400V192C128 183.2 135.2 176 144 176C152.8 176 160 183.2 160 192V400zM240 400C240 408.8 232.8 416 224 416C215.2 416 208 408.8 208 400V192C208 183.2 215.2 176 224 176C232.8 176 240 183.2 240 192V400zM320 400C320 408.8 312.8 416 304 416C295.2 416 288 408.8 288 400V192C288 183.2 295.2 176 304 176C312.8 176 320 183.2 320 192V400zM317.5 24.94L354.2 80H424C437.3 80 448 90.75 448 104C448 117.3 437.3 128 424 128H416V432C416 476.2 380.2 512 336 512H112C67.82 512 32 476.2 32 432V128H24C10.75 128 0 117.3 0 104C0 90.75 10.75 80 24 80H93.82L130.5 24.94C140.9 9.357 158.4 0 177.1 0H270.9C289.6 0 307.1 9.358 317.5 24.94H317.5zM151.5 80H296.5L277.5 51.56C276 49.34 273.5 48 270.9 48H177.1C174.5 48 171.1 49.34 170.5 51.56L151.5 80zM80 432C80 449.7 94.33 464 112 464H336C353.7 464 368 449.7 368 432V128H80V432z"></path>
                     </svg>
@@ -192,6 +199,7 @@ function showDeleteModalWindow(id) {
 
 function closeModalWindow() {
 	$("#deleteAccept").modal('hide');
+	$("#tRasp").modal('hide');
 }
 
 function deleteObject() {
@@ -227,6 +235,50 @@ function sortTable(colIndex) {
   for (const row of rows) {
     tbody.appendChild(row);
   }
+}
+
+function openRasp(id){
+    $.ajax({
+		type: 'get',
+		url: '/spec/list-teachers/rasp/' + id,
+		success: function(data) {
+			$('.rasp-info').html(data);
+			$("#tRasp").modal('show');
+		},
+	})
+}
+
+function saveRasp(id_t){
+
+    // Находим таблицу по её id
+    var table = document.getElementById('rasp');
+    var arr = "";
+    // Находим все элементы <input type="checkbox"> внутри таблицы
+    var checkboxes = table.querySelectorAll('input[type="checkbox"]');
+
+    // Проходимся по каждому элементу <input type="checkbox">
+    checkboxes.forEach(function(checkbox) {
+        var id = checkbox.id;
+        var isChecked = checkbox.checked;
+        arr = arr+id+":"+isChecked+" ";
+    });
+
+    // Печатаем результаты в консоль
+    $.ajax({
+    url: '/spec/list-teachers/rasp/save/' + id_t,
+    type: 'POST',
+    contentType: 'application/json',
+    data: arr,
+    success: function(response) {
+      // Обработка успешного ответа от сервера
+      console.log('Массив успешно передан на сервер');
+      $("#tRasp").modal('hide');
+    },
+    error: function(xhr, status, error) {
+      // Обработка ошибки
+      alert("Ошибка отправки данных на сервер!\n"+error);
+    }
+  });
 }
 </script>
 

@@ -7,7 +7,9 @@ import com.diplom.crtdu.services.UserService;
 import com.diplom.crtdu.utils.KidsOnMeropModel;
 import com.diplom.crtdu.utils.StatKids;
 import com.diplom.crtdu.utils.StatTeacher;
+import com.diplom.crtdu.utils.WeekTimesModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -84,7 +87,10 @@ public class SpecController {
     private TeacherDocRepository teacherDocRepository;
     @Autowired
     private NormaRepository normaRepository;
-
+    @Autowired
+    private WorkTimeRepository workTimeRepository;
+    @Autowired
+    private RaspisanieRepository raspisanieRepository;
 
     public static String convertDate(String inputDate) {
         try {
@@ -321,7 +327,14 @@ public class SpecController {
 
     @GetMapping("/spec/list-teachers")
     public String openTeacherListPage(Model model) {
+        boolean[][] wt = new boolean[13][7];
+        for (int i = 0; i < 13; i++) {
+            for (int j = 0; j < 7; j++) {
+                wt[i][j] = false;
+            }
+        }
         model.addAttribute("teachers", teacherRepository.findAll());
+        model.addAttribute("arrTime", wt);
         return "spec/teacher-list";
     }
 
@@ -431,6 +444,97 @@ public class SpecController {
         return "redirect:/spec/list-teachers/edit/" + teachEditId;
     }
 
+    @GetMapping("/spec/list-teachers/rasp/{id}")
+    public String openRaspTeacher(Model model, @PathVariable("id") Long id) {
+        Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new NotFoundException("Teacher with id = " + id + " not found on server!"));
+        List<WorkTime> workTimes = teacher.getWorkTimes();
+        boolean[][] wt = new boolean[13][7];
+        for (int i = 0; i < 13; i++) {
+            for (int j = 0; j < 7; j++) {
+                wt[i][j] = false;
+            }
+        }
+        for (WorkTime w: workTimes) {
+            int i = 0;
+            int j = 0;
+            if (w.getDayOfWeek().equals("Понедельник")) j = 0;
+            if (w.getDayOfWeek().equals("Вторник")) j = 1;
+            if (w.getDayOfWeek().equals("Среда")) j = 2;
+            if (w.getDayOfWeek().equals("Четверг")) j = 3;
+            if (w.getDayOfWeek().equals("Пятница")) j = 4;
+            if (w.getDayOfWeek().equals("Суббота")) j = 5;
+            if (w.getDayOfWeek().equals("Воскресенье")) j = 6;
+
+            if (w.getHour().equals("08:00")) i = 0;
+            if (w.getHour().equals("09:00")) i = 1;
+            if (w.getHour().equals("10:00")) i = 2;
+            if (w.getHour().equals("11:00")) i = 3;
+            if (w.getHour().equals("12:00")) i = 4;
+            if (w.getHour().equals("13:00")) i = 5;
+            if (w.getHour().equals("14:00")) i = 6;
+            if (w.getHour().equals("15:00")) i = 7;
+            if (w.getHour().equals("16:00")) i = 8;
+            if (w.getHour().equals("17:00")) i = 9;
+            if (w.getHour().equals("18:00")) i = 10;
+            if (w.getHour().equals("19:00")) i = 11;
+            if (w.getHour().equals("20:00")) i = 12;
+
+            wt[i][j] = true;
+        }
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("arrTime",wt);
+        return "blocks/teacher-raspisanie :: rasp-info";
+    }
+
+    @PostMapping("/spec/list-teachers/rasp/save/{id}")
+    public String saveRaspTeacher(Model model, @PathVariable("id") Long id, @RequestBody String arr) {
+        Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new NotFoundException("Teacher with id = " + id + " not found on server!"));
+        workTimeRepository.deleteAll(teacher.getWorkTimes());
+        List<WorkTime> wt = new ArrayList<>();
+        arr = removeLastCharOptional(arr);
+        String[] mass1 = arr.split(" ");
+        for (String s: mass1) {
+            String day = s.split(":")[0].substring(0,s.split(":")[0].length()/2);
+            String time = s.split(":")[0].substring(s.split(":")[0].length()/2);
+            boolean isChecked = Boolean.parseBoolean(s.split(":")[1]);
+            if (isChecked) {
+                if (day.equals("pn")) day = "Понедельник";
+                if (day.equals("vt")) day = "Вторник";
+                if (day.equals("sr")) day = "Среда";
+                if (day.equals("ch")) day = "Четверг";
+                if (day.equals("pt")) day = "Пятница";
+                if (day.equals("sb")) day = "Суббота";
+                if (day.equals("vs")) day = "Воскресенье";
+
+                if (time.equals("08")) time = "08:00";
+                if (time.equals("09")) time = "09:00";
+                if (time.equals("10")) time = "10:00";
+                if (time.equals("11")) time = "11:00";
+                if (time.equals("12")) time = "12:00";
+                if (time.equals("13")) time = "13:00";
+                if (time.equals("14")) time = "14:00";
+                if (time.equals("15")) time = "15:00";
+                if (time.equals("16")) time = "16:00";
+                if (time.equals("17")) time = "17:00";
+                if (time.equals("18")) time = "18:00";
+                if (time.equals("19")) time = "19:00";
+                if (time.equals("20")) time = "20:00";
+
+                wt.add(new WorkTime(day,time,teacher));
+                System.out.println("Created new work time object: "+day+" "+time);
+            }
+
+        }
+        workTimeRepository.saveAll(wt);
+        System.out.println("Successfully save all work time objects to "+teacher.getFullFIO());
+        return "redirect:/spec/list-teachers";
+    }
+    public static String removeLastCharOptional(String s) {
+        return Optional.ofNullable(s)
+                .filter(str -> str.length() != 0)
+                .map(str -> str.substring(0, str.length() - 1))
+                .orElse(s);
+    }
 
     //------------------------------- мероприятия---------------
 
@@ -1336,11 +1440,12 @@ public class SpecController {
     @PostMapping("/spec/norma/save-new/{type}/{age}/{hoursPreWeek}/{hoursPerDay}")
     public String saveNorma(Model model,
                             @PathVariable("type") Long id_type,
-                            @PathVariable("age") int age,
+                            @PathVariable("age") String age,
                             @PathVariable("hoursPreWeek") int hoursPreWeek,
                             @PathVariable("hoursPerDay") int hoursPerDay) {
         TypeKrujok type = typeKrujokRepository.findById(id_type).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id_type + " not found on server!"));
-        Norma norma = normaRepository.save(new Norma(age+"",hoursPreWeek,hoursPerDay,type));
+
+        Norma norma = normaRepository.save(new Norma(age,hoursPreWeek,hoursPerDay,type));
 
         log.warn("Save new norma: {}", norma);
         return "redirect:/spec/norma-list";
@@ -1359,12 +1464,12 @@ public class SpecController {
     public String saveEditedNorma(Model model,
                                      @PathVariable("id") Long id,
                                   @PathVariable("type") Long id_type,
-                                  @PathVariable("age") int age,
+                                  @PathVariable("age") String age,
                                   @PathVariable("hoursPreWeek") int hoursPreWeek,
                                   @PathVariable("hoursPerDay") int hoursPerDay) {
         TypeKrujok t = typeKrujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id + " not found on server!"));
         Norma norma = normaRepository.findById(id).orElseThrow(() -> new NotFoundException("Norma with id = " + id + " not found on server!"));
-        norma.setAge(age+"");
+        norma.setAge(age);
         norma.setHoursPerWeek(hoursPreWeek);
         norma.setHoursPerDay(hoursPerDay);
         norma.setTypeKrujok(t);
@@ -1378,6 +1483,162 @@ public class SpecController {
         log.warn("Deleted norma with id: {}", id);
         return "redirect:/spec/norma-list";
     }
+    //------------------------- Расптсание ----------------------
+
+   /* private String calculateEndTime(String startTime, int duration) {
+        LocalTime start = LocalTime.parse(startTime);
+        LocalTime end = start.plusHours(duration);
+        return end.toString();
+    }
+
+    private Norma findNormaByAge(List<Norma> normi, String vozrast) {
+        for (Norma norma : normi) {
+            if (vozrast.equals(norma.getAge())) {
+                return norma;
+            }
+        }
+        return new Norma("",4,2,null);
+    }
+
+    private List<Teacher> findAvailableTeachers(List<Teacher> teachers, Krujok krujok, List<WorkTime> workTimes) {
+        List<Teacher> availableTeachers = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            if (teacher.getKrujki().contains(krujok) && hasAvailableWorkTime(workTimes, teacher)) {
+                availableTeachers.add(teacher);
+            }
+        }
+        return availableTeachers;
+    }
+
+    private boolean hasAvailableWorkTime(List<WorkTime> workTimes, Teacher teacher) {
+        for (WorkTime workTime : workTimes) {
+            if (workTime.getTeacher().equals(teacher)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<WorkTime> findAvailableWorkTimes(List<WorkTime> workTimes, String dayOfWeek, List<Teacher> availableTeachers) {
+        List<WorkTime> availableWorkTimes = new ArrayList<>();
+        for (WorkTime workTime : workTimes) {
+            if (workTime.getDayOfWeek().equalsIgnoreCase(dayOfWeek) && availableTeachers.contains(workTime.getTeacher())) {
+                availableWorkTimes.add(workTime);
+            }
+        }
+        return availableWorkTimes;
+    }
+
+    private String getDayOfWeekByIndex(int index) {
+        String[] daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"};
+        if (index >= 0 && index < daysOfWeek.length) {
+            return daysOfWeek[index];
+        }
+        return "";
+    }
+
+    public void generateSchedule(List<Krujok> krujki, List<Teacher> teachers, List<Norma> normi, List<WorkTime> workTimes) {
+        for (Krujok krujok : krujki) {
+            Norma norma = findNormaByAge(normi, krujok.getVozrast());
+            List<Teacher> availableTeachers = findAvailableTeachers(teachers, krujok, workTimes);
+            int maxHoursPerWeek = norma.getHoursPerWeek();
+            int maxHoursPerDay = norma.getHoursPerDay();
+
+            int hoursPerWeek = 0;
+            int hoursPerDay = 0;
+            int dayOfWeekIndex = 0;
+
+            for (Raspisanie raspisanie : krujok.getRaspisanie()) {
+                if (hoursPerWeek >= maxHoursPerWeek) {
+                    break;
+                }
+
+                String dayOfWeek = getDayOfWeekByIndex(dayOfWeekIndex);
+                List<WorkTime> availableWorkTimes = findAvailableWorkTimes(workTimes, dayOfWeek, availableTeachers);
+
+                if (availableWorkTimes.isEmpty()) {
+                    continue;
+                }
+
+                if (hoursPerDay >= maxHoursPerDay) {
+                    dayOfWeekIndex++;
+                    hoursPerDay = 0;
+                    continue;
+                }
+
+                WorkTime workTime = availableWorkTimes.get(0);
+                raspisanie.setTeacher(workTime.getTeacher());
+
+                String startTime = workTime.getHour();
+                String endTime = calculateEndTime(startTime, maxHoursPerDay); // Рассчитываем время окончания занятия
+
+                switch (dayOfWeek) {
+                    case "Понедельник":
+                        raspisanie.setMonday(startTime + "-" + endTime);
+                        break;
+                    case "Вторник":
+                        raspisanie.setTuesday(startTime + "-" + endTime);
+                        break;
+                    case "Среда":
+                        raspisanie.setWednesday(startTime + "-" + endTime);
+                        break;
+                    case "Четверг":
+                        raspisanie.setThursday(startTime + "-" + endTime);
+                        break;
+                    case "Пятница":
+                        raspisanie.setFriday(startTime + "-" + endTime);
+                        break;
+                    case "Суббота":
+                        raspisanie.setSaturday(startTime + "-" + endTime);
+                        break;
+                    case "Воскресенье":
+                        raspisanie.setSunday(startTime + "-" + endTime);
+                        break;
+                }
+                System.out.println(raspisanie.toString());
+                raspisanieRepository.save(raspisanie);
+
+                hoursPerWeek++;
+                hoursPerDay++;
+            }
+        }
+    }
+*/
+    @GetMapping("/spec/raspisanie/create")
+    public String createRaspisanie() {
+        List<Krujok> krujki = krujokRepository.findAllByOrderByCreativeAssociationNameAndKrujokName();
+        String[] daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"};
+        for (Krujok krujok: krujki) {
+            int usedHoursWeek = 0;
+            //int usedHoursDay = 0;
+            Norma norma = normaRepository.findByAgeAndTypeKrujokId(krujok.getVozrast(),krujok.getTypeKrujok().getId()).get(0);
+            for (String day : daysOfWeek) {
+                for (Teacher t : krujok.getTeachers()) {
+                    List<WorkTime> times = workTimeRepository.findByDayOfWeekAndTeacherId(day,t.getId());
+                    if (times.size()>=norma.getHoursPerDay()) {
+
+                    }
+
+                }
+            }
+        }
+
+        List<Teacher> teachers = StreamSupport.stream(teacherRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+        List<Norma> normi =  StreamSupport.stream(normaRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+        List<WorkTime> workTimes = StreamSupport.stream(workTimeRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+//        generateSchedule(krujki,teachers,normi,workTimes);
+
+
+        List<Raspisanie> raspisanie = StreamSupport.stream(raspisanieRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+        raspisanie.forEach(raspisanie1 -> System.out.println(raspisanie1.toString()));
+        return "home";
+    }
+
+
 
 
 }

@@ -44,6 +44,10 @@ public class Krujok {
     @JoinColumn(name = "krujok_id")
     private List<Ocenka> marks;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "krujok_id")
+    private List<Raspisanie> raspisanie;
+
     @ManyToOne
     private TypeKrujok typeKrujok;
 
