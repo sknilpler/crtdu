@@ -43,20 +43,20 @@ public class Norma {
                 '}';
     }
 
-    public String ageGroup() {
-        int age = Integer.parseInt(this.age);
-        if (age == 1) {
-            return "3-5 лет";
-        } else if (age == 2) {
-            return "6-8 лет";
-        } else if (age == 3) {
-            return "9-11 лет";
-        } else if (age == 4) {
-            return "12-15 лет";
-        } else if (age == 5) {
-            return "16-17 лет";
-        } else {
-            return "Неизвестная возрастная группа";
-        }
-    }
+//    public String ageGroup() {
+//        int age = Integer.parseInt(this.age);
+//        if (age == 1) {
+//            return "3-5 лет";
+//        } else if (age == 2) {
+//            return "6-8 лет";
+//        } else if (age == 3) {
+//            return "9-11 лет";
+//        } else if (age == 4) {
+//            return "12-15 лет";
+//        } else if (age == 5) {
+//            return "16-17 лет";
+//        } else {
+//            return "Неизвестная возрастная группа";
+//        }
+//    }
 }

@@ -454,7 +454,7 @@ public class SpecController {
                 wt[i][j] = false;
             }
         }
-        for (WorkTime w: workTimes) {
+        for (WorkTime w : workTimes) {
             int i = 0;
             int j = 0;
             if (w.getDayOfWeek().equals("Понедельник")) j = 0;
@@ -482,7 +482,7 @@ public class SpecController {
             wt[i][j] = true;
         }
         model.addAttribute("teacher", teacher);
-        model.addAttribute("arrTime",wt);
+        model.addAttribute("arrTime", wt);
         return "blocks/teacher-raspisanie :: rasp-info";
     }
 
@@ -493,9 +493,9 @@ public class SpecController {
         List<WorkTime> wt = new ArrayList<>();
         arr = removeLastCharOptional(arr);
         String[] mass1 = arr.split(" ");
-        for (String s: mass1) {
-            String day = s.split(":")[0].substring(0,s.split(":")[0].length()/2);
-            String time = s.split(":")[0].substring(s.split(":")[0].length()/2);
+        for (String s : mass1) {
+            String day = s.split(":")[0].substring(0, s.split(":")[0].length() / 2);
+            String time = s.split(":")[0].substring(s.split(":")[0].length() / 2);
             boolean isChecked = Boolean.parseBoolean(s.split(":")[1]);
             if (isChecked) {
                 if (day.equals("pn")) day = "Понедельник";
@@ -520,15 +520,16 @@ public class SpecController {
                 if (time.equals("19")) time = "19:00";
                 if (time.equals("20")) time = "20:00";
 
-                wt.add(new WorkTime(day,time,teacher));
-                System.out.println("Created new work time object: "+day+" "+time);
+                wt.add(new WorkTime(day, time, teacher));
+                System.out.println("Created new work time object: " + day + " " + time);
             }
 
         }
         workTimeRepository.saveAll(wt);
-        System.out.println("Successfully save all work time objects to "+teacher.getFullFIO());
+        System.out.println("Successfully save all work time objects to " + teacher.getFullFIO());
         return "redirect:/spec/list-teachers";
     }
+
     public static String removeLastCharOptional(String s) {
         return Optional.ofNullable(s)
                 .filter(str -> str.length() != 0)
@@ -1445,7 +1446,7 @@ public class SpecController {
                             @PathVariable("hoursPerDay") int hoursPerDay) {
         TypeKrujok type = typeKrujokRepository.findById(id_type).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id_type + " not found on server!"));
 
-        Norma norma = normaRepository.save(new Norma(age,hoursPreWeek,hoursPerDay,type));
+        Norma norma = normaRepository.save(new Norma(age, hoursPreWeek, hoursPerDay, type));
 
         log.warn("Save new norma: {}", norma);
         return "redirect:/spec/norma-list";
@@ -1453,7 +1454,7 @@ public class SpecController {
 
     @GetMapping("/spec/norma/edit/{id}")
     public String editNorma(Model model,
-                               @PathVariable("id") Long id) {
+                            @PathVariable("id") Long id) {
         Norma norma = normaRepository.findById(id).orElseThrow(() -> new NotFoundException("Norma with id = " + id + " not found on server!"));
         model.addAttribute("norma", norma);
         model.addAttribute("types", typeKrujokRepository.findAll());
@@ -1462,7 +1463,7 @@ public class SpecController {
 
     @PostMapping("/spec/norma/edit/{id}/{type}/{age}/{hoursPreWeek}/{hoursPerDay}")
     public String saveEditedNorma(Model model,
-                                     @PathVariable("id") Long id,
+                                  @PathVariable("id") Long id,
                                   @PathVariable("type") Long id_type,
                                   @PathVariable("age") String age,
                                   @PathVariable("hoursPreWeek") int hoursPreWeek,
@@ -1485,160 +1486,217 @@ public class SpecController {
     }
     //------------------------- Расптсание ----------------------
 
-   /* private String calculateEndTime(String startTime, int duration) {
+    private String calculateEndTime(String startTime, int duration) {
         LocalTime start = LocalTime.parse(startTime);
         LocalTime end = start.plusHours(duration);
         return end.toString();
     }
 
-    private Norma findNormaByAge(List<Norma> normi, String vozrast) {
-        for (Norma norma : normi) {
-            if (vozrast.equals(norma.getAge())) {
-                return norma;
-            }
-        }
-        return new Norma("",4,2,null);
-    }
-
-    private List<Teacher> findAvailableTeachers(List<Teacher> teachers, Krujok krujok, List<WorkTime> workTimes) {
-        List<Teacher> availableTeachers = new ArrayList<>();
-        for (Teacher teacher : teachers) {
-            if (teacher.getKrujki().contains(krujok) && hasAvailableWorkTime(workTimes, teacher)) {
-                availableTeachers.add(teacher);
-            }
-        }
-        return availableTeachers;
-    }
-
-    private boolean hasAvailableWorkTime(List<WorkTime> workTimes, Teacher teacher) {
-        for (WorkTime workTime : workTimes) {
-            if (workTime.getTeacher().equals(teacher)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private List<WorkTime> findAvailableWorkTimes(List<WorkTime> workTimes, String dayOfWeek, List<Teacher> availableTeachers) {
-        List<WorkTime> availableWorkTimes = new ArrayList<>();
-        for (WorkTime workTime : workTimes) {
-            if (workTime.getDayOfWeek().equalsIgnoreCase(dayOfWeek) && availableTeachers.contains(workTime.getTeacher())) {
-                availableWorkTimes.add(workTime);
-            }
-        }
-        return availableWorkTimes;
-    }
-
-    private String getDayOfWeekByIndex(int index) {
-        String[] daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"};
-        if (index >= 0 && index < daysOfWeek.length) {
-            return daysOfWeek[index];
-        }
-        return "";
-    }
-
-    public void generateSchedule(List<Krujok> krujki, List<Teacher> teachers, List<Norma> normi, List<WorkTime> workTimes) {
-        for (Krujok krujok : krujki) {
-            Norma norma = findNormaByAge(normi, krujok.getVozrast());
-            List<Teacher> availableTeachers = findAvailableTeachers(teachers, krujok, workTimes);
-            int maxHoursPerWeek = norma.getHoursPerWeek();
-            int maxHoursPerDay = norma.getHoursPerDay();
-
-            int hoursPerWeek = 0;
-            int hoursPerDay = 0;
-            int dayOfWeekIndex = 0;
-
-            for (Raspisanie raspisanie : krujok.getRaspisanie()) {
-                if (hoursPerWeek >= maxHoursPerWeek) {
-                    break;
+    /*
+        private Norma findNormaByAge(List<Norma> normi, String vozrast) {
+            for (Norma norma : normi) {
+                if (vozrast.equals(norma.getAge())) {
+                    return norma;
                 }
+            }
+            return new Norma("",4,2,null);
+        }
 
-                String dayOfWeek = getDayOfWeekByIndex(dayOfWeekIndex);
-                List<WorkTime> availableWorkTimes = findAvailableWorkTimes(workTimes, dayOfWeek, availableTeachers);
-
-                if (availableWorkTimes.isEmpty()) {
-                    continue;
+        private List<Teacher> findAvailableTeachers(List<Teacher> teachers, Krujok krujok, List<WorkTime> workTimes) {
+            List<Teacher> availableTeachers = new ArrayList<>();
+            for (Teacher teacher : teachers) {
+                if (teacher.getKrujki().contains(krujok) && hasAvailableWorkTime(workTimes, teacher)) {
+                    availableTeachers.add(teacher);
                 }
+            }
+            return availableTeachers;
+        }
 
-                if (hoursPerDay >= maxHoursPerDay) {
-                    dayOfWeekIndex++;
-                    hoursPerDay = 0;
-                    continue;
+        private boolean hasAvailableWorkTime(List<WorkTime> workTimes, Teacher teacher) {
+            for (WorkTime workTime : workTimes) {
+                if (workTime.getTeacher().equals(teacher)) {
+                    return true;
                 }
+            }
+            return false;
+        }
 
-                WorkTime workTime = availableWorkTimes.get(0);
-                raspisanie.setTeacher(workTime.getTeacher());
-
-                String startTime = workTime.getHour();
-                String endTime = calculateEndTime(startTime, maxHoursPerDay); // Рассчитываем время окончания занятия
-
-                switch (dayOfWeek) {
-                    case "Понедельник":
-                        raspisanie.setMonday(startTime + "-" + endTime);
-                        break;
-                    case "Вторник":
-                        raspisanie.setTuesday(startTime + "-" + endTime);
-                        break;
-                    case "Среда":
-                        raspisanie.setWednesday(startTime + "-" + endTime);
-                        break;
-                    case "Четверг":
-                        raspisanie.setThursday(startTime + "-" + endTime);
-                        break;
-                    case "Пятница":
-                        raspisanie.setFriday(startTime + "-" + endTime);
-                        break;
-                    case "Суббота":
-                        raspisanie.setSaturday(startTime + "-" + endTime);
-                        break;
-                    case "Воскресенье":
-                        raspisanie.setSunday(startTime + "-" + endTime);
-                        break;
+        private List<WorkTime> findAvailableWorkTimes(List<WorkTime> workTimes, String dayOfWeek, List<Teacher> availableTeachers) {
+            List<WorkTime> availableWorkTimes = new ArrayList<>();
+            for (WorkTime workTime : workTimes) {
+                if (workTime.getDayOfWeek().equalsIgnoreCase(dayOfWeek) && availableTeachers.contains(workTime.getTeacher())) {
+                    availableWorkTimes.add(workTime);
                 }
-                System.out.println(raspisanie.toString());
-                raspisanieRepository.save(raspisanie);
+            }
+            return availableWorkTimes;
+        }
 
-                hoursPerWeek++;
-                hoursPerDay++;
+        private String getDayOfWeekByIndex(int index) {
+            String[] daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"};
+            if (index >= 0 && index < daysOfWeek.length) {
+                return daysOfWeek[index];
+            }
+            return "";
+        }
+
+        public void generateSchedule(List<Krujok> krujki, List<Teacher> teachers, List<Norma> normi, List<WorkTime> workTimes) {
+            for (Krujok krujok : krujki) {
+                Norma norma = findNormaByAge(normi, krujok.getVozrast());
+                List<Teacher> availableTeachers = findAvailableTeachers(teachers, krujok, workTimes);
+                int maxHoursPerWeek = norma.getHoursPerWeek();
+                int maxHoursPerDay = norma.getHoursPerDay();
+
+                int hoursPerWeek = 0;
+                int hoursPerDay = 0;
+                int dayOfWeekIndex = 0;
+
+                for (Raspisanie raspisanie : krujok.getRaspisanie()) {
+                    if (hoursPerWeek >= maxHoursPerWeek) {
+                        break;
+                    }
+
+                    String dayOfWeek = getDayOfWeekByIndex(dayOfWeekIndex);
+                    List<WorkTime> availableWorkTimes = findAvailableWorkTimes(workTimes, dayOfWeek, availableTeachers);
+
+                    if (availableWorkTimes.isEmpty()) {
+                        continue;
+                    }
+
+                    if (hoursPerDay >= maxHoursPerDay) {
+                        dayOfWeekIndex++;
+                        hoursPerDay = 0;
+                        continue;
+                    }
+
+                    WorkTime workTime = availableWorkTimes.get(0);
+                    raspisanie.setTeacher(workTime.getTeacher());
+
+                    String startTime = workTime.getHour();
+                    String endTime = calculateEndTime(startTime, maxHoursPerDay); // Рассчитываем время окончания занятия
+
+                    switch (dayOfWeek) {
+                        case "Понедельник":
+                            raspisanie.setMonday(startTime + "-" + endTime);
+                            break;
+                        case "Вторник":
+                            raspisanie.setTuesday(startTime + "-" + endTime);
+                            break;
+                        case "Среда":
+                            raspisanie.setWednesday(startTime + "-" + endTime);
+                            break;
+                        case "Четверг":
+                            raspisanie.setThursday(startTime + "-" + endTime);
+                            break;
+                        case "Пятница":
+                            raspisanie.setFriday(startTime + "-" + endTime);
+                            break;
+                        case "Суббота":
+                            raspisanie.setSaturday(startTime + "-" + endTime);
+                            break;
+                        case "Воскресенье":
+                            raspisanie.setSunday(startTime + "-" + endTime);
+                            break;
+                    }
+                    System.out.println(raspisanie.toString());
+                    raspisanieRepository.save(raspisanie);
+
+                    hoursPerWeek++;
+                    hoursPerDay++;
+                }
             }
         }
-    }
-*/
+    */
     @GetMapping("/spec/raspisanie/create")
     public String createRaspisanie() {
         List<Krujok> krujki = krujokRepository.findAllByOrderByCreativeAssociationNameAndKrujokName();
         String[] daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"};
-        for (Krujok krujok: krujki) {
+        List<Raspisanie> raspisanie = new ArrayList<>();
+        List<WorkTime> busyTime = new ArrayList<>();
+        for (Krujok krujok : krujki) {
             int usedHoursWeek = 0;
-            //int usedHoursDay = 0;
-            Norma norma = normaRepository.findByAgeAndTypeKrujokId(krujok.getVozrast(),krujok.getTypeKrujok().getId()).get(0);
-            for (String day : daysOfWeek) {
+            List<Norma> norms = normaRepository.findByAgeAndTypeKrujokId(krujok.getVozrast(), krujok.getTypeKrujok().getId());
+            if (norms.size() > 0) {
+                Norma norma = norms.get(0);
                 for (Teacher t : krujok.getTeachers()) {
-                    List<WorkTime> times = workTimeRepository.findByDayOfWeekAndTeacherId(day,t.getId());
-                    if (times.size()>=norma.getHoursPerDay()) {
-
+                    Raspisanie rasp = new Raspisanie();
+                    for (String day : daysOfWeek) {
+                        List<WorkTime> times = workTimeRepository.findByDayOfWeekAndTeacherId(day, t.getId());
+                        for (WorkTime time : busyTime) {
+                            times.remove(time);
+                        }
+                        if (t.getSurname().equals("Герасимчук")){
+                            System.out.println(times.size());
+                            System.out.println(norma.getHoursPerDay());
+                            System.out.println(usedHoursWeek);
+                            System.out.println(norma.getHoursPerWeek());
+                            System.out.println("------------------------------");
+                        }
+                        if ((times.size() >= norma.getHoursPerDay()) && (usedHoursWeek <= (norma.getHoursPerWeek() - norma.getHoursPerDay()))) {
+                            String startTime = times.get(0).getHour();
+                            String endTime = calculateEndTime(startTime, norma.getHoursPerDay());
+                            for (int i = 0; i < norma.getHoursPerDay(); i++) {
+                                busyTime.add(times.get(i));
+                            }
+                            switch (day) {
+                                case "Понедельник":
+                                    rasp.setMonday(startTime + "-" + endTime);
+                                    break;
+                                case "Вторник":
+                                    rasp.setTuesday(startTime + "-" + endTime);
+                                    break;
+                                case "Среда":
+                                    rasp.setWednesday(startTime + "-" + endTime);
+                                    break;
+                                case "Четверг":
+                                    rasp.setThursday(startTime + "-" + endTime);
+                                    break;
+                                case "Пятница":
+                                    rasp.setFriday(startTime + "-" + endTime);
+                                    break;
+                                case "Суббота":
+                                    rasp.setSaturday(startTime + "-" + endTime);
+                                    break;
+                                case "Воскресенье":
+                                    rasp.setSunday(startTime + "-" + endTime);
+                                    break;
+                            }
+                            usedHoursWeek = usedHoursWeek + norma.getHoursPerDay();
+                        } else {
+                            switch (day) {
+                                case "Понедельник":
+                                    rasp.setMonday("");
+                                    break;
+                                case "Вторник":
+                                    rasp.setTuesday("");
+                                    break;
+                                case "Среда":
+                                    rasp.setWednesday("");
+                                    break;
+                                case "Четверг":
+                                    rasp.setThursday("");
+                                    break;
+                                case "Пятница":
+                                    rasp.setFriday("");
+                                    break;
+                                case "Суббота":
+                                    rasp.setSaturday("");
+                                    break;
+                                case "Воскресенье":
+                                    rasp.setSunday("");
+                                    break;
+                            }
+                        }
                     }
-
+                    rasp.setTeacher(t);
+                    rasp.setKrujok(krujok);
+                    raspisanie.add(rasp);
                 }
             }
         }
 
-        List<Teacher> teachers = StreamSupport.stream(teacherRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
-        List<Norma> normi =  StreamSupport.stream(normaRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
-        List<WorkTime> workTimes = StreamSupport.stream(workTimeRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
-//        generateSchedule(krujki,teachers,normi,workTimes);
-
-
-        List<Raspisanie> raspisanie = StreamSupport.stream(raspisanieRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
         raspisanie.forEach(raspisanie1 -> System.out.println(raspisanie1.toString()));
         return "home";
     }
-
-
 
 
 }
