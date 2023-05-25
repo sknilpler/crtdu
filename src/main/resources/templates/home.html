@@ -43,6 +43,7 @@
 
 
 
+
     </style>
 </head>
 
@@ -65,6 +66,9 @@
             </a>
         </div>
     </div>
+
+    <div class="raspis" th:fragment="raspis">
+
 
     <table class="table table-bordered">
         <thead>
@@ -91,7 +95,8 @@
                 <div class="text-center">
                     <div th:unless="${r.monday==''}">
                         <p
-                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalMonday(\'' + ${r.id} + '\');'">
+                                sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalMonday(\'' + ${r.id} + '\');'">
                             <a href="#"
                                class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
                                th:text="${r.monday}"></a>
@@ -99,21 +104,23 @@
                         <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.monday}"></p>
                     </div>
                     <div th:if="${r.monday==''}">
-                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewMonday(\'' + ${r.id} + '\');'">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalNewMonday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
+                                 fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
                             </svg>
                         </button>
                     </div>
-
                 </div>
             </th>
             <th>
                 <div class="text-center">
                     <div th:unless="${r.tuesday==''}">
                         <p
-                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalTuesday(\'' + ${r.id} + '\');'">
+                                sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalTuesday(\'' + ${r.id} + '\');'">
                             <a href="#"
                                class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
                                th:text="${r.tuesday}"></a>
@@ -121,21 +128,24 @@
                         <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.tuesday}"></p>
                     </div>
                     <div th:if="${r.tuesday==''}">
-                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewTuesday(\'' + ${r.id} + '\');'">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalNewTuesday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
+                                 fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
                             </svg>
                         </button>
                     </div>
-
                 </div>
             </th>
             <th>
                 <div class="text-center">
                     <div th:if="${r.wednesday == ''}">
-                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewWednesday(\'' + ${r.id} + '\');'">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalNewWednesday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
+                                 fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
                             </svg>
@@ -143,21 +153,23 @@
                     </div>
                     <div th:unless="${r.wednesday == ''}">
                         <p
-                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalWednesday(\'' + ${r.id} + '\');'">
+                                sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalWednesday(\'' + ${r.id} + '\');'">
                             <a href="#"
                                class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
                                th:text="${r.wednesday}"></a>
                         </p>
                         <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.wednesday}"></p>
                     </div>
-
                 </div>
             </th>
             <th>
                 <div class="text-center">
                     <div th:if="${r.thursday == ''}">
-                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewThursday(\'' + ${r.id} + '\');'">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalNewThursday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
+                                 fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
                             </svg>
@@ -165,21 +177,23 @@
                     </div>
                     <div th:unless="${r.thursday == ''}">
                         <p
-                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalThursday(\'' + ${r.id} + '\');'">
+                                sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalThursday(\'' + ${r.id} + '\');'">
                             <a href="#"
                                class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
                                th:text="${r.thursday}"></a>
                         </p>
                         <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.thursday}"></p>
                     </div>
-
                 </div>
             </th>
             <th>
                 <div class="text-center">
                     <div th:if="${r.friday == ''}">
-                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewFriday(\'' + ${r.id} + '\');'">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalNewFriday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
+                                 fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
                             </svg>
@@ -187,21 +201,23 @@
                     </div>
                     <div th:unless="${r.friday == ''}">
                         <p
-                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalFriday(\'' + ${r.id} + '\');'">
+                                sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalFriday(\'' + ${r.id} + '\');'">
                             <a href="#"
                                class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
                                th:text="${r.friday}"></a>
                         </p>
                         <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.friday}"></p>
                     </div>
-
                 </div>
             </th>
             <th>
                 <div class="text-center">
                     <div th:if="${r.saturday == ''}">
-                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewSaturday(\'' + ${r.id} + '\');'">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalNewSaturday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
+                                 fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
                             </svg>
@@ -209,21 +225,23 @@
                     </div>
                     <div th:unless="${r.saturday == ''}">
                         <p
-                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalSaturday(\'' + ${r.id} + '\');'">
+                                sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalSaturday(\'' + ${r.id} + '\');'">
                             <a href="#"
                                class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
                                th:text="${r.saturday}"></a>
                         </p>
                         <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.saturday}"></p>
                     </div>
-
                 </div>
             </th>
             <th>
                 <div class="text-center">
                     <div th:if="${r.sunday == ''}">
-                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewSunday(\'' + ${r.id} + '\');'">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalNewSunday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
+                                 fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
                                 <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
                                 <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
                             </svg>
@@ -231,22 +249,95 @@
                     </div>
                     <div th:unless="${r.sunday == ''}">
                         <p
-                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalSunday(\'' + ${r.id} + '\');'">
+                                sec:authorize="hasRole('ROLE_ADMIN')"
+                                th:onclick="'javascript:modalSunday(\'' + ${r.id} + '\');'">
                             <a href="#"
                                class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
                                th:text="${r.sunday}"></a>
                         </p>
                         <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.sunday}"></p>
                     </div>
-
                 </div>
             </th>
         </tr>
         </tbody>
     </table>
+    </div>
+</div>
+<!-- Modal window for add new time -->
+    <div class="modal fade" id="add-rasp-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить занятия в расписание</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <label for="startTime" class="input-group-text">С:</label>
+                            <input type="time" class="form-control" id="startTime"
+                                   title="Время начала занятия">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <label for="endTime" class="input-group-text">По:</label>
+                            <input type="time" class="form-control" id="endTime"
+                                   title="Время конца занятия">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                            onclick="saveNewTime()">Сохранить
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+</div>
+<!-- Modal window for edit time -->
+<div class="modal-edit-time" th:fragment="modal-edit-time">
+<div class="modal fade" id="edit-rasp-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Редактировать время</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <label for="startTimeE" class="input-group-text">С:</label>
+                        <input type="time" class="form-control" id="startTimeE" th:value="${startTime}"
+                               title="Время начала занятия">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="input-group">
+                        <label for="endTimeE" class="input-group-text">По:</label>
+                        <input type="time" class="form-control" id="endTimeE" th:value="${endTime}"
+                               title="Время конца занятия">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                        onclick="saveEditTime()">Сохранить
+                </button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                        onclick="delTime()">Удалить
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/theme.js"></script>
+<script src="/js/jquery.min.js"></script>
 <script>
 //const header = document.getElementById("header");
 //header.addEventListener("mousemove", (e) => {
@@ -255,8 +346,162 @@
 //  header.style.backgroundPosition = `${x * 100}% ${y * 100}%`;
 //});
 
+var dayOfWeek;
+var id_rasp;
+
+function modalNewMonday(id){
+    dayOfWeek = "Понедельник";
+    id_rasp = id;
+    $('#add-rasp-modal').modal('show');
+}
+function modalNewTuesday(id){
+    dayOfWeek = "Вторник";
+    id_rasp = id;
+    $('#add-rasp-modal').modal('show');
+}
+function modalNewWednesday(id){
+    dayOfWeek = "Среда";
+    id_rasp = id;
+    $('#add-rasp-modal').modal('show');
+}
+function modalNewThursday(id){
+    dayOfWeek = "Четверг";
+    id_rasp = id;
+    $('#add-rasp-modal').modal('show');
+}
+function modalNewFriday(id){
+    dayOfWeek = "Пятница";
+    id_rasp = id;
+    $('#add-rasp-modal').modal('show');
+}
+function modalNewSaturday(id){
+    dayOfWeek = "Суббота";
+    id_rasp = id;
+    $('#add-rasp-modal').modal('show');
+}
+function modalNewSunday(id){
+    dayOfWeek = "Воскресенье";
+    id_rasp = id;
+    $('#add-rasp-modal').modal('show');
+}
 
 
+function modalMonday(id){
+    dayOfWeek = "Понедельник";
+    id_rasp = id;
+    $.ajax({
+		type: 'get',
+		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
+		success: function(data) {
+			$('.modal-edit-time').html(data);
+			$('#edit-rasp-modal').modal('show');
+		},
+	})
+}
+function modalTuesday(id){
+    dayOfWeek = "Вторник";
+    id_rasp = id;
+    $.ajax({
+		type: 'get',
+		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
+		success: function(data) {
+			$('.modal-edit-time').html(data);
+			$('#edit-rasp-modal').modal('show');
+		},
+	})
+}
+function modalWednesday(id){
+    dayOfWeek = "Среда";
+    id_rasp = id;
+    $.ajax({
+		type: 'get',
+		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
+		success: function(data) {
+			$('.modal-edit-time').html(data);
+			$('#edit-rasp-modal').modal('show');
+		},
+	})
+}
+function modalThursday(id){
+    dayOfWeek = "Четверг";
+    id_rasp = id;
+    $.ajax({
+		type: 'get',
+		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
+		success: function(data) {
+			$('.modal-edit-time').html(data);
+			$('#edit-rasp-modal').modal('show');
+		},
+	})
+}
+function modalFriday(id){
+    dayOfWeek = "Пятница";
+    id_rasp = id;
+    $.ajax({
+		type: 'get',
+		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
+		success: function(data) {
+			$('.modal-edit-time').html(data);
+			$('#edit-rasp-modal').modal('show');
+		},
+	})
+}
+function modalSaturday(id){
+    dayOfWeek = "Суббота";
+    id_rasp = id;
+    $.ajax({
+		type: 'get',
+		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
+		success: function(data) {
+			$('.modal-edit-time').html(data);
+			$('#edit-rasp-modal').modal('show');
+		},
+	})
+}
+
+function modalSunday(id){
+    dayOfWeek = "Воскресенье";
+    id_rasp = id;
+    $.ajax({
+		type: 'get',
+		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
+		success: function(data) {
+			$('.modal-edit-time').html(data);
+			$('#edit-rasp-modal').modal('show');
+		},
+	})
+}
+
+function saveNewTime(){
+    var startTime = document.getElementById("startTime").value;
+    var endTime = document.getElementById("endTime").value;
+
+	post('/spec/raspisanie/add/' + id_rasp+'/'+dayOfWeek+'/'+startTime+'/'+endTime);
+
+}
+
+function saveEditTime(){
+    var startTimeE = document.getElementById("startTimeE").value;
+    var endTimeE = document.getElementById("endTimeE").value;
+
+	post('/spec/raspisanie/edit/' + id_rasp+'/'+dayOfWeek+'/'+startTimeE+'/'+endTimeE);
+
+}
+
+function delTime(){
+	post('/spec/raspisanie/delete/' + id_rasp+'/'+dayOfWeek);
+}
+
+function post(path, method = 'post') {
+	const form = document.createElement('form');
+	form.method = method;
+	form.action = path;
+	const hiddenField = document.createElement('input');
+	hiddenField.type = 'hidden';
+	form.appendChild(hiddenField);
+	document.body.appendChild(form);
+	form.submit();
+}
 </script>
 </body>
 

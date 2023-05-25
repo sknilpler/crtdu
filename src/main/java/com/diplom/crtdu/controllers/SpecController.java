@@ -1500,120 +1500,6 @@ public class SpecController {
         return end.toString();
     }
 
-    /*
-        private Norma findNormaByAge(List<Norma> normi, String vozrast) {
-            for (Norma norma : normi) {
-                if (vozrast.equals(norma.getAge())) {
-                    return norma;
-                }
-            }
-            return new Norma("",4,2,null);
-        }
-
-        private List<Teacher> findAvailableTeachers(List<Teacher> teachers, Krujok krujok, List<WorkTime> workTimes) {
-            List<Teacher> availableTeachers = new ArrayList<>();
-            for (Teacher teacher : teachers) {
-                if (teacher.getKrujki().contains(krujok) && hasAvailableWorkTime(workTimes, teacher)) {
-                    availableTeachers.add(teacher);
-                }
-            }
-            return availableTeachers;
-        }
-
-        private boolean hasAvailableWorkTime(List<WorkTime> workTimes, Teacher teacher) {
-            for (WorkTime workTime : workTimes) {
-                if (workTime.getTeacher().equals(teacher)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private List<WorkTime> findAvailableWorkTimes(List<WorkTime> workTimes, String dayOfWeek, List<Teacher> availableTeachers) {
-            List<WorkTime> availableWorkTimes = new ArrayList<>();
-            for (WorkTime workTime : workTimes) {
-                if (workTime.getDayOfWeek().equalsIgnoreCase(dayOfWeek) && availableTeachers.contains(workTime.getTeacher())) {
-                    availableWorkTimes.add(workTime);
-                }
-            }
-            return availableWorkTimes;
-        }
-
-        private String getDayOfWeekByIndex(int index) {
-            String[] daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"};
-            if (index >= 0 && index < daysOfWeek.length) {
-                return daysOfWeek[index];
-            }
-            return "";
-        }
-
-        public void generateSchedule(List<Krujok> krujki, List<Teacher> teachers, List<Norma> normi, List<WorkTime> workTimes) {
-            for (Krujok krujok : krujki) {
-                Norma norma = findNormaByAge(normi, krujok.getVozrast());
-                List<Teacher> availableTeachers = findAvailableTeachers(teachers, krujok, workTimes);
-                int maxHoursPerWeek = norma.getHoursPerWeek();
-                int maxHoursPerDay = norma.getHoursPerDay();
-
-                int hoursPerWeek = 0;
-                int hoursPerDay = 0;
-                int dayOfWeekIndex = 0;
-
-                for (Raspisanie raspisanie : krujok.getRaspisanie()) {
-                    if (hoursPerWeek >= maxHoursPerWeek) {
-                        break;
-                    }
-
-                    String dayOfWeek = getDayOfWeekByIndex(dayOfWeekIndex);
-                    List<WorkTime> availableWorkTimes = findAvailableWorkTimes(workTimes, dayOfWeek, availableTeachers);
-
-                    if (availableWorkTimes.isEmpty()) {
-                        continue;
-                    }
-
-                    if (hoursPerDay >= maxHoursPerDay) {
-                        dayOfWeekIndex++;
-                        hoursPerDay = 0;
-                        continue;
-                    }
-
-                    WorkTime workTime = availableWorkTimes.get(0);
-                    raspisanie.setTeacher(workTime.getTeacher());
-
-                    String startTime = workTime.getHour();
-                    String endTime = calculateEndTime(startTime, maxHoursPerDay); // Рассчитываем время окончания занятия
-
-                    switch (dayOfWeek) {
-                        case "Понедельник":
-                            raspisanie.setMonday(startTime + "-" + endTime);
-                            break;
-                        case "Вторник":
-                            raspisanie.setTuesday(startTime + "-" + endTime);
-                            break;
-                        case "Среда":
-                            raspisanie.setWednesday(startTime + "-" + endTime);
-                            break;
-                        case "Четверг":
-                            raspisanie.setThursday(startTime + "-" + endTime);
-                            break;
-                        case "Пятница":
-                            raspisanie.setFriday(startTime + "-" + endTime);
-                            break;
-                        case "Суббота":
-                            raspisanie.setSaturday(startTime + "-" + endTime);
-                            break;
-                        case "Воскресенье":
-                            raspisanie.setSunday(startTime + "-" + endTime);
-                            break;
-                    }
-                    System.out.println(raspisanie.toString());
-                    raspisanieRepository.save(raspisanie);
-
-                    hoursPerWeek++;
-                    hoursPerDay++;
-                }
-            }
-        }
-    */
     @GetMapping("/spec/raspisanie/create")
     public String createRaspisanie() {
         raspisanieRepository.deleteAll();
@@ -1716,6 +1602,154 @@ public class SpecController {
         return "redirect:/";
     }
 
+    @GetMapping("/spec/raspisanie/edit-modal/{id_rasp}/{dayOfWeek}")
+    public String openEditModalWindowRasp(Model model,
+                                          @PathVariable("id_rasp") Long id,
+                                          @PathVariable("dayOfWeek") String dayOfWeek) {
+        Raspisanie r = raspisanieRepository.findById(id).orElse(null);
+        String startTime = "";
+        String endTime = "";
+        switch (dayOfWeek) {
+            case "Понедельник":
+                startTime = r.getMonday().split("-")[0];
+                endTime = r.getMonday().split("-")[1];
+                break;
+            case "Вторник":
+                startTime = r.getTuesday().split("-")[0];
+                endTime = r.getTuesday().split("-")[1];
+                break;
+            case "Среда":
+                startTime = r.getWednesday().split("-")[0];
+                endTime = r.getWednesday().split("-")[1];
+                break;
+            case "Четверг":
+                startTime = r.getThursday().split("-")[0];
+                endTime = r.getThursday().split("-")[1];
+                break;
+            case "Пятница":
+                startTime = r.getFriday().split("-")[0];
+                endTime = r.getFriday().split("-")[1];
+                break;
+            case "Суббота":
+                startTime = r.getSaturday().split("-")[0];
+                endTime = r.getSaturday().split("-")[1];
+                break;
+            case "Воскресенье":
+                startTime = r.getSunday().split("-")[0];
+                endTime = r.getSunday().split("-")[1];
+                break;
+        }
+        model.addAttribute("startTime", startTime);
+        model.addAttribute("endTime", endTime);
+        return "home :: modal-edit-time";
+    }
+
+    @PostMapping("/spec/raspisanie/add/{id_rasp}/{dayOfWeek}/{startTime}/{endTime}")
+    public String saveNewTime(Model model,
+                              @PathVariable("id_rasp") Long id,
+                              @PathVariable("dayOfWeek") String dayOfWeek,
+                              @PathVariable("startTime") String startTime,
+                              @PathVariable("endTime") String endTime) {
+        System.out.println(startTime+"-"+endTime);
+        Raspisanie r = raspisanieRepository.findById(id).orElse(null);
+        switch (dayOfWeek) {
+            case "Понедельник":
+                r.setMonday(startTime+"-"+endTime);
+                break;
+            case "Вторник":
+                r.setTuesday(startTime+"-"+endTime);
+                break;
+            case "Среда":
+                r.setWednesday(startTime+"-"+endTime);
+                break;
+            case "Четверг":
+                r.setThursday(startTime+"-"+endTime);
+                break;
+            case "Пятница":
+                r.setFriday(startTime+"-"+endTime);
+                break;
+            case "Суббота":
+                r.setSaturday(startTime+"-"+endTime);
+                break;
+            case "Воскресенье":
+                r.setSunday(startTime+"-"+endTime);
+                break;
+        }
+        raspisanieRepository.save(r);
+        model.addAttribute("startTimeE", startTime);
+        model.addAttribute("endTimeE", endTime);
+        return "redirect:/";
+    }
+
+    @PostMapping("/spec/raspisanie/edit/{id_rasp}/{dayOfWeek}/{startTimeE}/{endTimeE}")
+    public String saveEditTime(Model model,
+                              @PathVariable("id_rasp") Long id,
+                              @PathVariable("dayOfWeek") String dayOfWeek,
+                              @PathVariable("startTimeE") String startTime,
+                              @PathVariable("endTimeE") String endTime) {
+        System.out.println(startTime+"-"+endTime);
+        Raspisanie r = raspisanieRepository.findById(id).orElse(null);
+        switch (dayOfWeek) {
+            case "Понедельник":
+                r.setMonday(startTime+"-"+endTime);
+                break;
+            case "Вторник":
+                r.setTuesday(startTime+"-"+endTime);
+                break;
+            case "Среда":
+                r.setWednesday(startTime+"-"+endTime);
+                break;
+            case "Четверг":
+                r.setThursday(startTime+"-"+endTime);
+                break;
+            case "Пятница":
+                r.setFriday(startTime+"-"+endTime);
+                break;
+            case "Суббота":
+                r.setSaturday(startTime+"-"+endTime);
+                break;
+            case "Воскресенье":
+                r.setSunday(startTime+"-"+endTime);
+                break;
+        }
+        raspisanieRepository.save(r);
+        model.addAttribute("startTimeE", startTime);
+        model.addAttribute("endTimeE", endTime);
+        return "redirect:/";
+    }
+
+    @PostMapping("/spec/raspisanie/delete/{id_rasp}/{dayOfWeek}")
+    public String delTime(Model model,
+                               @PathVariable("id_rasp") Long id,
+                               @PathVariable("dayOfWeek") String dayOfWeek) {
+
+        Raspisanie r = raspisanieRepository.findById(id).orElse(null);
+        switch (dayOfWeek) {
+            case "Понедельник":
+                r.setMonday("");
+                break;
+            case "Вторник":
+                r.setTuesday("");
+                break;
+            case "Среда":
+                r.setWednesday("");
+                break;
+            case "Четверг":
+                r.setThursday("");
+                break;
+            case "Пятница":
+                r.setFriday("");
+                break;
+            case "Суббота":
+                r.setSaturday("");
+                break;
+            case "Воскресенье":
+                r.setSunday("");
+                break;
+        }
+        raspisanieRepository.save(r);
+        return "redirect:/";
+    }
 
 }
 
