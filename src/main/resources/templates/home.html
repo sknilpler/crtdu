@@ -40,63 +40,213 @@
 //#header:hover::before {
 //  transform: scale(1.1);
 //}
+
+
+
     </style>
 </head>
 
 <body>
 <header th:insert="blocks/header :: header"></header>
 
-<div class="container">
-    <h1>Расписание занятий по дням недели</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10">
+            <h2>Расписание занятий по дням недели</h2>
+        </div>
+        <div class="col-md-2 text-md-end">
+            <a class="btn btn-outline-warning" id="export-btn" href="/spec/raspisanie/create"
+               title="Обновить расписание" sec:authorize="hasRole('ROLE_ADMIN')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
+                     fill="currentColor" style="font-size: 15px;">
+                    <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                    <path d="M449.9 39.96l-48.5 48.53C362.5 53.19 311.4 32 256 32C161.5 32 78.59 92.34 49.58 182.2c-5.438 16.81 3.797 34.88 20.61 40.28c16.97 5.5 34.86-3.812 40.3-20.59C130.9 138.5 189.4 96 256 96c37.96 0 73 14.18 100.2 37.8L311.1 178C295.1 194.8 306.8 223.4 330.4 224h146.9C487.7 223.7 496 215.3 496 204.9V59.04C496 34.99 466.9 22.95 449.9 39.96zM441.8 289.6c-16.94-5.438-34.88 3.812-40.3 20.59C381.1 373.5 322.6 416 256 416c-37.96 0-73-14.18-100.2-37.8L200 334C216.9 317.2 205.2 288.6 181.6 288H34.66C24.32 288.3 16 296.7 16 307.1v145.9c0 24.04 29.07 36.08 46.07 19.07l48.5-48.53C149.5 458.8 200.6 480 255.1 480c94.45 0 177.4-60.34 206.4-150.2C467.9 313 458.6 294.1 441.8 289.6z"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th>Наименование объединения</th>
-            <th>Понедельник</th>
-            <th>Вторник</th>
-            <th>Среда</th>
-            <th>Четверг</th>
-            <th>Пятница</th>
-            <th>Суббота</th>
-            <th>Воскресенье</th>
+            <th class="text-center">Наименование объединения</th>
+            <th class="text-center">Понедельник</th>
+            <th class="text-center">Вторник</th>
+            <th class="text-center">Среда</th>
+            <th class="text-center">Четверг</th>
+            <th class="text-center">Пятница</th>
+            <th class="text-center">Суббота</th>
+            <th class="text-center">Воскресенье</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td><strong>Ансамбль "Ромашки"</strong><br>преп: Иванов И.И.<br>каб. 101</td>
-            <td>15:00-16:30</td>
-            <td></td>
-            <td>15:00-16:30</td>
-            <td></td>
-            <td>15:00-16:30</td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td><strong>Хореографический кружок</strong><br>преп: Сидорова О.П.<br>каб. 102</td>
-            <td></td>
-            <td>14:00-15:30</td>
-            <td></td>
-            <td>14:00-15:30</td>
-            <td></td>
-            <td>14:00-15:30</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td><strong>Каратэ</strong><br>преп: Ким Р.А.<br>каб. 103</td>
-            <td></td>
-            <td>16:00-17:30</td>
-            <td>16:00-17:30</td>
-            <td>16:00-17:30</td>
-            <td></td>
-            <td></td>
-            <td></td>
+        <tr th:each="r : ${rasp}">
+            <th>
+                <strong th:text="${r.krujok.name}"></strong><br>
+                <a th:text="${r.krujok.vozrast}+' лет'"></a><br>
+                <a th:text="${r.teacher.getShortFIO()}"></a><br>
+                <a th:text="${r.krujok.mesto}"></a>
+            </th>
+            <th>
+                <div class="text-center">
+                    <div th:unless="${r.monday==''}">
+                        <p
+                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalMonday(\'' + ${r.id} + '\');'">
+                            <a href="#"
+                               class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
+                               th:text="${r.monday}"></a>
+                        </p>
+                        <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.monday}"></p>
+                    </div>
+                    <div th:if="${r.monday==''}">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewMonday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                                <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                </div>
+            </th>
+            <th>
+                <div class="text-center">
+                    <div th:unless="${r.tuesday==''}">
+                        <p
+                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalTuesday(\'' + ${r.id} + '\');'">
+                            <a href="#"
+                               class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
+                               th:text="${r.tuesday}"></a>
+                        </p>
+                        <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.tuesday}"></p>
+                    </div>
+                    <div th:if="${r.tuesday==''}">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewTuesday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                                <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                </div>
+            </th>
+            <th>
+                <div class="text-center">
+                    <div th:if="${r.wednesday == ''}">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewWednesday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                                <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div th:unless="${r.wednesday == ''}">
+                        <p
+                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalWednesday(\'' + ${r.id} + '\');'">
+                            <a href="#"
+                               class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
+                               th:text="${r.wednesday}"></a>
+                        </p>
+                        <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.wednesday}"></p>
+                    </div>
+
+                </div>
+            </th>
+            <th>
+                <div class="text-center">
+                    <div th:if="${r.thursday == ''}">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewThursday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                                <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div th:unless="${r.thursday == ''}">
+                        <p
+                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalThursday(\'' + ${r.id} + '\');'">
+                            <a href="#"
+                               class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
+                               th:text="${r.thursday}"></a>
+                        </p>
+                        <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.thursday}"></p>
+                    </div>
+
+                </div>
+            </th>
+            <th>
+                <div class="text-center">
+                    <div th:if="${r.friday == ''}">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewFriday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                                <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div th:unless="${r.friday == ''}">
+                        <p
+                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalFriday(\'' + ${r.id} + '\');'">
+                            <a href="#"
+                               class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
+                               th:text="${r.friday}"></a>
+                        </p>
+                        <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.friday}"></p>
+                    </div>
+
+                </div>
+            </th>
+            <th>
+                <div class="text-center">
+                    <div th:if="${r.saturday == ''}">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewSaturday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                                <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div th:unless="${r.saturday == ''}">
+                        <p
+                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalSaturday(\'' + ${r.id} + '\');'">
+                            <a href="#"
+                               class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
+                               th:text="${r.saturday}"></a>
+                        </p>
+                        <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.saturday}"></p>
+                    </div>
+
+                </div>
+            </th>
+            <th>
+                <div class="text-center">
+                    <div th:if="${r.sunday == ''}">
+                        <button type="button" class="btn btn-outline-secondary" sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalNewSunday(\'' + ${r.id} + '\');'">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em" fill="currentColor" style="font-size: 15px;width: 32px;height: 32px;">
+                                <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                                <path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div th:unless="${r.sunday == ''}">
+                        <p
+                                sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="'javascript:modalSunday(\'' + ${r.id} + '\');'">
+                            <a href="#"
+                               class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover"
+                               th:text="${r.sunday}"></a>
+                        </p>
+                        <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.sunday}"></p>
+                    </div>
+
+                </div>
+            </th>
         </tr>
         </tbody>
     </table>
 </div>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/theme.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/theme.js"></script>
 <script>
 //const header = document.getElementById("header");
 //header.addEventListener("mousemove", (e) => {
@@ -104,6 +254,9 @@
 //  const y = e.clientY / window.innerHeight;
 //  header.style.backgroundPosition = `${x * 100}% ${y * 100}%`;
 //});
+
+
+
 </script>
 </body>
 

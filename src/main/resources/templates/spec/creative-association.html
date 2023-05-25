@@ -118,7 +118,18 @@
                 </div>
                 <div class="mb-3">
                     <label for="vozrast" class="form-label">Возрастная группа</label>
-                    <input type="text" class="form-control" id="vozrast" name="vozrast">
+                    <select class="form-select" id="vozrast" name="vozrast">
+                        <option value="0" selected disabled>-- Выберите возраст --</option>
+                        <option value="3-5">3-5 лет</option>
+                        <option value="6-8">6-8 лет</option>
+                        <option value="9-11">9-11 лет</option>
+                        <option value="12-15">12-15 лет</option>
+                        <option value="16-17">16-17 лет</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="mestoK" class="form-label">Место проведения</label>
+                    <input type="text" class="form-control" id="mestoK" name="mestoK">
                 </div>
                 <div class="mb-3">
                     <label for="typeK" class="form-label">Тип</label>
@@ -186,7 +197,18 @@
                     </div>
                     <div class="mb-3">
                         <label for="vozrastKr" class="form-label">Возрастная группа</label>
-                        <input type="text" class="form-control" th:field="*{vozrast}" id="vozrastKr" name="vozrastKr">
+                        <select class="form-select" id="vozrastKr" name="vozrastKr" th:field="*{vozrast}">
+                            <option value="0" selected disabled>-- Выберите возраст --</option>
+                            <option value="3-5">3-5 лет</option>
+                            <option value="6-8">6-8 лет</option>
+                            <option value="9-11">9-11 лет</option>
+                            <option value="12-15">12-15 лет</option>
+                            <option value="16-17">16-17 лет</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="mestoKr" class="form-label">Место проведения</label>
+                        <input type="text" class="form-control" th:field="*{mesto}" id="mestoKr" name="mestoKr">
                     </div>
                     <div class="mb-3">
                         <label for="typeKr" class="form-label">Тип</label>
@@ -324,8 +346,9 @@
                         <tr>
                             <th onclick="sortTable(0);">Название</th>
                             <th onclick="sortTable(1);">Возр. группа</th>
-                            <th onclick="sortTable(2);">Тип</th>
-                            <th onclick="sortTable(3);">Педагоги</th>
+                            <th onclick="sortTable(2);">Место проведения</th>
+                            <th onclick="sortTable(3);">Тип</th>
+                            <th onclick="sortTable(4);">Педагоги</th>
                             <th></th>
                         </tr>
                         </thead>
@@ -333,6 +356,7 @@
                         <tr th:each="k : ${krujki}">
                             <td th:text="${k.name}"></td>
                             <td th:text="${k.vozrast}"></td>
+                            <td th:text="${k.mesto}"></td>
                             <td th:text="${k.typeKrujok.name}"></td>
                             <td>
                                 <div th:each="t: ${k.teachers}">
@@ -495,10 +519,11 @@ function saveKruj() {
 	var nameK = document.getElementById("nameK").value;
 	var vozrast = document.getElementById("vozrast").value;
 	var typeK = document.getElementById("typeK").value;
+	var mestoK = document.getElementById("mestoK").value;
 	if (assignTeachersCheckbox.checked === true) {
 		$.ajax({
 			type: 'get',
-			url: '/spec/kruj-add-new/' + nameK + '/' + id_ca + '/' + vozrast + '/' + typeK + '/list-ids/' + getSelectedTeachers(),
+			url: '/spec/kruj-add-new/' + nameK + '/' + id_ca + '/' + vozrast + '/' + typeK + '/' + mestoK + '/list-ids/' + getSelectedTeachers(),
 			success: function(data) {
 				$('.kruj-table').html(data);
 				$('#new-kruj-modal').modal('hide');
@@ -507,7 +532,7 @@ function saveKruj() {
 	} else {
 		$.ajax({
 			type: 'get',
-			url: '/spec/kruj-add-new/' + nameK + '/' + id_ca + '/' + vozrast + '/' + typeK,
+			url: '/spec/kruj-add-new/' + nameK + '/' + id_ca + '/' + vozrast + '/' + typeK+ '/' + mestoK,
 			success: function(data) {
 				$('.kruj-table').html(data);
 				$('#new-kruj-modal').modal('hide');
@@ -633,10 +658,11 @@ function saveKrujEdit(id) {
 	var nameKr = document.getElementById("nameKr").value;
 	var vozrastKr = document.getElementById("vozrastKr").value;
 	var typeKr = document.getElementById("typeKr").value;
+	var mestoKr = document.getElementById("mestoKr").value;
 	if (document.getElementById("teachersCheckbox").checked === true) {
 		$.ajax({
 			type: 'get',
-			url: '/spec/kruj-edit/' + id + '/' + nameKr + '/' + vozrastKr + '/' + typeKr + '/list-ids/' + getSelectedTeachersE(),
+			url: '/spec/kruj-edit/' + id + '/' + nameKr + '/' + vozrastKr + '/' + typeKr + '/' + mestoKr + '/list-ids/' + getSelectedTeachersE(),
 			success: function(data) {
 				$('.kruj-table').html(data);
 				$('#edit-kruj-modal').modal('hide');
@@ -645,7 +671,7 @@ function saveKrujEdit(id) {
 	} else {
 		$.ajax({
 			type: 'get',
-			url: '/spec/kruj-edit/' + id + '/' + nameKr + '/' + vozrastKr + '/' + typeKr,
+			url: '/spec/kruj-edit/' + id + '/' + nameKr + '/' + vozrastKr + '/' + typeKr+ '/' + mestoKr,
 			success: function(data) {
 				$('.kruj-table').html(data);
 				$('#edit-kruj-modal').modal('hide');

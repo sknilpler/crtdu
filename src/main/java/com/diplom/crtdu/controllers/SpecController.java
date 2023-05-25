@@ -1040,11 +1040,12 @@ public class SpecController {
         return "spec/creative-association :: kruj-table";
     }
 
-    @GetMapping("/spec/kruj-add-new/{name}/{id}/{vozrast}/{type}")
+    @GetMapping("/spec/kruj-add-new/{name}/{id}/{vozrast}/{type}/{mesto}")
     public String saveKruj(Model model,
                            @PathVariable("id") Long id,
                            @PathVariable("name") String name,
                            @PathVariable("vozrast") String vozrast,
+                           @PathVariable("mesto") String mesto,
                            @PathVariable("type") Long type) {
         //Krujok k = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
         CreativeAssociation ca = caRepository.findById(id).orElseThrow(() -> new NotFoundException("Creative Association with id = " + id + " not found on server!"));
@@ -1054,17 +1055,19 @@ public class SpecController {
         k.setVozrast(vozrast);
         k.setTypeKrujok(tk);
         k.setCreativeAssociation(ca);
+        k.setMesto(mesto);
         krujokRepository.save(k);
         model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(id));
         return "spec/creative-association :: kruj-table";
     }
 
-    @GetMapping("/spec/kruj-add-new/{name}/{id}/{vozrast}/{type}/list-ids/{list}")
+    @GetMapping("/spec/kruj-add-new/{name}/{id}/{vozrast}/{type}/{mesto}/list-ids/{list}")
     public String saveKrujWithTeachers(Model model,
                                        @PathVariable("id") Long id,
                                        @PathVariable("name") String name,
                                        @PathVariable("vozrast") String vozrast,
                                        @PathVariable("type") Long type,
+                                       @PathVariable("mesto") String mesto,
                                        @PathVariable("list") List<String> ids) {
         List<Teacher> teachers = ids.stream()
                 .map(Long::valueOf)
@@ -1080,6 +1083,7 @@ public class SpecController {
         k.setTypeKrujok(tk);
         k.setCreativeAssociation(ca);
         k.setTeachers(teachers);
+        k.setMesto(mesto);
         krujokRepository.save(k);
         model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(id));
         return "spec/creative-association :: kruj-table";
@@ -1096,29 +1100,32 @@ public class SpecController {
     }
 
 
-    @GetMapping("/spec/kruj-edit/{id}/{name}/{vozrast}/{type}")
+    @GetMapping("/spec/kruj-edit/{id}/{name}/{vozrast}/{type}/{mesto}")
     public String saveEditedKruj(Model model,
                                  @PathVariable("id") Long id,
                                  @PathVariable("name") String name,
                                  @PathVariable("vozrast") String vozrast,
+                                 @PathVariable("mesto") String mesto,
                                  @PathVariable("type") Long type) {
         Krujok k = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
         TypeKrujok tk = typeKrujokRepository.findById(type).orElseThrow(() -> new NotFoundException("Type kryjok with id = " + type + " not found on server!"));
         k.setName(name);
         k.setVozrast(vozrast);
         k.setTypeKrujok(tk);
+        k.setMesto(mesto);
         krujokRepository.save(k);
         model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(k.getCreativeAssociation().getId()));
         return "spec/creative-association :: kruj-table";
     }
 
 
-    @GetMapping("/spec/kruj-edit/{id}/{name}/{vozrast}/{type}/list-ids/{list}")
+    @GetMapping("/spec/kruj-edit/{id}/{name}/{vozrast}/{type}/{mesto}/list-ids/{list}")
     public String saveEditedKrujWithTeachers(Model model,
                                              @PathVariable("id") Long id,
                                              @PathVariable("name") String name,
                                              @PathVariable("vozrast") String vozrast,
                                              @PathVariable("type") Long type,
+                                             @PathVariable("mesto") String mesto,
                                              @PathVariable("list") List<String> ids) {
         Krujok k = krujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Krujok with id = " + id + " not found on server!"));
         TypeKrujok tk = typeKrujokRepository.findById(type).orElseThrow(() -> new NotFoundException("Type kryjok with id = " + type + " not found on server!"));
@@ -1132,6 +1139,7 @@ public class SpecController {
         k.setVozrast(vozrast);
         k.setTypeKrujok(tk);
         k.setTeachers(teachers);
+        k.setMesto(mesto);
         krujokRepository.save(k);
         model.addAttribute("krujki", krujokRepository.findByCreativeAssociationId(k.getCreativeAssociation().getId()));
         return "spec/creative-association :: kruj-table";
@@ -1468,7 +1476,7 @@ public class SpecController {
                                   @PathVariable("age") String age,
                                   @PathVariable("hoursPreWeek") int hoursPreWeek,
                                   @PathVariable("hoursPerDay") int hoursPerDay) {
-        TypeKrujok t = typeKrujokRepository.findById(id).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id + " not found on server!"));
+        TypeKrujok t = typeKrujokRepository.findById(id_type).orElseThrow(() -> new NotFoundException("Type krujok with id = " + id_type + " not found on server!"));
         Norma norma = normaRepository.findById(id).orElseThrow(() -> new NotFoundException("Norma with id = " + id + " not found on server!"));
         norma.setAge(age);
         norma.setHoursPerWeek(hoursPreWeek);
@@ -1608,6 +1616,7 @@ public class SpecController {
     */
     @GetMapping("/spec/raspisanie/create")
     public String createRaspisanie() {
+        raspisanieRepository.deleteAll();
         List<Krujok> krujki = krujokRepository.findAllByOrderByCreativeAssociationNameAndKrujokName();
         String[] daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"};
         List<Raspisanie> raspisanie = new ArrayList<>();
@@ -1623,13 +1632,6 @@ public class SpecController {
                         List<WorkTime> times = workTimeRepository.findByDayOfWeekAndTeacherId(day, t.getId());
                         for (WorkTime time : busyTime) {
                             times.remove(time);
-                        }
-                        if (t.getSurname().equals("Герасимчук")){
-                            System.out.println(times.size());
-                            System.out.println(norma.getHoursPerDay());
-                            System.out.println(usedHoursWeek);
-                            System.out.println(norma.getHoursPerWeek());
-                            System.out.println("------------------------------");
                         }
                         if ((times.size() >= norma.getHoursPerDay()) && (usedHoursWeek <= (norma.getHoursPerWeek() - norma.getHoursPerDay()))) {
                             String startTime = times.get(0).getHour();
@@ -1691,11 +1693,27 @@ public class SpecController {
                     rasp.setKrujok(krujok);
                     raspisanie.add(rasp);
                 }
+            } else {
+                System.out.println("!!!-------------------------------------------");
+                System.out.println("Отсутствуют нормы часов для '" + krujok.getTypeKrujok().getName() + "', возрастная группа: " + krujok.getVozrast() + " лет");
+                int defaultHoursByDay = 1;
+                int defaultHoursByWeek = 2;
+                normaRepository.save(new Norma(krujok.getVozrast(), defaultHoursByWeek, defaultHoursByDay, krujok.getTypeKrujok()));
+                System.out.println("Создана новая норма часов для '" + krujok.getTypeKrujok().getName() + "', возрастная группа: " + krujok.getVozrast() + " лет");
+                System.out.println("По умолчанию установлены кол-во часов в день: " + defaultHoursByDay + ", кол-во часов в неделю: " + defaultHoursByWeek);
+                System.out.println("Необходимо снова запустить формирование расписания");
+                System.out.println("!!!-------------------------------------------");
             }
         }
+        //удаление пустых расписаний
+        raspisanie.removeIf(r -> r.getMonday().equals("") && r.getTuesday().equals("") &&
+                r.getFriday().equals("") && r.getThursday().equals("") && r.getWednesday().equals("") &&
+                r.getSaturday().equals("") && r.getSunday().equals(""));
 
         raspisanie.forEach(raspisanie1 -> System.out.println(raspisanie1.toString()));
-        return "home";
+
+        raspisanieRepository.saveAll(raspisanie);
+        return "redirect:/";
     }
 
 

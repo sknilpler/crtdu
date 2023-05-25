@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
+//@NoArgsConstructor
 public class Krujok {
 
     @Id
@@ -21,6 +21,7 @@ public class Krujok {
     private String name;
     private String vozrast;
     private boolean archive;
+    private String mesto;
 
     @ManyToMany
     @JoinTable(name = "teacher_krujok",
@@ -66,20 +67,29 @@ public class Krujok {
     @JoinColumn(name = "krujok_id")
     private List<Dostijenie> dostList;
 
-    public Krujok(String name, String vozrast, TypeKrujok type) {
-        this.name = name;
-        this.vozrast = vozrast;
-        this.typeKrujok = type;
-        this.archive = false;
-    }
+//    public Krujok(String name, String vozrast, TypeKrujok type) {
+//        this.name = name;
+//        this.vozrast = vozrast;
+//        this.typeKrujok = type;
+//        this.archive = false;
+//    }
+//
+//    public Krujok(String name, String vozrast, TypeKrujok typeKrujok, CreativeAssociation creativeAssociation) {
+//        this.name = name;
+//        this.vozrast = vozrast;
+//        this.typeKrujok = typeKrujok;
+//        this.creativeAssociation = creativeAssociation;
+//        this.archive = false;
+//    }
 
-    public Krujok(String name, String vozrast, TypeKrujok typeKrujok, CreativeAssociation creativeAssociation) {
-        this.name = name;
-        this.vozrast = vozrast;
-        this.typeKrujok = typeKrujok;
-        this.creativeAssociation = creativeAssociation;
-        this.archive = false;
-    }
+//    public Krujok(String name, String vozrast, boolean archive, String mesto, TypeKrujok typeKrujok, CreativeAssociation creativeAssociation) {
+//        this.name = name;
+//        this.vozrast = vozrast;
+//        this.archive = archive;
+//        this.mesto = mesto;
+//        this.typeKrujok = typeKrujok;
+//        this.creativeAssociation = creativeAssociation;
+//    }
 
     @Override
     public String toString() {

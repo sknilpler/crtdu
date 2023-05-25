@@ -5,6 +5,7 @@ import com.diplom.crtdu.models.Role;
 import com.diplom.crtdu.models.TypeMeropriyatiya;
 import com.diplom.crtdu.models.User;
 import com.diplom.crtdu.repo.LevelMeropriyatiyaRepository;
+import com.diplom.crtdu.repo.RaspisanieRepository;
 import com.diplom.crtdu.repo.RoleRepository;
 import com.diplom.crtdu.repo.TypeMeropriyatiyaRepository;
 import com.diplom.crtdu.services.UserService;
@@ -31,6 +32,8 @@ public class MainController {
     private TypeMeropriyatiyaRepository typeMeropriyatiyaRepository;
     @Autowired
     private LevelMeropriyatiyaRepository levelMeropriyatiyaRepository;
+    @Autowired
+    private RaspisanieRepository raspisanieRepository;
 
     @GetMapping("/")
     public String home(Model model, Authentication authentication) {
@@ -93,7 +96,7 @@ public class MainController {
             levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Национальный"));
             levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Международный"));
         }
-
+        model.addAttribute("rasp", raspisanieRepository.findAll());
         model.addAttribute("title", "Главная страница");
         return "home";
     }
