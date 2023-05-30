@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface TeacherRepository extends CrudRepository<Teacher,Long> {
 
+    Teacher findByUsername(String username);
+
     @Query(value = "SELECT \n" +
             "    teacher.id AS id, CONCAT(teacher.surname, ' ', LEFT(teacher.name, 1), '.', LEFT(teacher.patronymic, 1), '.') AS full_name, \n" +
             "    COUNT(dostijenie.id) AS count_participations, \n" +

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Календарь мероприятий</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+    /* Дополнительные стили для календаря */
+    .event-day {
+      background-color: #ffcc00;
+      color: #000;
+    }
+    .event-info {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      z-index: 9999;
+    }
+    .event-day:hover .event-info {
+      display: block;
+    }
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center">Планирование мероприятий</h1>
+    <table class="table table-borderless">
+        <thead>
+        <tr>
+            <th class="text-center">Пн</th>
+            <th class="text-center">Вт</th>
+            <th class="text-center">Ср</th>
+            <th class="text-center">Чт</th>
+            <th class="text-center">Пт</th>
+            <th class="text-center">Сб</th>
+            <th class="text-center">Вс</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Итерация по строкам календаря -->
+        <tr th:each="week : ${calendar}">
+            <!-- Итерация по дням в каждой строке -->
+            <td th:each="day : ${week}">
+
+                <div th:if="${#lists.isEmpty(day.events) == false}" class="card text-black bg-primary mb-1" style="max-width: 10rem; height: 10rem; min-width: 7rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                    <div class="card-header">
+                        <span th:if="${day.date != 0}" th:text="${day.date}" ></span>
+                    </div>
+                    <div class="card-body text-white" >
+                        <div th:if="${day.events}" class="row">
+                            <div th:each="event : ${day.events}"
+                                 class="col-md-6"
+                                 data-html="true" data-toggle="tooltip" data-placement="top"
+                                 th:title="'Наименование: ' + ${event.name} + ' &#10;Место проведения: ' + ${event.place} + ' &#10;Ответственный: ' + ${event.otvetstvenniy}">
+
+                                <p class="card-text small" th:text="${#temporals.format(event.data.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${#lists.isEmpty(day.events) == false}" class="card text-dark bg-light mb-1" style="max-width: 10rem; height: 10rem; min-width: 7rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                    <div class="card-header">
+                        <span th:if="${day.date != 0}" th:text="${day.date}" ></span>
+                    </div>
+                    <div class="card-body">
+
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script th:inline="javascript">
+
+$(document).ready(function() {
+  $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+</body>
+</html>

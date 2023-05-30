@@ -4,10 +4,7 @@ import com.diplom.crtdu.exception.NotFoundException;
 import com.diplom.crtdu.models.*;
 import com.diplom.crtdu.repo.*;
 import com.diplom.crtdu.services.UserService;
-import com.diplom.crtdu.utils.KidsOnMeropModel;
-import com.diplom.crtdu.utils.StatKids;
-import com.diplom.crtdu.utils.StatTeacher;
-import com.diplom.crtdu.utils.WeekTimesModel;
+import com.diplom.crtdu.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,9 +23,13 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -553,6 +554,17 @@ public class SpecController {
         model.addAttribute("levels", levelMeropriyatiyaRepository.findAll());
         model.addAttribute("types", typeMeropriyatiyaRepository.findAllByOrderByName());
         model.addAttribute("merop", meropriyatieRepository.findByData(d1, d2));
+
+        // Получите список мероприятий за выбранный месяц
+        LocalDate currentDate = LocalDate.now();
+        int currentMonth = currentDate.getMonthValue();
+        List<Meropriyatie> events = meropriyatieRepository.findByData(getFirstDayOfMonth(currentMonth),getLastDayOfMonth(currentMonth));
+        // Создайте объект календаря
+        List<List<DayMerop>> calendar = generateCalendar(events, year, currentMonth);
+        // Передайте календарь в модель
+        model.addAttribute("calendar", calendar);
+        model.addAttribute("year",year);
+        model.addAttribute("month",currentMonth);
         return "spec/meropriyatiya";
     }
 
@@ -1650,29 +1662,29 @@ public class SpecController {
                               @PathVariable("dayOfWeek") String dayOfWeek,
                               @PathVariable("startTime") String startTime,
                               @PathVariable("endTime") String endTime) {
-        System.out.println(startTime+"-"+endTime);
+        System.out.println(startTime + "-" + endTime);
         Raspisanie r = raspisanieRepository.findById(id).orElse(null);
         switch (dayOfWeek) {
             case "Понедельник":
-                r.setMonday(startTime+"-"+endTime);
+                r.setMonday(startTime + "-" + endTime);
                 break;
             case "Вторник":
-                r.setTuesday(startTime+"-"+endTime);
+                r.setTuesday(startTime + "-" + endTime);
                 break;
             case "Среда":
-                r.setWednesday(startTime+"-"+endTime);
+                r.setWednesday(startTime + "-" + endTime);
                 break;
             case "Четверг":
-                r.setThursday(startTime+"-"+endTime);
+                r.setThursday(startTime + "-" + endTime);
                 break;
             case "Пятница":
-                r.setFriday(startTime+"-"+endTime);
+                r.setFriday(startTime + "-" + endTime);
                 break;
             case "Суббота":
-                r.setSaturday(startTime+"-"+endTime);
+                r.setSaturday(startTime + "-" + endTime);
                 break;
             case "Воскресенье":
-                r.setSunday(startTime+"-"+endTime);
+                r.setSunday(startTime + "-" + endTime);
                 break;
         }
         raspisanieRepository.save(r);
@@ -1683,33 +1695,33 @@ public class SpecController {
 
     @PostMapping("/spec/raspisanie/edit/{id_rasp}/{dayOfWeek}/{startTimeE}/{endTimeE}")
     public String saveEditTime(Model model,
-                              @PathVariable("id_rasp") Long id,
-                              @PathVariable("dayOfWeek") String dayOfWeek,
-                              @PathVariable("startTimeE") String startTime,
-                              @PathVariable("endTimeE") String endTime) {
-        System.out.println(startTime+"-"+endTime);
+                               @PathVariable("id_rasp") Long id,
+                               @PathVariable("dayOfWeek") String dayOfWeek,
+                               @PathVariable("startTimeE") String startTime,
+                               @PathVariable("endTimeE") String endTime) {
+        System.out.println(startTime + "-" + endTime);
         Raspisanie r = raspisanieRepository.findById(id).orElse(null);
         switch (dayOfWeek) {
             case "Понедельник":
-                r.setMonday(startTime+"-"+endTime);
+                r.setMonday(startTime + "-" + endTime);
                 break;
             case "Вторник":
-                r.setTuesday(startTime+"-"+endTime);
+                r.setTuesday(startTime + "-" + endTime);
                 break;
             case "Среда":
-                r.setWednesday(startTime+"-"+endTime);
+                r.setWednesday(startTime + "-" + endTime);
                 break;
             case "Четверг":
-                r.setThursday(startTime+"-"+endTime);
+                r.setThursday(startTime + "-" + endTime);
                 break;
             case "Пятница":
-                r.setFriday(startTime+"-"+endTime);
+                r.setFriday(startTime + "-" + endTime);
                 break;
             case "Суббота":
-                r.setSaturday(startTime+"-"+endTime);
+                r.setSaturday(startTime + "-" + endTime);
                 break;
             case "Воскресенье":
-                r.setSunday(startTime+"-"+endTime);
+                r.setSunday(startTime + "-" + endTime);
                 break;
         }
         raspisanieRepository.save(r);
@@ -1720,8 +1732,8 @@ public class SpecController {
 
     @PostMapping("/spec/raspisanie/delete/{id_rasp}/{dayOfWeek}")
     public String delTime(Model model,
-                               @PathVariable("id_rasp") Long id,
-                               @PathVariable("dayOfWeek") String dayOfWeek) {
+                          @PathVariable("id_rasp") Long id,
+                          @PathVariable("dayOfWeek") String dayOfWeek) {
 
         Raspisanie r = raspisanieRepository.findById(id).orElse(null);
         switch (dayOfWeek) {
@@ -1749,6 +1761,103 @@ public class SpecController {
         }
         raspisanieRepository.save(r);
         return "redirect:/";
+    }
+
+    //----------------планирование мероприятий-------------------
+    public String getFirstDayOfMonth(int monthNumber) {
+        // Получаем текущую дату
+        LocalDate currentDate = LocalDate.now();
+
+        // Устанавливаем указанный месяц и первый день месяца
+        LocalDate firstDayOfMonth = currentDate.withMonth(monthNumber).withDayOfMonth(1);
+
+        // Форматируем дату в нужный формат
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = firstDayOfMonth.format(formatter);
+        System.out.println(formattedDate);
+        return formattedDate;
+    }
+
+
+    public String getLastDayOfMonth(int monthNumber) {
+        // Получаем текущую дату
+        LocalDate currentDate = LocalDate.now();
+
+        // Устанавливаем указанный месяц и последний день месяца
+        LocalDate lastDayOfMonth = currentDate.withMonth(monthNumber).withDayOfMonth(1).plusMonths(1).minusDays(1);
+
+        // Форматируем дату в нужный формат
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = lastDayOfMonth.format(formatter);
+        System.out.println(formattedDate);
+        return formattedDate;
+    }
+
+
+    @GetMapping("/spec/merop-calendar/{year}/{month}")
+    public String getEvents(Model model, @PathVariable("month") int month, @PathVariable("year") int year) {
+        // Получите список мероприятий за выбранный месяц
+        List<Meropriyatie> events = meropriyatieRepository.findByData(getFirstDayOfMonth(month),getLastDayOfMonth(month));
+        // Создайте объект календаря
+        List<List<DayMerop>> calendar = generateCalendar(events, year, month);
+        // Передайте календарь в модель
+        model.addAttribute("calendar", calendar);
+
+        // Верните имя представления
+        return "spec/meropriyatiya :: calendar-fragment";
+    }
+
+    private List<List<DayMerop>> generateCalendar(List<Meropriyatie> events, int year, int month) {
+        List<List<DayMerop>> calendar = new ArrayList<>();
+
+        // Получаем первый день месяца
+        LocalDate firstDayOfMonth = LocalDate.of(year, month, 1);
+
+        // Определяем день недели первого дня месяца
+        DayOfWeek firstDayOfWeek = firstDayOfMonth.getDayOfWeek();
+
+        // Вычисляем смещение для первого дня месяца
+        int offset = firstDayOfWeek.getValue() - DayOfWeek.MONDAY.getValue();
+        if (offset < 0) {
+            offset += 7;
+        }
+        // Создаем первую строку в календаре
+        calendar.add(new ArrayList<>());
+        // Создаем пустые дни для смещения
+        for (int i = 0; i < offset; i++) {
+            calendar.get(0).add(new DayMerop()); // Предполагается, что первая строка уже существует
+        }
+
+        // Заполняем календарь днями месяца
+        LocalDate currentDate = firstDayOfMonth;
+        int weekIndex = 0;
+        while (currentDate.getMonthValue() == month) {
+            // Создаем новую строку для новой недели, если необходимо
+            if (calendar.size() <= weekIndex) {
+                calendar.add(new ArrayList<>());
+            }
+
+            // Добавляем день в календарь
+            calendar.get(weekIndex).add(new DayMerop(currentDate.getDayOfMonth(), getEventsForDate(events, currentDate)));
+
+            // Переходим к следующему дню
+            currentDate = currentDate.plusDays(1);
+
+            // Переходим к следующей неделе при достижении конца недели
+            if (currentDate.getDayOfWeek() == DayOfWeek.MONDAY) {
+                weekIndex++;
+            }
+        }
+
+        return calendar;
+    }
+
+
+    public List<Meropriyatie> getEventsForDate(List<Meropriyatie> events, LocalDate date) {
+        // Фильтруем мероприятия по указанной дате
+        return events.stream()
+                .filter(event -> event.getData().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isEqual(date))
+                .collect(Collectors.toList());
     }
 
 }

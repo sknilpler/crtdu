@@ -54,4 +54,6 @@ public interface MeropriyatieRepository extends CrudRepository<Meropriyatie, Lon
     List<Meropriyatie> findByDataAndType(@Param("d1") String date1,
                                          @Param("d2") String date2,
                                          @Param("t") Long type);
+
+
 }

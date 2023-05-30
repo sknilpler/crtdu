@@ -12,6 +12,8 @@ public interface KidRepository extends CrudRepository<Kid,Long> {
 
     List<Kid> findByParentsId(Long id);
 
+    Kid findByUsername(String username);
+
     @Query(value = "SELECT kid.* FROM kid , kid_krujok\n" +
             "WHERE kid.id = kid_krujok.kid_id and kid_krujok.krujok_id = :id and kid.archive = 0\n" +
             "ORDER by kid.surname",  nativeQuery = true)

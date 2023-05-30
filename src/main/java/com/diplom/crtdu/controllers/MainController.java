@@ -1,23 +1,20 @@
 package com.diplom.crtdu.controllers;
 
-import com.diplom.crtdu.models.LevelMeropriyatiya;
-import com.diplom.crtdu.models.Role;
-import com.diplom.crtdu.models.TypeMeropriyatiya;
-import com.diplom.crtdu.models.User;
-import com.diplom.crtdu.repo.LevelMeropriyatiyaRepository;
-import com.diplom.crtdu.repo.RaspisanieRepository;
-import com.diplom.crtdu.repo.RoleRepository;
-import com.diplom.crtdu.repo.TypeMeropriyatiyaRepository;
+import com.diplom.crtdu.models.*;
+import com.diplom.crtdu.repo.*;
 import com.diplom.crtdu.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -34,6 +31,10 @@ public class MainController {
     private LevelMeropriyatiyaRepository levelMeropriyatiyaRepository;
     @Autowired
     private RaspisanieRepository raspisanieRepository;
+    @Autowired
+    private TeacherRepository teacherRepository;
+    @Autowired
+    private KidRepository kidRepository;
 
     @GetMapping("/")
     public String home(Model model, Authentication authentication) {
@@ -89,14 +90,32 @@ public class MainController {
 
         if (levelMeropriyatiyaRepository.findAll().size() == 0) {
             System.out.println("Add list of levels meropriyatiya");
-            levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Местный"));
             levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Районный"));
             levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Городской"));
             levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Региональный"));
             levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Национальный"));
             levelMeropriyatiyaRepository.save(new LevelMeropriyatiya("Международный"));
         }
-        model.addAttribute("rasp", raspisanieRepository.findAll());
+        if (authentication != null) {
+            if (authentication.isAuthenticated()) {
+                List<String> roles = new ArrayList<>();
+                for (GrantedAuthority authority : authentication.getAuthorities()) {
+                    roles.add(authority.getAuthority());
+                }
+                if (roles.get(0).equals("ROLE_ADMIN")){
+                    model.addAttribute("rasp", raspisanieRepository.findAll());
+                }
+                if (roles.get(0).equals("ROLE_TEACHER")){
+                    Teacher teacher = teacherRepository.findByUsername(authentication.getName());
+                    model.addAttribute("rasp", raspisanieRepository.findByTeacherId(teacher.getId()));
+                }
+                if (roles.get(0).equals("ROLE_KID")){
+                    Kid kid = kidRepository.findByUsername(authentication.getName());
+                    model.addAttribute("rasp", raspisanieRepository.findByKidId(kid.getId()));
+                }
+            }
+        }
+
         model.addAttribute("title", "Главная страница");
         return "home";
     }

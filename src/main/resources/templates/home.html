@@ -42,6 +42,20 @@
 //}
 
 
+   /* Выделение строк и столбцов при наведении мыши */
+  table tr:hover td {
+    background-color: yellow;
+  }
+
+  table td:hover {
+    background-color: yellow;
+  }
+
+  /* Выделение ячейки под курсором */
+  table td.highlight {
+    background-color: blue;
+  }
+
 
 
     </style>
@@ -502,6 +516,28 @@ function post(path, method = 'post') {
 	document.body.appendChild(form);
 	form.submit();
 }
+
+
+// Добавление класса highlight к ячейке при наведении на неё мыши
+  var tds = document.getElementsByTagName("td");
+  for (var i = 0; i < tds.length; i++) {
+    tds[i].addEventListener("mouseover", function() {
+      this.classList.add("highlight");
+      var colIndex = this.cellIndex;
+      var rows = document.getElementsByTagName("tr");
+      for (var j = 0; j < rows.length; j++) {
+        rows[j].getElementsByTagName("td")[colIndex].classList.add("highlight");
+      }
+    });
+    tds[i].addEventListener("mouseout", function() {
+      this.classList.remove("highlight");
+      var colIndex = this.cellIndex;
+      var rows = document.getElementsByTagName("tr");
+      for (var j = 0; j < rows.length; j++) {
+        rows[j].getElementsByTagName("td")[colIndex].classList.remove("highlight");
+      }
+    });
+  }
 </script>
 </body>
 
