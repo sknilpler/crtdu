@@ -30,6 +30,8 @@
     }
 
 
+
+
     </style>
 </head>
 <body>
@@ -55,88 +57,92 @@
              tabindex="0">
             <!-- Calendar -->
             <br>
-            <div class="row">
-                <div class="col-md-2">
-                    <select class="form-select" id="year" name="year" onchange="updateCalendar()">
-                        <option value="0" disabled>-- Выберите год --</option>
-                        <option value="2020" th:selected="${year == 2020}">2020</option>
-                        <option value="2021" th:selected="${year == 2021}">2021</option>
-                        <option value="2022" th:selected="${year == 2022}">2022</option>
-                        <option value="2023" th:selected="${year == 2023}">2023</option>
-                        <option value="2024" th:selected="${year == 2024}">2024</option>
-                        <option value="2025" th:selected="${year == 2025}">2025</option>
-                    </select>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-2">
+                        <select class="form-select" id="year" name="year" onchange="updateCalendar()">
+                            <option value="0" disabled>-- Выберите год --</option>
+                            <option value="2020" th:selected="${year == 2020}">2020</option>
+                            <option value="2021" th:selected="${year == 2021}">2021</option>
+                            <option value="2022" th:selected="${year == 2022}">2022</option>
+                            <option value="2023" th:selected="${year == 2023}">2023</option>
+                            <option value="2024" th:selected="${year == 2024}">2024</option>
+                            <option value="2025" th:selected="${year == 2025}">2025</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="month" name="month" onchange="updateCalendar()">
+                            <option value="0" disabled>-- Выберите месяц --</option>
+                            <option value="1" th:selected="${month == 1}">Январь</option>
+                            <option value="2" th:selected="${month == 2}">Февраль</option>
+                            <option value="3" th:selected="${month == 3}">Март</option>
+                            <option value="4" th:selected="${month == 4}">Апрель</option>
+                            <option value="5" th:selected="${month == 5}">Май</option>
+                            <option value="6" th:selected="${month == 6}">Июнь</option>
+                            <option value="7" th:selected="${month == 7}">Июль</option>
+                            <option value="8" th:selected="${month == 8}">Август</option>
+                            <option value="9" th:selected="${month == 9}">Сентябрь</option>
+                            <option value="10" th:selected="${month == 10}">Октябрь</option>
+                            <option value="11" th:selected="${month == 11}">Ноябрь</option>
+                            <option value="12" th:selected="${month == 12}">Декабрь</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="month" name="month" onchange="updateCalendar()">
-                        <option value="0" disabled>-- Выберите месяц --</option>
-                        <option value="1" th:selected="${month == 1}">Январь</option>
-                        <option value="2" th:selected="${month == 2}">Февраль</option>
-                        <option value="3" th:selected="${month == 3}">Март</option>
-                        <option value="4" th:selected="${month == 4}">Апрель</option>
-                        <option value="5" th:selected="${month == 5}">Май</option>
-                        <option value="6" th:selected="${month == 6}">Июнь</option>
-                        <option value="7" th:selected="${month == 7}">Июль</option>
-                        <option value="8" th:selected="${month == 8}">Август</option>
-                        <option value="9" th:selected="${month == 9}">Сентябрь</option>
-                        <option value="10" th:selected="${month == 10}">Октябрь</option>
-                        <option value="11" th:selected="${month == 11}">Ноябрь</option>
-                        <option value="12" th:selected="${month == 12}">Декабрь</option>
-                    </select>
-                </div>
-            </div>
-            <div class="calendar-fragment" th:fragment="calendar-fragment">
+                <div class="calendar-fragment" th:fragment="calendar-fragment">
 
 
-            <table class="table table-borderless">
-                <thead>
-                <tr>
-                    <th class="text-center">Пн</th>
-                    <th class="text-center">Вт</th>
-                    <th class="text-center">Ср</th>
-                    <th class="text-center">Чт</th>
-                    <th class="text-center">Пт</th>
-                    <th class="text-center">Сб</th>
-                    <th class="text-center">Вс</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Итерация по строкам календаря -->
-                <tr th:each="week : ${calendar}">
-                    <!-- Итерация по дням в каждой строке -->
-                    <td th:each="day : ${week}">
+                    <table class="table table-borderless">
+                        <thead>
+                        <tr>
+                            <th class="text-center">Пн</th>
+                            <th class="text-center">Вт</th>
+                            <th class="text-center">Ср</th>
+                            <th class="text-center">Чт</th>
+                            <th class="text-center">Пт</th>
+                            <th class="text-center">Сб</th>
+                            <th class="text-center">Вс</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Итерация по строкам календаря -->
+                        <tr th:each="week : ${calendar}">
+                            <!-- Итерация по дням в каждой строке -->
+                            <td th:each="day : ${week}">
 
-                        <div th:if="${#lists.isEmpty(day.events) == false}" class="card text-black bg-primary mb-1"
-                             style="max-width: 10rem; height: 10rem; min-width: 7rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-                            <div class="card-header">
-                                <span th:if="${day.date != 0}" th:text="${day.date}"></span>
-                            </div>
-                            <div class="card-body text-white">
-                                <div th:if="${day.events}" class="row">
-                                    <div th:each="event : ${day.events}"
-                                         class="col-md-6"
-                                         data-html="true" data-toggle="tooltip" data-placement="top"
-                                         th:title="'Наименование: ' + ${event.name} + ' &#10;Место проведения: ' + ${event.place} + ' &#10;Ответственный: ' + ${event.otvetstvenniy}">
+                                <div th:if="${#lists.isEmpty(day.events) == false}"
+                                     class="card text-white bg-primary mb-1"
+                                     style="max-width: 10rem; height: 10rem; min-width: 7rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                                    <div class="card-header bg-primary">
+                                        <span th:if="${day.date != 0}" th:text="${day.date}"></span>
+                                    </div>
+                                    <div class="card-body text-white">
+                                        <div th:if="${day.events}" class="row">
+                                            <div th:each="event : ${day.events}"
+                                                 class="col-md-6"
+                                                 data-html="true" data-toggle="tooltip" data-placement="top"
+                                                 th:title="'Наименование: ' + ${event.name} + ' &#10;Место проведения: ' + ${event.place} + ' &#10;Ответственный: ' + ${event.otvetstvenniy}">
 
-                                        <p class="card-text small"
-                                           th:text="${#temporals.format(event.data.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')}"></p>
+                                                <p class="card-text small"
+                                                   th:text="${#temporals.format(event.data.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')}"></p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div th:unless="${#lists.isEmpty(day.events) == false}" class="card text-dark bg-light mb-1"
-                             style="max-width: 10rem; height: 10rem; min-width: 7rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-                            <div class="card-header">
-                                <span th:if="${day.date != 0}" th:text="${day.date}"></span>
-                            </div>
-                            <div class="card-body">
+                                <div th:unless="${#lists.isEmpty(day.events) == false}"
+                                     class="card text-dark border-secondary mb-1"
+                                     style="max-width: 10rem; height: 10rem; min-width: 7rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                                    <div class="card-header">
+                                        <span th:if="${day.date != 0}" th:text="${day.date}"></span>
+                                    </div>
+                                    <div class="card-body">
 
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" tabindex="0">
@@ -490,6 +496,8 @@ function updateCalendar(){
 		},
 	})
 }
+
+
 
 </script>
 </body>

@@ -56,4 +56,26 @@ public interface MeropriyatieRepository extends CrudRepository<Meropriyatie, Lon
                                          @Param("t") Long type);
 
 
+    @Query(value = "SELECT\n" +
+            "    m.id AS id,\n" +
+            "    m.name AS name_merop,\n" +
+            "    m.data AS date_merop,\n" +
+            "    lm.name AS level_merop,\n" +
+            "    tm.name AS type_merop,\n" +
+            "    COUNT(u.id) AS total_count,\n" +
+            "    COUNT(CASE WHEN d.win_place = 'Первое' THEN 1 END) AS num_first,\n" +
+            "    COUNT(CASE WHEN d.win_place = 'Второе' THEN 1 END) AS num_second,\n" +
+            "    COUNT(CASE WHEN d.win_place = 'Третье' THEN 1 END) AS num_third\n" +
+            "FROM\n" +
+            "    meropriyatie m\n" +
+            "    LEFT JOIN level_meropriyatiya lm ON m.level_id = lm.id\n" +
+            "    LEFT JOIN type_meropriyatiya tm ON m.type_id = tm.id\n" +
+            "    LEFT JOIN uchastnik u ON m.id = u.meropriyatie_id\n" +
+            "    LEFT JOIN dostijenie d ON m.id = d.meropriyatie_id AND u.kid_id = d.kid_id\n" +
+            "WHERE\n" +
+            "    m.data BETWEEN :d1 AND :d2\n" +
+            "GROUP BY\n" +
+            "    m.id, m.name, m.data, lm.name, tm.name;",nativeQuery = true)
+    List<Object[]> getStatByMeropriyatie(@Param("d1") String date1,
+                                         @Param("d2") String date2);
 }

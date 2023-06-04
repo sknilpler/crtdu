@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Статистика по мероприятиям</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        :root {
+            --bs-body-color: #000000;
+        }
+    </style>
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+
+<!-- Modal windows for accepting delete -->
+<div th:insert="blocks/accept-delete :: accept-delete"></div>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+<div class="container-fluid">
+
+    <h1 class="text-center mb-4">Статистическая информация о мероприятиях</h1>
+
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="input-group">
+                <label for="startDate" class="input-group-text">С:</label>
+                <input type="date" onchange="filter()" class="form-control" id="startDate" th:value="${d1}"
+                       title="Начальная точка фильтрации по дате">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <label for="endDate" class="input-group-text">По:</label>
+                <input type="date" onchange="filter()" class="form-control" id="endDate" th:value="${d2}"
+                       title="Конечная точка фильтрации по дате">
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="table-stat" th:fragment="table-stat">
+
+
+        <table class="table table-striped" id="myTable">
+            <thead>
+            <tr>
+                <th style="display: none;"></th>
+                <th onclick="sortTable(1);">Мероприятие</th>
+                <th onclick="sortTable(2);">Дата</th>
+                <th onclick="sortTable(3);" title="Уровень мероприятия">Уровень</th>
+                <th onclick="sortTable(4);" title="Тип мероприятия">Тип</th>
+                <th onclick="sortTable(5);" title="Общее количество воспитанников участвовавших в мероприятии">Общее кол-во</th>
+                <th onclick="sortTable(6);" title="Количество воспитанников занявших первое место">Первое</th>
+                <th onclick="sortTable(7);" title="Количество воспитанников занявших второе место">Второе</th>
+                <th onclick="sortTable(8);" title="Количество воспитанников занявших третье место">Третье</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${total}">
+                <td style="display: none;" th:text="${t.id}"></td>
+                <td th:text="${t.meropName}"></td>
+                <td th:text="${#dates.format(t.meropDate, 'dd.MM.yyyy')}"></td>
+                <td th:text="${t.lvlName}"></td>
+                <td th:text="${t.typeName}"></td>
+                <td th:text="${t.total}"></td>
+                <td th:text="${t.first}"></td>
+                <td th:text="${t.second}"></td>
+                <td th:text="${t.third}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/chart.js"></script>
+<script>
+function filter(){
+var startDate = document.getElementById('startDate').value;
+var endDate = document.getElementById('endDate').value;
+
+$.ajax({
+type: 'get',
+url: '/spec/stat-merop/' + startDate + '/' + endDate,
+success: function(data) {
+$('.table-stat').html(data);
+},
+})
+}
+
+function sortTable(colIndex) {
+  const table = document.getElementById("myTable");
+  const tbody = table.getElementsByTagName("tbody")[0];
+  const rows = Array.from(tbody.getElementsByTagName("tr"));
+
+  rows.sort((row1, row2) => {
+    const cell1 = row1.getElementsByTagName("td")[colIndex].textContent.trim();
+    const cell2 = row2.getElementsByTagName("td")[colIndex].textContent.trim();
+
+    if (!isNaN(cell1) && !isNaN(cell2)) {
+      return Number(cell1) - Number(cell2);
+    } else {
+      return cell1.localeCompare(cell2);
+    }
+  });
+
+  for (const row of rows) {
+    tbody.appendChild(row);
+  }
+}
+</script>
+</body>
+</html>
+</body>
+</html>

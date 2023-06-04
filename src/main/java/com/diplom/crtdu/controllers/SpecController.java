@@ -1448,6 +1448,47 @@ public class SpecController {
         return "stat/stat-by-teacher :: table-stat";
     }
 
+    @GetMapping("/spec/stat-merop")
+    public String getStatMerop(Model model) throws ParseException {
+        int year = LocalDate.now().getYear(); // текущий год
+        // дата 1 января текущего года
+        String d1 = LocalDate.of(year, 1, 1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        //текущая дата
+        String d2 = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        // дата 31 декабря текущего года
+        //String d2 = LocalDate.of(year, 12, 31).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        model.addAttribute("d1", d1);
+        model.addAttribute("d2", d2);
+        //таблица с подробными данными
+        List<StatMerop> list = new ArrayList<>();
+        List<Object[]> objectList = meropriyatieRepository.getStatByMeropriyatie(d1,d2);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        for (Object[] obj : objectList) {
+            list.add(new StatMerop(Long.parseLong(obj[0].toString()), (String) obj[1],format.parse(obj[2].toString()), obj[3].toString(),
+                    obj[4].toString(), Integer.parseInt(obj[5].toString()), Integer.parseInt(obj[6].toString()),
+                    Integer.parseInt(obj[7].toString()), Integer.parseInt(obj[8].toString())));
+        }
+        model.addAttribute("total", list);
+        return "stat/stat-by-merop";
+    }
+
+    @GetMapping("/spec/stat-merop/{d1}/{d2}")
+    public String filterStatMerop(Model model, @PathVariable("d1") String d1,
+                               @PathVariable("d2") String d2) throws ParseException {
+
+        //таблица с подробными данными
+        List<StatMerop> list = new ArrayList<>();
+        List<Object[]> objectList = meropriyatieRepository.getStatByMeropriyatie(d1,d2);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        for (Object[] obj : objectList) {
+            list.add(new StatMerop(Long.parseLong(obj[0].toString()), (String) obj[1],format.parse(obj[2].toString()), obj[3].toString(),
+                    obj[4].toString(), Integer.parseInt(obj[5].toString()), Integer.parseInt(obj[6].toString()),
+                    Integer.parseInt(obj[7].toString()), Integer.parseInt(obj[8].toString())));
+        }
+        model.addAttribute("total", list);
+        return "stat/stat-by-merop :: table-stat";
+    }
+
     //-------------------------- нормы -----------------------
 
     @GetMapping("/spec/norma-list")

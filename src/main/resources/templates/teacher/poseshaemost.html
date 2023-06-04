@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Посещаемость</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        :root {
+            --bs-body-color: #000000;
+        }
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    .fixed-column {
+      position: sticky;
+      left: 0;
+      background-color: white;
+      width: 150px; /* Фиксированная ширина первого столбца */
+    }
+
+    </style>
+</head>
+<body>
+<header th:insert="blocks/header2 :: header2"></header>
+<div th:insert="blocks/sidebar :: sidebar"></div>
+<div th:insert="blocks/accept-delete :: accept-delete"></div>
+<div class="container">
+    <div class="table-wrapper">
+        <div class="d-flex">
+            <div class="fixed-column">
+                <table class="table table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th>Воспитанник</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Иванов И.И.</td>
+                    </tr>
+                    <tr>
+                        <td>Петров В.С.</td>
+                    </tr>
+                    <!-- Добавьте остальные строки с данными детей здесь -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex-grow-1">
+                <table class="table table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th>01.05.2023</th>
+                        <th>02.05.2023</th>
+                        <th>03.05.2023</th>
+                        <th>04.05.2023</th>
+                        <th>01.05.2023</th>
+                        <th>02.05.2023</th>
+                        <th>03.05.2023</th>
+                        <th>04.05.2023</th>
+                        <th>01.05.2023</th>
+                        <th>02.05.2023</th>
+                        <th>03.05.2023</th>
+                        <th>04.05.2023</th>
+                        <th>01.05.2023</th>
+                        <th>02.05.2023</th>
+                        <th>03.05.2023</th>
+                        <th>04.05.2023</th>
+                        <!-- Добавьте остальные столбцы дат здесь -->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>true</td>
+                        <td>false</td>
+                        <td>false</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>false</td>
+                        <td>false</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>false</td>
+                        <td>false</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>false</td>
+                        <td>false</td>
+                        <td>true</td>
+                        <!-- Добавьте данные посещаемости здесь -->
+                    </tr>
+                    <tr>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <td>true</td>
+                        <!-- Добавьте данные посещаемости здесь -->
+                    </tr>
+                    <!-- Добавьте остальные строки с данными детей здесь -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+</body>
+</html>
