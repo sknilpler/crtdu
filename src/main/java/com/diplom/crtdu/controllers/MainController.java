@@ -138,4 +138,10 @@ public class MainController {
         return "success-login";
     }
 
+    @GetMapping("/kid/portfolio")
+    public String kidPortfolio(Model model, Authentication authentication) {
+        Kid kid = kidRepository.findByUsername(authentication.getName());
+        return "redirect:/spec/get-portfolio/"+kid.getId();
+    }
+
 }

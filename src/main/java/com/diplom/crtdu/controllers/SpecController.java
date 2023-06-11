@@ -3,16 +3,14 @@ package com.diplom.crtdu.controllers;
 import com.diplom.crtdu.exception.NotFoundException;
 import com.diplom.crtdu.models.*;
 import com.diplom.crtdu.repo.*;
+import com.diplom.crtdu.services.TeacherService;
 import com.diplom.crtdu.services.UserService;
 import com.diplom.crtdu.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +26,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -92,6 +89,8 @@ public class SpecController {
     private WorkTimeRepository workTimeRepository;
     @Autowired
     private RaspisanieRepository raspisanieRepository;
+    @Autowired
+    private TeacherService teacherService;
 
     public static String convertDate(String inputDate) {
         try {
@@ -119,7 +118,8 @@ public class SpecController {
 
     @GetMapping("/spec/list-kids")
     public String openKidsListPage(Model model) {
-        model.addAttribute("kids", kidRepository.findAll());
+        model.addAttribute("kids", kidRepository.findByArchive(false));
+        model.addAttribute("krujki", krujokRepository.findAllByOrderByCreativeAssociationNameAndKrujokName());
         return "spec/list-kids";
     }
 
@@ -187,19 +187,18 @@ public class SpecController {
         return "spec/kids-edit";
     }
 
-    @PostMapping("/spec/list-kids/edit/{id}")
+    @PostMapping("/spec/list-kids/edit/{id}/{surname}/{name}/{patronymic}/{birthday}/{sex}/{grazhdanstvo}/{adres}/{phone}/{school}/{klas}")
     public String saveEditKid(Model model, @PathVariable("id") Long id,
-                              @RequestParam("surname") String surname,
-                              @RequestParam("name") String name,
-                              @RequestParam("patronymic") String patronymic,
-                              @RequestParam("birthday") String birthday,
-                              @RequestParam("sex") String sex,
-                              @RequestParam("grazhdanstvo") String grazhdanstvo,
-                              @RequestParam("adres") String adres,
-                              @RequestParam("phone") String phone,
-                              @RequestParam("school") String school,
-                              @RequestParam("klas") String klas,
-                              @RequestParam("scans") MultipartFile file) throws IOException {
+                              @PathVariable("surname") String surname,
+                              @PathVariable("name") String name,
+                              @PathVariable("patronymic") String patronymic,
+                              @PathVariable("birthday") String birthday,
+                              @PathVariable("sex") String sex,
+                              @PathVariable("grazhdanstvo") String grazhdanstvo,
+                              @PathVariable("adres") String adres,
+                              @PathVariable("phone") String phone,
+                              @PathVariable("school") String school,
+                              @PathVariable("klas") String klas) throws IOException {
         Kid kid = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
         kid.setSurname(surname);
         kid.setName(name);
@@ -228,14 +227,14 @@ public class SpecController {
         // для сохранения файлов на жесткий диск в определенной директории
         // или можно сохранять файлы в BLOB-полях таблицы ребенка в БД
         // ...
-        Document document = new Document();
-        document.setKid(kid);
-        document.setName(file.getOriginalFilename());
-        document.setDate(new Date());
-        document.setType(file.getContentType());
-        document.setContent(file.getBytes());
-
-        documentRepository.save(document);
+        //Document document = new Document();
+        //document.setKid(kid);
+        //document.setName(file.getOriginalFilename());
+        //document.setDate(new Date());
+        //document.setType(file.getContentType());
+        //document.setContent(file.getBytes());
+//
+        //documentRepository.save(document);
         // }
         return "redirect:/spec/list-kids";
     }
@@ -293,20 +292,23 @@ public class SpecController {
         return "spec/kids-edit :: parents-table";
     }
 
-    @PostMapping("/spec/list-kids/del/{id}")
-    public String delKid(Model model, @PathVariable("id") Long id) {
+    @PostMapping("/spec/list-kids/del/{id}/{reason}")
+    public String delKid(Model model, @PathVariable("id") Long id, @PathVariable("reason") String reason) {
         Kid kid = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
-        log.warn("Deleting Kid: {}", kid);
-        List<Parents> p = parentsRepository.findByKidsId(id);
-        p.forEach(parents -> {
-            if ((parents.getKids().size() == 1) && (Objects.equals(parents.getKids().get(0).getId(), id))) {
-                parentsRepository.deleteById(parents.getId());
-                System.out.println("\tDeleted parents: ID - " + parents.getId() + " FIO - " + parents.getFullFIO());
-            }
-        });
+        log.warn("Kid to archive: {}", kid);
+//        List<Parents> p = parentsRepository.findByKidsId(id);
+//        p.forEach(parents -> {
+//            if ((parents.getKids().size() == 1) && (Objects.equals(parents.getKids().get(0).getId(), id))) {
+//                parentsRepository.deleteById(parents.getId());
+//                System.out.println("\tDeleted parents: ID - " + parents.getId() + " FIO - " + parents.getFullFIO());
+//            }
+//        });
+        kid.setArchive(true);
+        kid.setDateOut(new Date());
+        kid.setReasonOut(reason);
         User user = userService.getUserByUsername(kid.getUsername());
         if (userService.deleteUser(user.getId())) log.warn("\tDeleted user: {}", user);
-        kidRepository.deleteById(id);
+        kidRepository.save(kid);
         return "redirect:/spec/list-kids";
     }
 
@@ -323,6 +325,12 @@ public class SpecController {
         return "redirect:/spec/list-kids/edit/" + kidEditId;
     }
 
+    @GetMapping("/spec/list-kid/filter-by-krujok/{id}")
+    public String filterKidsByKrujok2(Model model, @PathVariable("id") Long id) {
+        List<Kid> kids = kidRepository.findByKrujokOrderBySurname(id);
+        model.addAttribute("kids", kids);
+        return "spec/list-kids :: table-kids";
+    }
 
     //---------------- преподаватели ------------------------
 
@@ -344,7 +352,7 @@ public class SpecController {
         return "spec/teacher-add";
     }
 
-    @PostMapping("/spec/teacher-add/{surname}/{name}/{patronymic}/{doljnost}/{username}/{password}/{napravlenie}/{kvalif}/{staj}/{stajSpec}")
+    @PostMapping("/spec/teacher-add/{surname}/{name}/{patronymic}/{doljnost}/{username}/{password}/{napravlenie}/{kvalif}/{staj}/{stajSpec}/{dopInfo}")
     public String addTeacher(@PathVariable("surname") String surname,
                              @PathVariable("name") String name,
                              @PathVariable("patronymic") String patronymic,
@@ -355,6 +363,7 @@ public class SpecController {
                              @PathVariable("kvalif") String kvalif,
                              @PathVariable("staj") String staj,
                              @PathVariable("stajSpec") String stajSpec,
+                             @PathVariable("dopInfo") String dopInfo,
                              Authentication authentication) {
 
         Role role = roleRepository.findByName("ROLE_TEACHER");
@@ -362,7 +371,7 @@ public class SpecController {
         user.setRoles(Collections.singleton(role));
         userService.saveUser(user);
         log.warn("ADD new User: {}", user);
-        Teacher teach = new Teacher(surname, name, patronymic, doljnost, napravlenie, kvalif, staj, stajSpec);
+        Teacher teach = new Teacher(surname, name, patronymic, doljnost, napravlenie, kvalif, staj, stajSpec,dopInfo);
         teach.setUsername(username);
         teacherRepository.save(teach);
         log.warn("ADD new Teach: {}", teach);
@@ -398,7 +407,7 @@ public class SpecController {
         return "spec/teacher-list :: info-teacher";
     }
 
-    @PostMapping("/spec/list-teachers/edit/{id}/{surname}/{name}/{patronymic}/{doljnost}/{napravlenie}/{kvalif}/{staj}/{stajSpec}")
+    @PostMapping("/spec/list-teachers/edit/{id}/{surname}/{name}/{patronymic}/{doljnost}/{napravlenie}/{kvalif}/{staj}/{stajSpec}/{dopInfo}")
     public String saveEditTeacher(Model model, @PathVariable("id") Long id,
                                   @PathVariable("surname") String surname,
                                   @PathVariable("name") String name,
@@ -407,6 +416,7 @@ public class SpecController {
                                   @PathVariable("kvalif") String kvalif,
                                   @PathVariable("staj") String staj,
                                   @PathVariable("stajSpec") String stajSpec,
+                                  @PathVariable("dopInfo") String dopInfo,
                                   @PathVariable("doljnost") String doljnost) {
         Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new NotFoundException("Teacher with id = " + id + " not found on server!"));
         teacher.setSurname(surname);
@@ -417,6 +427,7 @@ public class SpecController {
         teacher.setKvalif(kvalif);
         teacher.setStaj(staj);
         teacher.setStajSpec(stajSpec);
+        teacher.setDopInfo(dopInfo);
         teacherRepository.save(teacher);
         log.warn("Edit Teacher: {}", teacher);
         return "redirect:/spec/list-teachers";
@@ -558,13 +569,13 @@ public class SpecController {
         // Получите список мероприятий за выбранный месяц
         LocalDate currentDate = LocalDate.now();
         int currentMonth = currentDate.getMonthValue();
-        List<Meropriyatie> events = meropriyatieRepository.findByData(getFirstDayOfMonth(currentMonth),getLastDayOfMonth(currentMonth));
+        List<Meropriyatie> events = meropriyatieRepository.findByData(getFirstDayOfMonth(currentMonth), getLastDayOfMonth(currentMonth));
         // Создайте объект календаря
         List<List<DayMerop>> calendar = generateCalendar(events, year, currentMonth);
         // Передайте календарь в модель
         model.addAttribute("calendar", calendar);
-        model.addAttribute("year",year);
-        model.addAttribute("month",currentMonth);
+        model.addAttribute("year", year);
+        model.addAttribute("month", currentMonth);
         return "spec/meropriyatiya";
     }
 
@@ -578,6 +589,7 @@ public class SpecController {
     @PostMapping("/spec/meropriyatiya-add")
     public String saveMeropriyatie(@RequestParam String name,
                                    @RequestParam String data,
+                                   @RequestParam String dataEnd,
                                    @RequestParam String place,
                                    @RequestParam Long type,
                                    @RequestParam Long level,
@@ -585,9 +597,10 @@ public class SpecController {
                                    Authentication authentication) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         Date d = dateFormat.parse(data);
+        Date dE = dateFormat.parse(dataEnd);
         TypeMeropriyatiya t = typeMeropriyatiyaRepository.findById(type).orElseThrow(() -> new NotFoundException("Type Meropriyatiya with id = " + type + " not found on server!"));
         LevelMeropriyatiya l = levelMeropriyatiyaRepository.findById(level).orElseThrow(() -> new NotFoundException("Level Meropriyatiya with id = " + level + " not found on server!"));
-        Meropriyatie m = new Meropriyatie(name, d, t, place, l, otvetstvenniy);
+        Meropriyatie m = new Meropriyatie(name, d, t, place, l, otvetstvenniy,dE);
         log.warn("Add meropriyatie: {}", m);
         meropriyatieRepository.save(m);
         return "redirect:/spec/list-meropriyatiya";
@@ -834,21 +847,125 @@ public class SpecController {
         Kid k = kidRepository.findById(id).orElseThrow(() -> new NotFoundException("Kid with id = " + id + " not found on server!"));
         List<Dostijenie> dostijenies = dostijenieRepository.findByKidId(id);
         List<Krujok> krujoks = krujokRepository.findByKidId(id);
-        Map<String, Double> marks = new HashMap<>();
+        AtomicReference<Double> summ = new AtomicReference<>(0.0);
+        Map<String, Integer> marks = new HashMap<>();
         krujoks.forEach(krujok -> {
             List<KidZanyatie> kidZanyaties = kidZanyatieRepository.findByKidIdAndKrujokId(id, krujok.getId());
-            int size = 0;
-            double summ = 0.0;
+            double size = 0.0;
+
             for (KidZanyatie zanyatie : kidZanyaties) {
-                if (zanyatie.getOtsenka() > 0) {
-                    size++;
-                    summ += zanyatie.getOtsenka();
+                size = size + 1.0;
+                if (zanyatie.isPoseshchenie()) {
+                    summ.set(summ.get() + 1.0);
                 }
             }
-            double average = size > 0 ? summ / size : 0.0;
-            marks.put(krujok.getName(), average);
-        });
+            double average = size > 0 ? summ.get() / size : 0.0;
+            marks.put(krujok.getName(), (int) (average * 100));
 
+        });
+        int ball = 0;
+        List<Uchastnik> uchastniks = uchastnikRepository.findByKidId(id);
+        for (Uchastnik u : uchastniks) {
+            switch (u.getMeropriyatie().getLevel().getName()) {
+                case "Международный":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 10;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 9;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 8;
+                                    break;
+                            }
+                        }
+                    }
+                    ball = ball + 5;
+                    break;
+                case "Национальный":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 8;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 7;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 6;
+                                    break;
+                            }
+
+                        }
+                    }
+                    ball = ball + 5;
+                    break;
+                case "Региональный":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 7;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 6;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 5;
+                                    break;
+                            }
+
+                        }
+                    }
+                    ball = ball + 4;
+                    break;
+                case "Городской":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 6;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 5;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 4;
+                                    break;
+                            }
+
+                        }
+                    }
+                    ball = ball + 4;
+                    break;
+                case "Районный":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 5;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 4;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 3;
+                                    break;
+                            }
+
+                        }
+                    }
+                    ball = ball + 2;
+                    break;
+            }
+        }
+        double posesheniya = summ.get();
+        model.addAttribute("posesheniya",(int) posesheniya);
+        model.addAttribute("ball", ball + (int) posesheniya);
         model.addAttribute("kid", k);
         model.addAttribute("dost", dostijenies);
         model.addAttribute("marks", marks);
@@ -1175,66 +1292,170 @@ public class SpecController {
         List<Dostijenie> dostijenies = dostijenieRepository.findByKidId(id);
         List<Krujok> krujoks = krujokRepository.findByKidId(id);
         Map<String, Integer> marks = new HashMap<>();
-        List<String> s = new ArrayList<>();
+        List<String> dates = new ArrayList<>();
+        List<String> subjects = new ArrayList<>();
         List<List<Integer>> g = new ArrayList<>();
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
+        AtomicReference<Double> summ = new AtomicReference<>(0.0);
         krujoks.forEach(krujok -> {
-            //List<KidZanyatie> kidZanyaties = kidZanyatieRepository.findByKidIdAndKrujokId(id, krujok.getId());
-            //int size = 0;
-            //double summ = 0.0;
-            //for (KidZanyatie zanyatie : kidZanyaties) {
-            //    if (zanyatie.getOtsenka() > 0) {
-            //        size++;
-            //        summ += zanyatie.getOtsenka();
-            //    }
-            //}
-            //double average = size > 0 ? summ / size : 0.0;
-            s.add(krujok.getName());
-            List<Ocenka> ocenki = ocenkaRepository.findByKidIdAndKrujokId(id, krujok.getId());
-            List<Integer> bally = new ArrayList<>();
-            int size = ocenki.size();
-            if (size > 0) {
-                marks.put(krujok.getName(), ocenki.get(size - 1).getBall());
-                for (Ocenka o : ocenki) {
-                    bally.add(o.getBall());
+            List<KidZanyatie> kidZanyaties = kidZanyatieRepository.findByKidIdAndKrujokId(id, krujok.getId());
+            double size = 0.0;
+            for (KidZanyatie zanyatie : kidZanyaties) {
+                size = size + 1.0;
+                if (zanyatie.isPoseshchenie()) {
+                    summ.set(summ.get() + 1.0);
                 }
-            } else {
-                marks.put(krujok.getName(), 0);
             }
-            g.add(bally);
-
+            double average = size > 0 ? summ.get() / size : 0.0;
+            marks.put(krujok.getName(), (int) (average * 100));
 
         });
 
+        int ball = 0;
+       // int index = 0;
+        List<Integer> statBal = new ArrayList<>();
+        statBal.add(ball);
+        dates.add("0");
+        List<Uchastnik> uchastniks = uchastnikRepository.findByKidId(id);
 
-        // Определение размеров двумерного массива
-        int rowCount = g.size();
-        int colCount = 0;
+        for (Uchastnik u : uchastniks) {
+            switch (u.getMeropriyatie().getLevel().getName()) {
+                case "Международный":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 10;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 9;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 8;
+                                    break;
+                            }
+                        }
+                    }
+                    ball = ball + 5;
+                    break;
+                case "Национальный":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 8;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 7;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 6;
+                                    break;
+                            }
 
-// Нахождение максимальной длины внутренних списков
-        for (List<Integer> row : g) {
-            colCount = Math.max(colCount, row.size());
-        }
+                        }
+                    }
+                    ball = ball + 5;
+                    break;
+                case "Региональный":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 7;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 6;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 5;
+                                    break;
+                            }
 
-// Создание и заполнение двумерного массива
-        int[][] grades = new int[rowCount][colCount];
-        for (int i = 0; i < rowCount; i++) {
+                        }
+                    }
+                    ball = ball + 4;
+                    break;
+                case "Городской":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 6;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 5;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 4;
+                                    break;
+                            }
 
-            List<Integer> row = g.get(i);
-            for (int j = 0; j < row.size(); j++) {
-                grades[i][j] = row.get(j);
+                        }
+                    }
+                    ball = ball + 4;
+                    break;
+                case "Районный":
+                    for (Dostijenie d : dostijenies) {
+                        if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                            switch (d.getWinPlace()) {
+                                case "Первое":
+                                    ball = ball + 5;
+                                    break;
+                                case "Второе":
+                                    ball = ball + 4;
+                                    break;
+                                case "Третье":
+                                    ball = ball + 3;
+                                    break;
+                            }
+
+                        }
+                    }
+                    ball = ball + 2;
+                    break;
             }
+
+            String strDate = dateFormat.format(u.getMeropriyatie().getData());
+            dates.add(strDate);
+            statBal.add(ball);
         }
-        int[] dates = new int[colCount];
-        for (int i = 0; i < colCount; i++) {
-            dates[i] = i + 1;
-        }
-        String[] subjects = s.toArray(new String[0]);
+
+        subjects.add("Баллы");
+        double posesheniya = summ.get();
+        model.addAttribute("posesheniya",(int) posesheniya);
+        model.addAttribute("ball", ball + (int) posesheniya);
+
+//        // Определение размеров двумерного массива
+//        int rowCount = g.size();
+//        int colCount = 0;
+//
+//// Нахождение максимальной длины внутренних списков
+//        for (List<Integer> row : g) {
+//            colCount = Math.max(colCount, row.size());
+//        }
+//
+//// Создание и заполнение двумерного массива
+//        int[][] grades = new int[rowCount][colCount];
+//        for (int i = 0; i < rowCount; i++) {
+//
+//            List<Integer> row = g.get(i);
+//            for (int j = 0; j < row.size(); j++) {
+//                grades[i][j] = row.get(j);
+//            }
+//        }
+//        int[] dates = new int[colCount];
+//        for (int i = 0; i < colCount; i++) {
+//            dates[i] = i + 1;
+//        }
+//        String[] subjects = s.toArray(new String[0]);
 
 
 // Передача строк JSON в модель
         model.addAttribute("dates", dates);
         model.addAttribute("subjects", subjects);
-        model.addAttribute("grades", grades);
+        model.addAttribute("grades", statBal);
+
         model.addAttribute("kid", k);
         model.addAttribute("parents", parents);
         model.addAttribute("dost", dostijenies);
@@ -1295,6 +1516,7 @@ public class SpecController {
 
     @GetMapping("/spec/stat-kids")
     public String showDiagram(Model model) {
+
         int kidRF = kidRepository.findByGrazhdanstvoAndArchive("РФ", false).size();
         int kidRK = kidRepository.findByGrazhdanstvoAndArchive("РК", false).size();
         int kidOther = kidRepository.findByGrazhdanstvoAndArchive("Другое", false).size();
@@ -1398,6 +1620,29 @@ public class SpecController {
         model.addAttribute("arrNapr", arrNapr);
         model.addAttribute("labelNapr2", labelNapr2);
         model.addAttribute("numDost", numdost);
+
+        int num_all = 0;
+        int num_m   = 0;
+        int num_f   = 0;
+        int num_rf  = 0;
+        int num_rk  = 0;
+        int num_o   = 0;
+
+        for (StatKids s: list) {
+            num_all = num_all+ s.getTotal();
+            num_m = num_m  + s.getM();
+            num_f = num_f  + s.getF();
+            num_rf = num_rf + s.getRf();
+            num_rk = num_rk + s.getRk();
+            num_o = num_o  + s.getO();
+        }
+
+        model.addAttribute("num_all", num_all);
+        model.addAttribute("num_m", num_m);
+        model.addAttribute("num_f", num_f);
+        model.addAttribute("num_rf", num_rf);
+        model.addAttribute("num_rk", num_rk);
+        model.addAttribute("num_o", num_o);
         return "stat/stat-by-kids";
     }
 
@@ -1461,10 +1706,10 @@ public class SpecController {
         model.addAttribute("d2", d2);
         //таблица с подробными данными
         List<StatMerop> list = new ArrayList<>();
-        List<Object[]> objectList = meropriyatieRepository.getStatByMeropriyatie(d1,d2);
+        List<Object[]> objectList = meropriyatieRepository.getStatByMeropriyatie(d1, d2);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         for (Object[] obj : objectList) {
-            list.add(new StatMerop(Long.parseLong(obj[0].toString()), (String) obj[1],format.parse(obj[2].toString()), obj[3].toString(),
+            list.add(new StatMerop(Long.parseLong(obj[0].toString()), (String) obj[1], format.parse(obj[2].toString()), obj[3].toString(),
                     obj[4].toString(), Integer.parseInt(obj[5].toString()), Integer.parseInt(obj[6].toString()),
                     Integer.parseInt(obj[7].toString()), Integer.parseInt(obj[8].toString())));
         }
@@ -1474,14 +1719,14 @@ public class SpecController {
 
     @GetMapping("/spec/stat-merop/{d1}/{d2}")
     public String filterStatMerop(Model model, @PathVariable("d1") String d1,
-                               @PathVariable("d2") String d2) throws ParseException {
+                                  @PathVariable("d2") String d2) throws ParseException {
 
         //таблица с подробными данными
         List<StatMerop> list = new ArrayList<>();
-        List<Object[]> objectList = meropriyatieRepository.getStatByMeropriyatie(d1,d2);
+        List<Object[]> objectList = meropriyatieRepository.getStatByMeropriyatie(d1, d2);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         for (Object[] obj : objectList) {
-            list.add(new StatMerop(Long.parseLong(obj[0].toString()), (String) obj[1],format.parse(obj[2].toString()), obj[3].toString(),
+            list.add(new StatMerop(Long.parseLong(obj[0].toString()), (String) obj[1], format.parse(obj[2].toString()), obj[3].toString(),
                     obj[4].toString(), Integer.parseInt(obj[5].toString()), Integer.parseInt(obj[6].toString()),
                     Integer.parseInt(obj[7].toString()), Integer.parseInt(obj[8].toString())));
         }
@@ -1838,15 +2083,17 @@ public class SpecController {
     @GetMapping("/spec/merop-calendar/{year}/{month}")
     public String getEvents(Model model, @PathVariable("month") int month, @PathVariable("year") int year) {
         // Получите список мероприятий за выбранный месяц
-        List<Meropriyatie> events = meropriyatieRepository.findByData(getFirstDayOfMonth(month),getLastDayOfMonth(month));
+        List<Meropriyatie> events = meropriyatieRepository.findByData(getFirstDayOfMonth(month), getLastDayOfMonth(month));
         // Создайте объект календаря
         List<List<DayMerop>> calendar = generateCalendar(events, year, month);
         // Передайте календарь в модель
         model.addAttribute("calendar", calendar);
-
+        model.addAttribute("sevice", teacherService);
         // Верните имя представления
         return "spec/meropriyatiya :: calendar-fragment";
     }
+
+
 
     private List<List<DayMerop>> generateCalendar(List<Meropriyatie> events, int year, int month) {
         List<List<DayMerop>> calendar = new ArrayList<>();

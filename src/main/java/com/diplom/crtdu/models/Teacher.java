@@ -27,6 +27,8 @@ public class Teacher {
     private String staj;
     private String stajSpec;
 
+    private String dopInfo;
+
     private String username;
 
     /**
@@ -65,7 +67,7 @@ public class Teacher {
         this.archive = false;
     }
 
-    public Teacher(String surname, String name, String patronymic, String doljnost, String napravlenie, String kvalif, String staj, String stajSpec) {
+    public Teacher(String surname, String name, String patronymic, String doljnost, String napravlenie, String kvalif, String staj, String stajSpec, String dopInfo) {
         this.surname = surname;
         this.name = name;
         this.patronymic = patronymic;
@@ -74,6 +76,7 @@ public class Teacher {
         this.kvalif = kvalif;
         this.staj = staj;
         this.stajSpec = stajSpec;
+        this.dopInfo = dopInfo;
     }
 
     @Override

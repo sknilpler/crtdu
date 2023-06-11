@@ -118,12 +118,16 @@
                                     <div class="card-body text-white">
                                         <div th:if="${day.events}" class="row">
                                             <div th:each="event : ${day.events}"
-                                                 class="col-md-6"
+                                                 class="col-md-12"
                                                  data-html="true" data-toggle="tooltip" data-placement="top"
                                                  th:title="'Наименование: ' + ${event.name} + ' &#10;Место проведения: ' + ${event.place} + ' &#10;Ответственный: ' + ${event.otvetstvenniy}">
 
-                                                <p class="card-text small"
-                                                   th:text="${#temporals.format(event.data.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')}"></p>
+                                                <p th:if="!${sevice.isMoreThan24Hours(event.data,event.dataEnd)}" class="card-text small"
+                                                   th:text="${#temporals.format(event.data.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')} + ' - ' + ${#temporals.format(event.dataEnd.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')}">
+                                                </p>
+                                                <p th:unless="!${sevice.isMoreThan24Hours(event.data,event.dataEnd)}" class="card-text small"
+                                                   th:text="${#temporals.format(event.data.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')} + ' - ' + ${#dates.format(event.dataEnd, 'dd.MM HH:mm')}">
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -204,16 +208,18 @@
                     <tr>
                         <th onclick="sortTable(0);">Наименование</th>
                         <th onclick="sortTable(1);">Дата проведения</th>
-                        <th onclick="sortTable(2);">Место</th>
-                        <th onclick="sortTable(3);">Тип</th>
-                        <th onclick="sortTable(4);">Уровень</th>
-                        <th onclick="sortTable(5);">Ответственный</th>
+                        <th onclick="sortTable(2);">Дата окончания</th>
+                        <th onclick="sortTable(3);">Место</th>
+                        <th onclick="sortTable(4);">Тип</th>
+                        <th onclick="sortTable(5);">Уровень</th>
+                        <th onclick="sortTable(6);">Ответственный</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="m : ${merop}">
                         <td th:text="${m.name}"></td>
                         <td th:text="${#dates.format(m.data, 'dd.MM.yyyy HH:mm')}"></td>
+                        <td th:text="${#dates.format(m.dataEnd, 'dd.MM.yyyy HH:mm')}"></td>
                         <td th:text="${m.place}"></td>
                         <td th:text="${m.type?.name}"></td>
                         <td th:text="${m.level?.name}"></td>

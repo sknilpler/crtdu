@@ -45,7 +45,8 @@
             </div>
         </div>
         <hr>
-        <table class="table table-striped">
+        <button class="btn btn-sm btn-outline-success" onclick="generateExcelDocument()">В Excel</button>
+        <table class="table table-striped" id="stat">
             <thead>
             <tr>
                 <th>ПДО</th>
@@ -78,6 +79,8 @@
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/chart.js"></script>
+<script src="/js/exceljs.min.js"></script>
+<!--<script src="/js/xlsx.full.min.js"></script>-->
 <script th:inline="javascript">
  var listGender = /*[[${dataByGender}]]*/ '';
  var listCitizenship = /*[[${dataByCitizenship}]]*/ '';
@@ -118,25 +121,25 @@
 
       // Данные для второй диаграммы (количество детей по гражданству)
       const dataByCitizenship = {
-        labels: ['Граждане РФ', 'Граждане РК', 'Другое гражданство'],
-        datasets: [
-          {
-            label: 'Количество детей по гражданству',
-            data: listCitizenship,
-            backgroundColor: [
-              'rgba(255, 206, 86, 0.5)',
-              'rgba(75, 192, 192, 0.5)',
-              'rgba(153, 102, 255, 0.5)',
-            ],
-            borderColor: [
-              'rgba(255, 206, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-            ],
-            borderWidth: 1,
-          },
-        ],
-      };
+  labels: ['Граждане РФ', 'Граждане РК', 'Другое гражданство'],
+  datasets: [
+    {
+      label: 'Количество детей по гражданству',
+      data: listCitizenship,
+      backgroundColor: [
+        'rgba(255, 206, 86, 0.5)',
+        'rgba(75, 192, 192, 0.5)',
+        'rgba(153, 102, 255, 0.5)',
+      ],
+      borderColor: [
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+      ],
+      borderWidth: 1,
+    },
+  ],
+};
 
       // Конфигурация второй диаграммы
       const configByCitizenship = {
@@ -144,11 +147,11 @@
         data: dataByCitizenship,
       };
 
-      // Отрисовка второй диаграммы на странице
-        const chartByCitizenship = new Chart(
-        document.getElementById('chartByCitizenship'),
-        configByCitizenship
-        );
+const chartByCitizenship = new Chart(
+  document.getElementById('chartByCitizenship'),
+  configByCitizenship
+);
+
 
 // Данные для третей диаграммы (количество достижений по направлениям)
       const dataByDost = {
@@ -263,6 +266,192 @@ var arrNapr =  /*[[${arrNapr}]]*/ '';
             });
         });
 
+//////////////////////////////////// EXCEL /////////
+
+function generateExcelDocument() {
+  const date = new Date().toLocaleDateString();
+
+  const num_all = [[${num_all}]];  // Пример значения переменной
+  const num_m =   [[${num_m}]];    // Пример значения переменной
+  const num_f =   [[${num_f}]];    // Пример значения переменной
+  const num_rf =  [[${num_rf}]];   // Пример значения переменной
+  const num_rk =  [[${num_rk}]];   // Пример значения переменной
+  const num_o =   [[${num_o}]];    // Пример значения переменной
+
+  // Создание нового экземпляра книги Excel
+  const workbook = new ExcelJS.Workbook();
+
+  // Добавление нового листа
+  const worksheet = workbook.addWorksheet('Справка');
+
+  // Установка шрифта для всего документа
+  worksheet.getCell('A1').font = { name: 'Times New Roman', size: 12 };
+
+  // Установка шрифта для ячеек таблицы
+  const tableStyle = { name: 'Times New Roman', size: 12 };
+  worksheet.columns.forEach(column => {
+    column.eachCell({ includeEmpty: true }, cell => {
+      cell.font = tableStyle;
+    });
+  });
+
+// Получение данных для таблицы
+  const tableRows = document.getElementById('stat').querySelectorAll('tbody tr');
+
+
+
+
+
+  // Запись информации о количестве в объединенную область
+  worksheet.mergeCells('A6:H8');
+  const infoCell = worksheet.getCell('A6');
+
+  const infoData = 'По состоянию на '+date+' года в объединениях ГБУ ДО "ЦРТДиЮ им. В.М. Комарова" занимаются '+num_all+' учащихся, из которых мальчиков '+num_m+', девочек '+num_f+', граждан РФ - '+num_rf+', РК - '+num_rk+', Др. - '+num_o+'.';
+
+ infoCell.value = infoData;
+  infoCell.font = { name: 'Times New Roman', size: 12 };
+ infoCell.alignment = { wrapText: true, vertical: 'middle' };
+
+// Установка ширины столбцов по максимальной длине текста в ячейках
+  worksheet.columns.forEach(column => {
+    let maxCellWidth = 0;
+    column.eachCell({ includeEmpty: true }, cell => {
+      const cellWidth = cell.value ? cell.value.toString().length : 10;
+      if (cellWidth > maxCellWidth) {
+        maxCellWidth = cellWidth;
+      }
+    });
+    const maxTextWidth = Math.min(maxCellWidth, 30); // Максимальная ширина текста в ячейке (ограничение)
+    const columnWidth = Math.min(maxTextWidth + 2, 70); // Максимальная ширина столбца (ограничение)
+    column.width = column.actualWidth < columnWidth ? columnWidth : column.actualWidth;
+  });
+
+
+  //// Запись данных таблицы из HTML
+  //const table = document.getElementById('stat');
+  //const tableData = Array.from(table.rows).map(row =>
+  //  Array.from(row.cells).map(cell => cell.textContent)
+  //);
+  //worksheet.addRows(tableData);
+
+  // Запись данных таблицы из HTML
+const table = document.getElementById('stat');
+const tableData = Array.from(table.rows).map(row =>
+  Array.from(row.cells).map(cell => {
+    const value = cell.innerHTML; // или cell.innerHTML
+    return !isNaN(parseFloat(value)) ? parseFloat(value) : value;
+  })
+);
+worksheet.addRows(tableData);
+
+// Определение диапазона добавленных ячеек
+const startRow = 9; // Начальная строка таблицы
+const endRow = startRow + tableData.length - 1; // Конечная строка таблицы
+const range = `A${startRow}:H${endRow}`;
+
+// Применение стиля шрифта к диапазону ячеек
+worksheet.eachRow({ min: startRow, max: endRow }, row => {
+  row.eachCell(cell => {
+    cell.font = { name: 'Times New Roman', size: 12 };
+  });
+});
+
+  // Установка стилей для заголовков таблицы
+  worksheet.getRow(9).font = { name: 'Times New Roman', size: 12, bold: true };
+
+
+// Добавление строки "Итого"
+  const totalRow = worksheet.addRow([]);
+  const totalLabelCell = totalRow.getCell(2); // Столбец B
+  totalLabelCell.value = 'Итого';
+  totalLabelCell.font = { name: 'Times New Roman', size: 12, bold: true };
+
+  // Подсчет сумм столбцов C, D, E, F, G, H
+  const sumFormula = `SUM(C10:C${tableRows.length + 9})`; // Формула суммы для столбца C
+  const sumCell = totalRow.getCell(3); // Столбец C
+  sumCell.value = { formula: sumFormula };
+  sumCell.font = { name: 'Times New Roman', size: 12 };
+
+  for (let i = 4; i <= 8; i++) {
+    const columnLetter = getExcelColumnName(i);
+    const sumFormula = `SUM(${columnLetter}10:${columnLetter}${tableRows.length + 9})`;
+    const sumCell = totalRow.getCell(i);
+    sumCell.value = { formula: sumFormula };
+    sumCell.font = { name: 'Times New Roman', size: 12 };
+  }
+
+// Установка стиля границ для таблицы
+for (let row = 9; row <= 10 + tableRows.length; row++) {
+  for (let col = 1; col <= 8; col++) {
+    const cell = worksheet.getCell(`${getColumnLetter(col)}${row}`);
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    };
+  }
+}
+
+// Установка шрифта для раздела кому
+  worksheet.mergeCells('D1:H4');
+  const fromCell = worksheet.getCell('F1');
+  fromCell.value = 'Заместителю директора ГБУ ДО\n\"ЦРТДиЮ им. В.М. Комарова\"\nИбрагимовой Н.Д.';
+  fromCell.font = { name: 'Times New Roman', size: 12, bold: true };
+  fromCell.alignment = { wrapText: true, horizontal: 'right', vertical: 'top' };
+
+  // Установка шрифта для заголовка "СПРАВКА"
+  worksheet.mergeCells('A5:H5');
+  const titleCell = worksheet.getCell('A5');
+  titleCell.value = 'СПРАВКА';
+  titleCell.font = { name: 'Times New Roman', size: 12, bold: true };
+  titleCell.alignment = { horizontal: 'center' };
+
+
+  // Генерация Excel-документа
+  workbook.xlsx.writeBuffer().then(buffer => {
+    // Преобразование книги в формат массива байтов
+    const excelBuffer = new Uint8Array(buffer);
+
+    // Создание Blob из массива байтов
+    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    // Создание URL-адреса для Blob
+    const url = URL.createObjectURL(blob);
+
+    // Создание ссылки для скачивания файла
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Справка по воспитанникам.xlsx';
+
+    // Добавление ссылки на страницу
+    document.body.appendChild(link);
+
+    // Клик по ссылке для скачивания файла
+    link.click();
+
+    // Удаление ссылки после скачивания файла
+    document.body.removeChild(link);
+  });
+}
+// Вспомогательная функция для получения имени столбца по индексу (A, B, C, ...)
+function getExcelColumnName(index) {
+  let columnName = '';
+  while (index > 0) {
+    const remainder = (index - 1) % 26;
+    columnName = String.fromCharCode(65 + remainder) + columnName;
+    index = Math.floor((index - 1) / 26);
+  }
+  return columnName;
+}
+
+function getColumnLetter(columnIndex) {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const letterIndex = (columnIndex - 1) % 26;
+  const letter = alphabet[letterIndex];
+  const repeatCount = Math.floor((columnIndex - 1) / 26);
+  return repeatCount > 0 ? `${alphabet[repeatCount - 1]}${letter}` : letter;
+}
 </script>
 
 </body>

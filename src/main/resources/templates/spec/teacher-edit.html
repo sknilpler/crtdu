@@ -83,6 +83,10 @@
                     <label for="stajSpec" class="form-label">Стаж работы по специализации</label>
                     <input type="number" class="form-control" th:field="*{stajSpec}" id="stajSpec" name="stajSpec" required>
                 </div>
+                <div class="mb-3">
+                    <label for="dopInfo" class="form-label">Дополнительная информация</label>
+                    <textarea class="form-control" th:field="*{dopInfo}" rows="4" id="dopInfo"></textarea>
+                </div>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
                     <button type="button" class="btn btn-primary" th:onclick="'javascript:save(\'' + *{id} + '\');'"
@@ -135,8 +139,9 @@ function save(id) {
             var kvalif = document.getElementById("kvalif").value;
             var staj = document.getElementById("staj").value;
             var stajSpec = document.getElementById("stajSpec").value;
+            var dopInfo = document.getElementById("dopInfo").value;
 
-	post('/spec/list-teachers/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + doljnost +'/'+napravlenie+'/'+kvalif+'/'+staj+'/'+stajSpec);
+	post('/spec/list-teachers/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + doljnost +'/'+napravlenie+'/'+kvalif+'/'+staj+'/'+stajSpec+'/'+dopInfo);
 }
 
 function post(path, method = 'post') {

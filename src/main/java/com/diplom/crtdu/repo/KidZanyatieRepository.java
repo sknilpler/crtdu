@@ -13,7 +13,7 @@ public interface KidZanyatieRepository extends CrudRepository<KidZanyatie, Long>
 
     List<KidZanyatie> findByZanyatieId(Long zanyatieId);
 
-    List<KidZanyatie> findByKidIdAndZanyatieId(Long kidId, Long zanyatieId);
+    KidZanyatie findByKidIdAndZanyatieId(Long kidId, Long zanyatieId);
 
     @Query(value = "SELECT kid_zanyatie.* FROM kid_zanyatie, zanyatie\n" +
             "WHERE kid_zanyatie.kid_id = :id1 AND \n" +

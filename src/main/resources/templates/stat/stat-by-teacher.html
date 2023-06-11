@@ -40,6 +40,11 @@
                        title="Конечная точка фильтрации по дате">
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <button class="btn btn-sm btn-outline-success" onclick="generateExcelDocument()">В Excel</button>
+            </div>
+        </div>
     </div>
     <hr>
     <div class="table-stat" th:fragment="table-stat">
@@ -84,6 +89,7 @@
 
 </div>
 <script src="/js/jquery.min.js"></script>
+<script src="/js/exceljs.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/chart.js"></script>
 <script>
@@ -119,6 +125,167 @@ function sortTable(colIndex) {
   for (const row of rows) {
     tbody.appendChild(row);
   }
+}
+
+//////////////////////////////////// EXCEL /////////
+
+function generateExcelDocument() {
+  const data1 = formatDate(new Date(document.getElementById("startDate").value));
+  const data2 = formatDate(new Date(document.getElementById("endDate").value));
+
+
+  // Создание нового экземпляра книги Excel
+  const workbook = new ExcelJS.Workbook();
+
+  // Добавление нового листа
+  const worksheet = workbook.addWorksheet('Справка');
+
+  // Установка шрифта для всего документа
+  worksheet.getCell('A1').font = { name: 'Times New Roman', size: 12 };
+
+  // Установка шрифта для ячеек таблицы
+  const tableStyle = { name: 'Times New Roman', size: 12 };
+  worksheet.columns.forEach(column => {
+    column.eachCell({ includeEmpty: true }, cell => {
+      cell.font = tableStyle;
+    });
+  });
+
+// Получение данных для таблицы
+  const tableRows = document.getElementById('myTable').querySelectorAll('tbody tr');
+
+
+
+
+
+  // Запись информации о количестве в объединенную область
+  worksheet.mergeCells('A6:L8');
+  const infoCell = worksheet.getCell('A6');
+
+  const infoData = 'Статистическая информация по педагогам за период с '+data1+' по '+data2;
+
+ infoCell.value = infoData;
+  infoCell.font = { name: 'Times New Roman', size: 12 };
+ infoCell.alignment = { wrapText: true, vertical: 'middle' };
+
+// Установка ширины столбцов по максимальной длине текста в ячейках
+  worksheet.columns.forEach(column => {
+    let maxCellWidth = 0;
+    column.eachCell({ includeEmpty: true }, cell => {
+      const cellWidth = cell.value ? cell.value.toString().length : 10;
+      if (cellWidth > maxCellWidth) {
+        maxCellWidth = cellWidth;
+      }
+    });
+    const maxTextWidth = Math.min(maxCellWidth, 30); // Максимальная ширина текста в ячейке (ограничение)
+    const columnWidth = Math.min(maxTextWidth + 2, 70); // Максимальная ширина столбца (ограничение)
+    column.width = column.actualWidth < columnWidth ? columnWidth : column.actualWidth;
+  });
+
+  // Запись данных таблицы из HTML
+const table = document.getElementById('myTable');
+const tableData = Array.from(table.rows).map(row =>
+  Array.from(row.cells).map(cell => {
+    const value = cell.innerHTML; // или cell.innerHTML
+    return value;
+  })
+);
+worksheet.addRows(tableData);
+
+// Определение диапазона добавленных ячеек
+const startRow = 9; // Начальная строка таблицы
+const endRow = startRow + tableData.length - 1; // Конечная строка таблицы
+const range = `A${startRow}:H${endRow}`;
+
+// Применение стиля шрифта к диапазону ячеек
+worksheet.eachRow({ min: startRow, max: endRow }, row => {
+  row.eachCell(cell => {
+    cell.font = { name: 'Times New Roman', size: 12 };
+  });
+});
+
+  // Установка стилей для заголовков таблицы
+  worksheet.getRow(9).font = { name: 'Times New Roman', size: 12, bold: true };
+
+
+// Установка стиля границ для таблицы
+for (let row = 9; row <= 9 + tableRows.length; row++) {
+  for (let col = 1; col <= 12; col++) {
+    const cell = worksheet.getCell(`${getColumnLetter(col)}${row}`);
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    };
+  }
+}
+
+// Установка шрифта для раздела кому
+  worksheet.mergeCells('G1:L4');
+  const fromCell = worksheet.getCell('J1');
+  fromCell.value = 'Заместителю директора ГБУ ДО\n\"ЦРТДиЮ им. В.М. Комарова\"\nИбрагимовой Н.Д.';
+  fromCell.font = { name: 'Times New Roman', size: 12, bold: true };
+  fromCell.alignment = { wrapText: true, horizontal: 'right', vertical: 'top' };
+
+  // Установка шрифта для заголовка "СПРАВКА"
+  worksheet.mergeCells('A5:L5');
+  const titleCell = worksheet.getCell('A5');
+  titleCell.value = 'СПРАВКА';
+  titleCell.font = { name: 'Times New Roman', size: 12, bold: true };
+  titleCell.alignment = { horizontal: 'center' };
+
+
+  // Генерация Excel-документа
+  workbook.xlsx.writeBuffer().then(buffer => {
+    // Преобразование книги в формат массива байтов
+    const excelBuffer = new Uint8Array(buffer);
+
+    // Создание Blob из массива байтов
+    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    // Создание URL-адреса для Blob
+    const url = URL.createObjectURL(blob);
+
+    // Создание ссылки для скачивания файла
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Справка по педагогам.xlsx';
+
+    // Добавление ссылки на страницу
+    document.body.appendChild(link);
+
+    // Клик по ссылке для скачивания файла
+    link.click();
+
+    // Удаление ссылки после скачивания файла
+    document.body.removeChild(link);
+  });
+}
+// Вспомогательная функция для получения имени столбца по индексу (A, B, C, ...)
+function getExcelColumnName(index) {
+  let columnName = '';
+  while (index > 0) {
+    const remainder = (index - 1) % 26;
+    columnName = String.fromCharCode(65 + remainder) + columnName;
+    index = Math.floor((index - 1) / 26);
+  }
+  return columnName;
+}
+
+function getColumnLetter(columnIndex) {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const letterIndex = (columnIndex - 1) % 26;
+  const letter = alphabet[letterIndex];
+  const repeatCount = Math.floor((columnIndex - 1) / 26);
+  return repeatCount > 0 ? `${alphabet[repeatCount - 1]}${letter}` : letter;
+}
+
+function formatDate(date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear());
+  return `${day}.${month}.${year}`;
 }
 </script>
 </body>

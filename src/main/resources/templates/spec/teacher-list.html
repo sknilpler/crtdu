@@ -120,6 +120,10 @@
                         <strong>Стаж работы по специальности, лет:</strong>
                         [[${teacher?.stajSpec}]]
                     </p>
+                    <p th:inline='text' th:if="${teacher?.dopInfo} != null">
+                        <strong>Дополнительная информация:</strong>
+                        [[${teacher?.dopInfo}]]
+                    </p>
                     <hr>
                     <h6>Ведет кружки</h6>
                     <div th:each="k : ${krujki}">

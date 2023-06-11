@@ -41,6 +41,10 @@ public class Kid {
     private String school;
     private String klas;
 
+    private Date dateIn;
+    private Date dateOut;
+    private String reasonOut;
+
     private int rang;
     /**
      * true - воспитанник не ходит в кружки (в архиве) <br>
@@ -107,6 +111,7 @@ public class Kid {
         this.school = school;
         this.klas = klas;
         this.archive = false;
+        this.dateIn = new Date();
     }
 
     public Kid(String surname, String name, String patronymic, Date birthday, boolean sex, String grazhdanstvo, String adres, String phone, String school, String klas, String username) {
@@ -122,6 +127,7 @@ public class Kid {
         this.klas = klas;
         this.username = username;
         this.archive = false;
+        this.dateIn = new Date();
     }
 
 
@@ -133,13 +139,18 @@ public class Kid {
                 ", name='" + name + '\'' +
                 ", patronymic='" + patronymic + '\'' +
                 ", birthday=" + birthday +
-                ", sex=" + (sex ? " мужской" : " женский") +
+                ", sex=" + sex +
                 ", grazhdanstvo='" + grazhdanstvo + '\'' +
                 ", adres='" + adres + '\'' +
                 ", phone='" + phone + '\'' +
                 ", school='" + school + '\'' +
                 ", klas='" + klas + '\'' +
-                ", user=" + username +
+                ", dateIn=" + dateIn +
+                ", dateOut=" + dateOut +
+                ", reasonOut='" + reasonOut + '\'' +
+                ", rang=" + rang +
+                ", archive=" + archive +
+                ", username='" + username + '\'' +
                 '}';
     }
 

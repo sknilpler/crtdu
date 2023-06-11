@@ -62,8 +62,8 @@
 </head>
 
 <body>
-<header th:insert="blocks/header :: header"></header>
-
+<header sec:authorize="!hasRole('ROLE_TEACHER') && !hasRole('ROLE_KID')" th:insert="blocks/header :: header"></header>
+<header sec:authorize="hasRole('ROLE_TEACHER') || hasRole('ROLE_KID')" th:insert="blocks/header2 :: header2"></header>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-10">

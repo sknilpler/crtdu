@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +9,7 @@
         :root {
             --bs-body-color: #000000;
         }
+
 
 
 
@@ -151,7 +152,8 @@
                 <div class="col-md-6 row">
                     <div class="col-md-10"><h1 th:text="${kid?.getFullFIO()}" id="fio">ФИО воспитанника</h1></div>
 
-                    <div class="col-md-2" id="buttons-grp" data-html2canvas-ignore="true">
+                    <div sec:authorize="hasRole('ROLE_ADMIN')" class="col-md-2" id="buttons-grp"
+                         data-html2canvas-ignore="true">
                         <div class="btn-group" role="group">
                             <button id="btnGroupDrop1" type="button"
                                     class="btn button-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"
@@ -168,6 +170,11 @@
                                 </li>
                                 <li>
                                     <button class="dropdown-item" onclick="openDelKrujkiModal()">Выход из кружка
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#dataTableModal">Показать таблицу баллов
                                     </button>
                                 </li>
                             </ul>
@@ -193,6 +200,26 @@
                     <p th:inline='text'>
                         <strong>Телефон:</strong>
                         [[${kid?.phone}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Дата зачисления:</strong>
+                        [[${#dates.format(kid?.dateIn, 'dd.MM.yyyy')}]]
+                    </p>
+                    <p th:inline='text'  th:if="${kid?.dateOut} != null">
+                        <strong>Дата отчисления:</strong>
+                        [[${#dates.format(kid?.dateOut, 'dd.MM.yyyy')}]]
+                    </p>
+                    <p th:inline='text' th:if="${kid?.reasonOut} != null">
+                        <strong>Причина отчисления:</strong>
+                        [[${kid?.reasonOut}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Баллы:</strong>
+                        [[${ball}]]
+                    </p>
+                    <p th:inline='text'>
+                        <strong>Вcего посещений занятий:</strong>
+                        [[${posesheniya}]]
                     </p>
                 </div>
 
@@ -221,10 +248,11 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <h3 class="mt-4">Кружки и успеваемость:</h3>
+                    <h3 class="mt-4">Кружки и посещаемость:</h3>
                     <div class="krujki-list" th:fragment="krujki-list">
                         <ul>
-                            <li th:each="krujok : ${marks}" th:text="${krujok.key} + ' балл: ' + ${krujok.value}"></li>
+                            <li th:each="krujok : ${marks}"
+                                th:text="${krujok.key} + ' % посещаемости: ' + ${krujok.value}"></li>
                         </ul>
                     </div>
                     <h3 class="mt-4">Достижения и призовые места:</h3>
@@ -258,6 +286,70 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dataTableModal" tabindex="-1" aria-labelledby="dataTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dataTableModalLabel">Таблица с данными</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Уровень мероприятия</th>
+                        <th>Баллы за 1 место</th>
+                        <th>Баллы за 2 место</th>
+                        <th>Баллы за 3 место</th>
+                        <th>Баллы за участие</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Международный</td>
+                        <td>10</td>
+                        <td>9</td>
+                        <td>8</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>Национальный</td>
+                        <td>8</td>
+                        <td>7</td>
+                        <td>6</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>Региональный</td>
+                        <td>7</td>
+                        <td>6</td>
+                        <td>5</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>Городской</td>
+                        <td>6</td>
+                        <td>5</td>
+                        <td>4</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>Районный</td>
+                        <td>5</td>
+                        <td>4</td>
+                        <td>3</td>
+                        <td>2</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
         </div>
     </div>
 </div>
@@ -397,14 +489,14 @@ var grades = /*[[${grades}]]*/ [];
       // Функция для создания наборов данных для графика
       function createDatasets() {
         var datasets = [];
-        for (var i = 0; i < subjects.length; i++) {
+
           datasets.push({
-            label: subjects[i],
-            data: grades[i],
+            label: subjects[0],
+            data: grades,
             borderColor: getRandomColor(),
             fill: false
           });
-        }
+
         return datasets;
       }
 
@@ -418,6 +510,7 @@ var grades = /*[[${grades}]]*/ [];
         return color;
       }
     });
+
 
 
 </script>

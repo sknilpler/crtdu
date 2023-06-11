@@ -22,6 +22,7 @@ public class Meropriyatie {
 
     private String name;
     private Date data;
+    private Date dataEnd;
     //private String type;
     private String place;
 
@@ -55,14 +56,16 @@ public class Meropriyatie {
 //    private List<Krujok> krujki;
 
 
-    public Meropriyatie(String name, Date data, TypeMeropriyatiya type, String place, LevelMeropriyatiya level, String otvetstvenniy) {
+    public Meropriyatie(String name, Date data, TypeMeropriyatiya type, String place, LevelMeropriyatiya level, String otvetstvenniy, Date dataEnd) {
         this.name = name;
         this.data = data;
         this.type = type;
         this.place = place;
         this.level = level;
         this.otvetstvenniy = otvetstvenniy;
+        this.dataEnd = dataEnd;
     }
+
 
     @Override
     public String toString() {

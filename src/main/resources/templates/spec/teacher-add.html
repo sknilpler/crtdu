@@ -76,6 +76,10 @@
                     <label for="stajSpec" class="form-label">Стаж работы по специализации</label>
                     <input type="number" class="form-control" id="stajSpec" name="stajSpec" required>
                 </div>
+                <div class="mb-3">
+                    <label for="dopInfo" class="form-label">Дополнительная информация</label>
+                    <textarea class="form-control" rows="4" id="dopInfo"></textarea>
+                </div>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-secondary" id="clear-btn">Очистить поля</button>
                     <button type="submit" class="btn btn-primary" id="save-btn">Сохранить</button>
@@ -106,6 +110,7 @@
             var kvalif = document.getElementById("kvalif").value;
             var staj = document.getElementById("staj").value;
             var stajSpec = document.getElementById("stajSpec").value;
+            var dopInfo = document.getElementById("dopInfo").value;
 
 			// Генерируем уникальный логин, используя первую букву имени, полностью фамилию и случайное число от 0 до 9999
             var username = transliterate(surname) + transliterate(name) + Math.floor(Math.random() * 10000);
@@ -115,7 +120,7 @@
 
             downloadTextFile("Логин: " + username + "\n" + "Пароль: " + password, "Логин и пароль педагога "+surname+".txt")
 
-	        post('/spec/teacher-add/'+surname+'/'+name+'/'+patronymic+'/'+doljnost+'/'+username+'/'+password+'/'+napravlenie+'/'+kvalif+'/'+staj+'/'+stajSpec);
+	        post('/spec/teacher-add/'+surname+'/'+name+'/'+patronymic+'/'+doljnost+'/'+username+'/'+password+'/'+napravlenie+'/'+kvalif+'/'+staj+'/'+stajSpec+'/'+dopInfo);
         });
 
 		function transliterate(str) {

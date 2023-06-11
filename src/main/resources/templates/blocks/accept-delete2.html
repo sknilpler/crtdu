@@ -1,0 +1,37 @@
+<div th:fragment="accept-delete2">
+    <div id="deleteAccept2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deleteAcceptLabel2"
+         aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAcceptLabel2">Подтверждение</h5>
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal" aria-label="Close"
+                            onclick="closeModalWindow()">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <h6 id="delete-object2"></h6>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Причина отчисления</label>
+                        <select class="form-control" id="reason" name="reason">
+                            <option value="Заявление родителей">Заявление родителей</option>
+                            <option value="По состоянию здоровья">По состоянию здоровья</option>
+                            <option value="Переезд в другое место жительство">Переезд в другое место жительство</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" name="acceptBtn" class="btn btn-primary btn-sm" data-dismiss="modal" onclick="deleteObject()">
+                        Подтвердить
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closeModalWindow()">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

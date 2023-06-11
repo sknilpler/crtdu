@@ -19,104 +19,180 @@
       width: 150px; /* Фиксированная ширина первого столбца */
     }
 
+
+
+
+
+
+
     </style>
 </head>
 <body>
 <header th:insert="blocks/header2 :: header2"></header>
-<div th:insert="blocks/sidebar :: sidebar"></div>
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
-<div class="container">
-    <div class="table-wrapper">
-        <div class="d-flex">
-            <div class="fixed-column">
-                <table class="table table-bordered mb-0">
-                    <thead>
-                    <tr>
-                        <th>Воспитанник</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Иванов И.И.</td>
-                    </tr>
-                    <tr>
-                        <td>Петров В.С.</td>
-                    </tr>
-                    <!-- Добавьте остальные строки с данными детей здесь -->
-                    </tbody>
-                </table>
+<div class="container-fluid">
+    <h3>Табель занятий</h3>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation" th:each="k, kIter: ${krujki}">
+            <button th:class="${kIter.index == 0} ? 'nav-link active' : 'nav-link'" th:id="'btn-'+${k.id}"
+                    data-bs-toggle="tab"
+                    th:data-bs-target="'#tab-' + ${k.id}" type="button" role="tab"
+                    th:aria-controls="'tab-' + ${k.id}" aria-selected="true"
+                    th:text="${k.name}"
+                    th:onclick="'javascript:openTab(\'' + ${k.id} + '\');'"></button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div th:each="k, kIter: ${krujki}"
+             th:class="${kIter.index == 0} ? 'tab-pane fade show active' : 'tab-pane fade'"
+             th:id="'tab-' + ${k.id}" role="tabpanel" th:aria-labelledby="'tab-' + ${k.id} + '-tab'">
+            <div class="mb-1 mt-2">
+                <button class="btn btn-outline-success" onclick="openModal()">
+                    Добавить занятие
+                </button>
             </div>
-            <div class="flex-grow-1">
-                <table class="table table-bordered mb-0">
-                    <thead>
-                    <tr>
-                        <th>01.05.2023</th>
-                        <th>02.05.2023</th>
-                        <th>03.05.2023</th>
-                        <th>04.05.2023</th>
-                        <th>01.05.2023</th>
-                        <th>02.05.2023</th>
-                        <th>03.05.2023</th>
-                        <th>04.05.2023</th>
-                        <th>01.05.2023</th>
-                        <th>02.05.2023</th>
-                        <th>03.05.2023</th>
-                        <th>04.05.2023</th>
-                        <th>01.05.2023</th>
-                        <th>02.05.2023</th>
-                        <th>03.05.2023</th>
-                        <th>04.05.2023</th>
-                        <!-- Добавьте остальные столбцы дат здесь -->
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>true</td>
-                        <td>false</td>
-                        <td>false</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>false</td>
-                        <td>false</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>false</td>
-                        <td>false</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>false</td>
-                        <td>false</td>
-                        <td>true</td>
-                        <!-- Добавьте данные посещаемости здесь -->
-                    </tr>
-                    <tr>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <!-- Добавьте данные посещаемости здесь -->
-                    </tr>
-                    <!-- Добавьте остальные строки с данными детей здесь -->
-                    </tbody>
-                </table>
+
+            <br>
+        </div>
+    </div>
+
+    <div class="table-pos" th:fragment="table-pos">
+
+
+        <div class="table-wrapper">
+            <div class="d-flex">
+                <div class="fixed-column">
+                    <table class="table table-bordered mb-0">
+                        <thead>
+                        <tr>
+<!--                            <th>Воспитанник</th>-->
+                            <th>
+                                <div class="d-flex flex-column align-items-center">
+                                    <div class="fw-bold">&nbsp;</div> <!-- Год -->
+                                    <div class="fw-bold">Воспитанник</div> <!-- Месяц -->
+                                    <div class="fw-bold">&nbsp;</div> <!-- День -->
+                                </div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="kid : ${kids}">
+                            <td>
+                                <a th:text="${kid.getShortFIO()}" th:href="'/spec/get-portfolio/'+${kid.id}" title="Портфолио" class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex-grow-1">
+                    <table class="table table-bordered mb-0" style="width: auto; max-width: 100%;">
+                        <thead>
+                        <tr>
+<!--                            <th th:each="z1 : ${zanyatiya}" th:text="${#dates.format(z1.dataZan, 'dd.MM.yy')}"></th>-->
+                            <!-- Добавьте остальные столбцы дат здесь -->
+                            <th th:each="z1 : ${zanyatiya}">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div class="fw-bold" th:text="${#dates.format(z1.dataZan, 'yy')}" title="Год"></div> <!-- Год -->
+                                    <div class="fw-bold" th:text="${#dates.format(z1.dataZan, 'MM')}" title="Месяц"></div> <!-- Месяц -->
+                                    <div class="fw-bold" th:text="${#dates.format(z1.dataZan, 'dd')}" title="День"></div> <!-- День -->
+                                </div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="kid : ${kids}">
+                            <td th:each="z2 : ${zanyatiya}">
+                                <div th:with="kz=${teacherService.getKZ(kid?.id, z2?.id)}">
+                                    <!--                                <div class="form-check form-switch">-->
+                                    <input class="form-check-input" type="checkbox" th:checked="${kz?.poseshchenie}" th:onclick="'javascript:mark(\'' + ${kz?.id} + '\');'" title="Отметка о посещении">
+                                    <!--                                </div>-->
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="kids-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление нового занятия</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="data-zan" class="form-label">Дата занятия</label>
+                    <input type="date" class="form-control"
+                           id="data-zan">
+                </div>
+                <div class="mb-3">
+                    <label for="dlitelnost" class="form-label">Длительность занятия, мин</label>
+                    <input type="number" min="0" class="form-control" id="dlitelnost">
+                </div>
+                <div class="mb-3">
+                    <label for="mesto" class="form-label">Место проведения</label>
+                    <input type="text"  class="form-control" id="mesto">
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button class="btn btn-success" onclick="newZanyatie()">Добавить</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Закрыть</button>
             </div>
         </div>
     </div>
 </div>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+<script th:inline="javascript">
 
+    function openTab(id){
+        $.ajax({
+		type: 'get',
+		url: '/teacher/posehenie/' + id,
+		success: function(data) {
+			$('.table-pos').html(data);
+		},
+	    })
+    }
+
+    function mark(id){
+        $.ajax({
+		type: 'get',
+		url: '/teacher/posehenie/mark/' + id,
+		success: function(data) {
+			$('.table-pos').html(data);
+		},
+	    })
+    }
+
+    function newZanyatie(){
+    var date = document.getElementById('data-zan').value;
+    var mesto = document.getElementById('mesto').value;
+    var dlitelnost = document.getElementById('dlitelnost').value;
+
+        $.ajax({
+		type: 'get',
+		url: '/teacher/posehenie/new-zanyatie/' + date+'/'+dlitelnost+'/'+mesto,
+		success: function(data) {
+			$('.table-pos').html(data);
+			$('#kids-modal').modal('hide');
+		},
+	    })
+    }
+    function closeModal(){
+        $('#kids-modal').modal('hide');
+    }
+    function openModal(){
+        $('#kids-modal').modal('show');
+    }
+</script>
 </body>
 </html>
