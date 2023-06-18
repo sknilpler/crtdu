@@ -122,10 +122,10 @@
                                                  data-html="true" data-toggle="tooltip" data-placement="top"
                                                  th:title="'Наименование: ' + ${event.name} + ' &#10;Место проведения: ' + ${event.place} + ' &#10;Ответственный: ' + ${event.otvetstvenniy}">
 
-                                                <p th:if="!${sevice.isMoreThan24Hours(event.data,event.dataEnd)}" class="card-text small"
+                                                <p th:if="!${service.isMoreThan24Hours(event.data,event.dataEnd)}" class="card-text small"
                                                    th:text="${#temporals.format(event.data.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')} + ' - ' + ${#temporals.format(event.dataEnd.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')}">
                                                 </p>
-                                                <p th:unless="!${sevice.isMoreThan24Hours(event.data,event.dataEnd)}" class="card-text small"
+                                                <p th:unless="!${service.isMoreThan24Hours(event.data,event.dataEnd)}" class="card-text small"
                                                    th:text="${#temporals.format(event.data.toInstant().atZone('UTC').toLocalDateTime(), 'HH:mm')} + ' - ' + ${#dates.format(event.dataEnd, 'dd.MM HH:mm')}">
                                                 </p>
                                             </div>

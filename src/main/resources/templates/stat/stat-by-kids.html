@@ -79,6 +79,7 @@
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/chart.js"></script>
+<script src="/js/chartjs-plugin-datalabels.min.js"></script>
 <script src="/js/exceljs.min.js"></script>
 <!--<script src="/js/xlsx.full.min.js"></script>-->
 <script th:inline="javascript">
@@ -141,17 +142,43 @@
   ],
 };
 
-      // Конфигурация второй диаграммы
+
+
+
+
+////опции для 2 диаграммы
+//const optionsCitizenship = {
+//  plugins: {
+//    datalabels: {
+//      color: {
+//        // Используйте цвет текста, который подходит к вашей диаграмме
+//        // Например, 'rgba(255, 255, 255, 1)' для белого текста
+//        // Или 'rgba(0, 0, 0, 1)' для черного текста
+//        rgba(0, 0, 0, 1),
+//        anchor: 'end',
+//        align: 'end',
+//        formatter: (value, ctx) => {
+//          let datasets = ctx.chart.data.datasets;
+//          let sum = datasets[0].data.reduce((a, b) => a + b, 0);
+//          let percentage = Math.round((value / sum) * 100) + '%';
+//          return percentage;
+//        },
+//      },
+//    },
+//  },
+//};
+
+     // Конфигурация второй диаграммы
       const configByCitizenship = {
         type: 'pie',
-        data: dataByCitizenship,
+        data: dataByCitizenship
+      //  options: optionsCitizenship
       };
 
 const chartByCitizenship = new Chart(
   document.getElementById('chartByCitizenship'),
   configByCitizenship
 );
-
 
 // Данные для третей диаграммы (количество достижений по направлениям)
       const dataByDost = {

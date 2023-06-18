@@ -371,7 +371,7 @@ public class SpecController {
         user.setRoles(Collections.singleton(role));
         userService.saveUser(user);
         log.warn("ADD new User: {}", user);
-        Teacher teach = new Teacher(surname, name, patronymic, doljnost, napravlenie, kvalif, staj, stajSpec,dopInfo);
+        Teacher teach = new Teacher(surname, name, patronymic, doljnost, napravlenie, kvalif, staj, stajSpec, dopInfo);
         teach.setUsername(username);
         teacherRepository.save(teach);
         log.warn("ADD new Teach: {}", teach);
@@ -501,7 +501,11 @@ public class SpecController {
     @PostMapping("/spec/list-teachers/rasp/save/{id}")
     public String saveRaspTeacher(Model model, @PathVariable("id") Long id, @RequestBody String arr) {
         Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new NotFoundException("Teacher with id = " + id + " not found on server!"));
-        workTimeRepository.deleteAll(teacher.getWorkTimes());
+        List<WorkTime> teachersWT = workTimeRepository.findByTeacherId(id);
+        for (WorkTime w : teachersWT) {
+            workTimeRepository.deleteById(w.getId());
+            System.out.println("Delete WT " + w.getHour() + " " + w.getDayOfWeek());
+        }
         List<WorkTime> wt = new ArrayList<>();
         arr = removeLastCharOptional(arr);
         String[] mass1 = arr.split(" ");
@@ -576,6 +580,7 @@ public class SpecController {
         model.addAttribute("calendar", calendar);
         model.addAttribute("year", year);
         model.addAttribute("month", currentMonth);
+        model.addAttribute("service", teacherService);
         return "spec/meropriyatiya";
     }
 
@@ -600,7 +605,7 @@ public class SpecController {
         Date dE = dateFormat.parse(dataEnd);
         TypeMeropriyatiya t = typeMeropriyatiyaRepository.findById(type).orElseThrow(() -> new NotFoundException("Type Meropriyatiya with id = " + type + " not found on server!"));
         LevelMeropriyatiya l = levelMeropriyatiyaRepository.findById(level).orElseThrow(() -> new NotFoundException("Level Meropriyatiya with id = " + level + " not found on server!"));
-        Meropriyatie m = new Meropriyatie(name, d, t, place, l, otvetstvenniy,dE);
+        Meropriyatie m = new Meropriyatie(name, d, t, place, l, otvetstvenniy, dE);
         log.warn("Add meropriyatie: {}", m);
         meropriyatieRepository.save(m);
         return "redirect:/spec/list-meropriyatiya";
@@ -964,7 +969,7 @@ public class SpecController {
             }
         }
         double posesheniya = summ.get();
-        model.addAttribute("posesheniya",(int) posesheniya);
+        model.addAttribute("posesheniya", (int) posesheniya);
         model.addAttribute("ball", ball + (int) posesheniya);
         model.addAttribute("kid", k);
         model.addAttribute("dost", dostijenies);
@@ -1312,26 +1317,31 @@ public class SpecController {
         });
 
         int ball = 0;
-       // int index = 0;
+        // int index = 0;
         List<Integer> statBal = new ArrayList<>();
         statBal.add(ball);
         dates.add("0");
         List<Uchastnik> uchastniks = uchastnikRepository.findByKidId(id);
 
         for (Uchastnik u : uchastniks) {
+            StringBuilder action = new StringBuilder();
             switch (u.getMeropriyatie().getLevel().getName()) {
                 case "Международный":
+                    action.append("Участие");
                     for (Dostijenie d : dostijenies) {
                         if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
                             switch (d.getWinPlace()) {
                                 case "Первое":
                                     ball = ball + 10;
+                                    action.append(", Место I");
                                     break;
                                 case "Второе":
                                     ball = ball + 9;
+                                    action.append(", Место II");
                                     break;
                                 case "Третье":
                                     ball = ball + 8;
+                                    action.append(", Место III");
                                     break;
                             }
                         }
@@ -1339,17 +1349,21 @@ public class SpecController {
                     ball = ball + 5;
                     break;
                 case "Национальный":
+                    action.append("Участие");
                     for (Dostijenie d : dostijenies) {
                         if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
                             switch (d.getWinPlace()) {
                                 case "Первое":
                                     ball = ball + 8;
+                                    action.append(", Место I");
                                     break;
                                 case "Второе":
                                     ball = ball + 7;
+                                    action.append(", Место II");
                                     break;
                                 case "Третье":
                                     ball = ball + 6;
+                                    action.append(", Место III");
                                     break;
                             }
 
@@ -1358,17 +1372,21 @@ public class SpecController {
                     ball = ball + 5;
                     break;
                 case "Региональный":
+                    action.append("Участие");
                     for (Dostijenie d : dostijenies) {
                         if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
                             switch (d.getWinPlace()) {
                                 case "Первое":
                                     ball = ball + 7;
+                                    action.append(", Место I");
                                     break;
                                 case "Второе":
                                     ball = ball + 6;
+                                    action.append(", Место II");
                                     break;
                                 case "Третье":
                                     ball = ball + 5;
+                                    action.append(", Место III");
                                     break;
                             }
 
@@ -1377,17 +1395,21 @@ public class SpecController {
                     ball = ball + 4;
                     break;
                 case "Городской":
+                    action.append("Участие");
                     for (Dostijenie d : dostijenies) {
                         if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
                             switch (d.getWinPlace()) {
                                 case "Первое":
                                     ball = ball + 6;
+                                    action.append(", Место I");
                                     break;
                                 case "Второе":
                                     ball = ball + 5;
+                                    action.append(", Место II");
                                     break;
                                 case "Третье":
                                     ball = ball + 4;
+                                    action.append(", Место III");
                                     break;
                             }
 
@@ -1396,17 +1418,21 @@ public class SpecController {
                     ball = ball + 4;
                     break;
                 case "Районный":
+                    action.append("Участие");
                     for (Dostijenie d : dostijenies) {
                         if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
                             switch (d.getWinPlace()) {
                                 case "Первое":
                                     ball = ball + 5;
+                                    action.append(", Место I");
                                     break;
                                 case "Второе":
                                     ball = ball + 4;
+                                    action.append(", Место II");
                                     break;
                                 case "Третье":
                                     ball = ball + 3;
+                                    action.append(", Место III");
                                     break;
                             }
 
@@ -1416,14 +1442,15 @@ public class SpecController {
                     break;
             }
 
-            String strDate = dateFormat.format(u.getMeropriyatie().getData());
+            String strDate = dateFormat.format(u.getMeropriyatie().getData()) + " " + action;
+            //String strDate = u.getMeropriyatie().getName() + "\n(" + dateFormat.format(u.getMeropriyatie().getData()) + ")";
             dates.add(strDate);
             statBal.add(ball);
         }
 
         subjects.add("Баллы");
         double posesheniya = summ.get();
-        model.addAttribute("posesheniya",(int) posesheniya);
+        model.addAttribute("posesheniya", (int) posesheniya);
         model.addAttribute("ball", ball + (int) posesheniya);
 
 //        // Определение размеров двумерного массива
@@ -1464,7 +1491,7 @@ public class SpecController {
                 .filter(item -> !krujoks.contains(item))
                 .collect(Collectors.toList()));
         model.addAttribute("kr", krujoks);
-
+        model.addAttribute("merops", uchastniks);
         return "spec/portfolio";
     }
 
@@ -1611,6 +1638,30 @@ public class SpecController {
             i++;
         }
         String[] labelNapr2 = napravleniya2.toArray(new String[0]);
+
+
+        int num_all = 0;
+        int num_m = 0;
+        int num_f = 0;
+        int num_rf = 0;
+        int num_rk = 0;
+        int num_o = 0;
+
+        for (StatKids s : list) {
+            num_all = num_all + s.getTotal();
+            num_m = num_m + s.getM();
+            num_f = num_f + s.getF();
+            num_rf = num_rf + s.getRf();
+            num_rk = num_rk + s.getRk();
+            num_o = num_o + s.getO();
+        }
+
+        model.addAttribute("num_all", num_all);
+        model.addAttribute("num_m", num_m);
+        model.addAttribute("num_f", num_f);
+        model.addAttribute("num_rf", num_rf);
+        model.addAttribute("num_rk", num_rk);
+        model.addAttribute("num_o", num_o);
         model.addAttribute("dataByGender", dataByGender);
         model.addAttribute("dataByCitizenship", dataByCitizenship);
         model.addAttribute("total", list);
@@ -1620,29 +1671,6 @@ public class SpecController {
         model.addAttribute("arrNapr", arrNapr);
         model.addAttribute("labelNapr2", labelNapr2);
         model.addAttribute("numDost", numdost);
-
-        int num_all = 0;
-        int num_m   = 0;
-        int num_f   = 0;
-        int num_rf  = 0;
-        int num_rk  = 0;
-        int num_o   = 0;
-
-        for (StatKids s: list) {
-            num_all = num_all+ s.getTotal();
-            num_m = num_m  + s.getM();
-            num_f = num_f  + s.getF();
-            num_rf = num_rf + s.getRf();
-            num_rk = num_rk + s.getRk();
-            num_o = num_o  + s.getO();
-        }
-
-        model.addAttribute("num_all", num_all);
-        model.addAttribute("num_m", num_m);
-        model.addAttribute("num_f", num_f);
-        model.addAttribute("num_rf", num_rf);
-        model.addAttribute("num_rk", num_rk);
-        model.addAttribute("num_o", num_o);
         return "stat/stat-by-kids";
     }
 
@@ -1950,70 +1978,220 @@ public class SpecController {
                               @PathVariable("endTime") String endTime) {
         System.out.println(startTime + "-" + endTime);
         Raspisanie r = raspisanieRepository.findById(id).orElse(null);
-        switch (dayOfWeek) {
-            case "Понедельник":
-                r.setMonday(startTime + "-" + endTime);
-                break;
-            case "Вторник":
-                r.setTuesday(startTime + "-" + endTime);
-                break;
-            case "Среда":
-                r.setWednesday(startTime + "-" + endTime);
-                break;
-            case "Четверг":
-                r.setThursday(startTime + "-" + endTime);
-                break;
-            case "Пятница":
-                r.setFriday(startTime + "-" + endTime);
-                break;
-            case "Суббота":
-                r.setSaturday(startTime + "-" + endTime);
-                break;
-            case "Воскресенье":
-                r.setSunday(startTime + "-" + endTime);
-                break;
+        if (isFree(r, dayOfWeek, startTime, endTime)) {
+            switch (dayOfWeek) {
+                case "Понедельник":
+                    r.setMonday(startTime + "-" + endTime);
+                    break;
+                case "Вторник":
+                    r.setTuesday(startTime + "-" + endTime);
+                    break;
+                case "Среда":
+                    r.setWednesday(startTime + "-" + endTime);
+                    break;
+                case "Четверг":
+                    r.setThursday(startTime + "-" + endTime);
+                    break;
+                case "Пятница":
+                    r.setFriday(startTime + "-" + endTime);
+                    break;
+                case "Суббота":
+                    r.setSaturday(startTime + "-" + endTime);
+                    break;
+                case "Воскресенье":
+                    r.setSunday(startTime + "-" + endTime);
+                    break;
+            }
+            raspisanieRepository.save(r);
+            model.addAttribute("startTimeE", startTime);
+            model.addAttribute("endTimeE", endTime);
+            return "redirect:/";
+        } else {
+            model.addAttribute("free", false);
+            model.addAttribute("startTime", startTime);
+            model.addAttribute("endTime", endTime);
+            return "home :: modal-edit-time";
         }
-        raspisanieRepository.save(r);
-        model.addAttribute("startTimeE", startTime);
-        model.addAttribute("endTimeE", endTime);
-        return "redirect:/";
     }
 
     @PostMapping("/spec/raspisanie/edit/{id_rasp}/{dayOfWeek}/{startTimeE}/{endTimeE}")
-    public String saveEditTime(Model model,
-                               @PathVariable("id_rasp") Long id,
-                               @PathVariable("dayOfWeek") String dayOfWeek,
-                               @PathVariable("startTimeE") String startTime,
-                               @PathVariable("endTimeE") String endTime) {
+    public ResponseEntity<Integer> saveEditTime(Model model,
+                                                @PathVariable("id_rasp") Long id,
+                                                @PathVariable("dayOfWeek") String dayOfWeek,
+                                                @PathVariable("startTimeE") String startTime,
+                                                @PathVariable("endTimeE") String endTime) {
         System.out.println(startTime + "-" + endTime);
         Raspisanie r = raspisanieRepository.findById(id).orElse(null);
+        if (isWorkedTime(r.getTeacher(),dayOfWeek,startTime,endTime)){
+            if (isFree(r, dayOfWeek, startTime, endTime)) {
+                switch (dayOfWeek) {
+                    case "Понедельник":
+                        r.setMonday(startTime + "-" + endTime);
+                        break;
+                    case "Вторник":
+                        r.setTuesday(startTime + "-" + endTime);
+                        break;
+                    case "Среда":
+                        r.setWednesday(startTime + "-" + endTime);
+                        break;
+                    case "Четверг":
+                        r.setThursday(startTime + "-" + endTime);
+                        break;
+                    case "Пятница":
+                        r.setFriday(startTime + "-" + endTime);
+                        break;
+                    case "Суббота":
+                        r.setSaturday(startTime + "-" + endTime);
+                        break;
+                    case "Воскресенье":
+                        r.setSunday(startTime + "-" + endTime);
+                        break;
+                }
+                raspisanieRepository.save(r);
+                return ResponseEntity.ok(2);
+            } else {
+                return ResponseEntity.ok(3);
+            }
+        } else {
+            return ResponseEntity.ok(1);
+        }
+
+    }
+
+    private boolean isWorkedTime(Teacher t, String dayOfWeek, String startTime, String endTime) {
+        List<String> workHours = new ArrayList<>();
+        for (WorkTime wt : workTimeRepository.findByDayOfWeekAndTeacherId(dayOfWeek, t.getId())) {
+            workHours.add(wt.getHour());
+        }
+        return containsTime(workHours, splitTimeRange(startTime + "-" + endTime));
+    }
+
+    private boolean containsTime(List<String> bigTimeList, List<String> smallTimeList) {
+        for (String time : smallTimeList) {
+            if (!bigTimeList.contains(time)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private List<String> splitTimeRange(String timeRange) {
+        List<String> result = new ArrayList<>();
+
+        String[] range = timeRange.split("-");
+        String startTime = range[0];
+        String endTime = range[1];
+
+        int startHour = Integer.parseInt(startTime.split(":")[0]);
+        int endHour = Integer.parseInt(endTime.split(":")[0]);
+
+        for (int hour = startHour; hour <= endHour; hour++) {
+            String formattedHour = String.format("%02d:00", hour);
+            result.add(formattedHour);
+        }
+
+        return result;
+    }
+
+    private boolean isFree(Raspisanie r, String dayOfWeek, String startTime, String endTime) {
+
+        List<Raspisanie> raspisanies = raspisanieRepository.findByTeacherId(r.getTeacher().getId());
+
+
         switch (dayOfWeek) {
             case "Понедельник":
-                r.setMonday(startTime + "-" + endTime);
+                raspisanies = raspisanies.stream().filter(raspisanie -> !raspisanie.getMonday().equals("") && !raspisanie.equals(r)).collect(Collectors.toList());
+                for (Raspisanie rasp : raspisanies) {
+                    if (areRangesOverlapping(startTime + "-" + endTime, rasp.getMonday())) return false;
+                }
                 break;
             case "Вторник":
-                r.setTuesday(startTime + "-" + endTime);
+                raspisanies = raspisanies.stream().filter(raspisanie -> !raspisanie.getTuesday().equals("") && !raspisanie.equals(r)).collect(Collectors.toList());
+                raspisanies.forEach(System.out::println);
+                for (Raspisanie rasp : raspisanies) {
+                    if (areRangesOverlapping(startTime + "-" + endTime, rasp.getTuesday())) return false;
+                }
                 break;
             case "Среда":
-                r.setWednesday(startTime + "-" + endTime);
+                raspisanies = raspisanies.stream().filter(raspisanie -> !raspisanie.getWednesday().equals("") && !raspisanie.equals(r)).collect(Collectors.toList());
+                for (Raspisanie rasp : raspisanies) {
+                    if (areRangesOverlapping(startTime + "-" + endTime, rasp.getWednesday())) return false;
+                }
                 break;
             case "Четверг":
-                r.setThursday(startTime + "-" + endTime);
+                raspisanies = raspisanies.stream().filter(raspisanie -> !raspisanie.getThursday().equals("") && !raspisanie.equals(r)).collect(Collectors.toList());
+                for (Raspisanie rasp : raspisanies) {
+                    if (areRangesOverlapping(startTime + "-" + endTime, rasp.getThursday())) return false;
+                }
                 break;
             case "Пятница":
-                r.setFriday(startTime + "-" + endTime);
+                raspisanies = raspisanies.stream().filter(raspisanie -> !raspisanie.getFriday().equals("") && !raspisanie.equals(r)).collect(Collectors.toList());
+                for (Raspisanie rasp : raspisanies) {
+                    if (areRangesOverlapping(startTime + "-" + endTime, rasp.getFriday())) return false;
+                }
                 break;
             case "Суббота":
-                r.setSaturday(startTime + "-" + endTime);
+                raspisanies = raspisanies.stream().filter(raspisanie -> !raspisanie.getSaturday().equals("") && !raspisanie.equals(r)).collect(Collectors.toList());
+                for (Raspisanie rasp : raspisanies) {
+                    if (areRangesOverlapping(startTime + "-" + endTime, rasp.getSaturday())) return false;
+                }
                 break;
             case "Воскресенье":
-                r.setSunday(startTime + "-" + endTime);
+                raspisanies = raspisanies.stream().filter(raspisanie -> !raspisanie.getSunday().equals("") && !raspisanie.equals(r)).collect(Collectors.toList());
+                for (Raspisanie rasp : raspisanies) {
+                    if (areRangesOverlapping(startTime + "-" + endTime, rasp.getSunday())) return false;
+                }
                 break;
         }
-        raspisanieRepository.save(r);
-        model.addAttribute("startTimeE", startTime);
-        model.addAttribute("endTimeE", endTime);
-        return "redirect:/";
+        System.out.println("Time is free");
+        return true;
+    }
+
+    public static boolean isTimeInRange(String time, String timeRange) {
+        String[] range = timeRange.split("-");
+        String startTime = range[0];
+        String endTime = range[1];
+
+        int timeMinutes = convertTimeToMinutes(time);
+        int startMinutes = convertTimeToMinutes(startTime);
+        int endMinutes = convertTimeToMinutes(endTime);
+
+        // Проверяем, находится ли время внутри диапазона
+        if (timeMinutes >= startMinutes && timeMinutes <= endMinutes) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean areRangesOverlapping(String time1, String time2) {
+        String[] range1 = time1.split("-");
+        String[] range2 = time2.split("-");
+
+        String startTime1 = range1[0];
+        String endTime1 = range1[1];
+        String startTime2 = range2[0];
+        String endTime2 = range2[1];
+
+        int start1 = convertTimeToMinutes(startTime1);
+        int end1 = convertTimeToMinutes(endTime1);
+        int start2 = convertTimeToMinutes(startTime2);
+        int end2 = convertTimeToMinutes(endTime2);
+
+        // Проверяем, пересекаются ли диапазоны
+        if (start1 <= end2 && start2 <= end1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static int convertTimeToMinutes(String time) {
+        String[] parts = time.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+
+        return hours * 60 + minutes;
     }
 
     @PostMapping("/spec/raspisanie/delete/{id_rasp}/{dayOfWeek}")
@@ -2088,11 +2266,10 @@ public class SpecController {
         List<List<DayMerop>> calendar = generateCalendar(events, year, month);
         // Передайте календарь в модель
         model.addAttribute("calendar", calendar);
-        model.addAttribute("sevice", teacherService);
+        model.addAttribute("service", teacherService);
         // Верните имя представления
         return "spec/meropriyatiya :: calendar-fragment";
     }
-
 
 
     private List<List<DayMerop>> generateCalendar(List<Meropriyatie> events, int year, int month) {

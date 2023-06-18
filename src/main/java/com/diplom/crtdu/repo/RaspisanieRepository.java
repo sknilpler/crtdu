@@ -16,4 +16,5 @@ public interface RaspisanieRepository extends CrudRepository<Raspisanie,Long> {
             "LEFT JOIN kid ON kid_krujok.kid_id = kid.id\n" +
             "WHERE kid.id = :id", nativeQuery = true)
     List<Raspisanie> findByKidId(@Param("id") Long id);
+
 }

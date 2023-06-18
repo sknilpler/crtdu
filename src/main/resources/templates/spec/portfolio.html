@@ -14,6 +14,7 @@
 
 
 
+
     </style>
 </head>
 <body>
@@ -205,7 +206,7 @@
                         <strong>Дата зачисления:</strong>
                         [[${#dates.format(kid?.dateIn, 'dd.MM.yyyy')}]]
                     </p>
-                    <p th:inline='text'  th:if="${kid?.dateOut} != null">
+                    <p th:inline='text' th:if="${kid?.dateOut} != null">
                         <strong>Дата отчисления:</strong>
                         [[${#dates.format(kid?.dateOut, 'dd.MM.yyyy')}]]
                     </p>
@@ -248,23 +249,60 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <h3 class="mt-4">Кружки и посещаемость:</h3>
+<!--                    <h3 class="mt-4">Кружки и посещаемость:</h3>-->
+<!--                    <div class="krujki-list" th:fragment="krujki-list">-->
+<!--                        <ul>-->
+<!--                            <li th:each="krujok : ${marks}"-->
+<!--                                th:text="${krujok.key} + ' % посещаемости: ' + ${krujok.value}"></li>-->
+<!--                        </ul>-->
+<!--                    </div>-->
+                    <h3 class="mt-4">Кружки:</h3>
                     <div class="krujki-list" th:fragment="krujki-list">
                         <ul>
                             <li th:each="krujok : ${marks}"
-                                th:text="${krujok.key} + ' % посещаемости: ' + ${krujok.value}"></li>
+                                th:text="${krujok.key}"></li>
                         </ul>
                     </div>
                     <h3 class="mt-4">Достижения и призовые места:</h3>
                     <ul>
-                        <li th:each="d : ${dost}"
-                            th:text="${d.meropriyatie.name}+': '+${d.name}+' '+${d.meropriyatie.level.name}+' '+${d.winPlace}"></li>
+                        <li th:each="d : ${dost}">
+                            <p th:inline='text'>
+                                <strong>[[${d.meropriyatie.name}]]</strong>
+                            </p>
+                            <p th:inline='text'>
+                                [[${d.name}]]
+                            </p>
+                            <p th:inline='text'>
+                                <strong>Уровень:</strong>
+                                [[${d.meropriyatie.level.name}]]
+                            </p>
+                            <p th:inline='text'>
+                                <strong>Место:</strong>
+                                [[${d.winPlace}]]
+                            </p>
+                        </li>
                     </ul>
 
                 </div>
-                <div class="col-md-6" data-html2canvas-ignore="true">
-                    <canvas id="marksChart"></canvas>
+                <div class="col-md-6">
+                    <div data-html2canvas-ignore="true">
+                        <canvas id="marksChart"></canvas>
+                    </div>
+                    <div class="overflow-auto">
+                        <h3 class="mt-4">Участие в мероприятиях:</h3>
+                        <ul>
+                            <li th:each="u : ${merops}">
+                                <p th:inline='text'>
+                                    <strong>[[${u.meropriyatie.name}]]</strong>
+                                </p>
+                                <p th:inline='text'>
+                                    [[${#dates.format(u.meropriyatie.data, 'dd.MM.yyyy')}]], [[${u.meropriyatie.level.name}]], Участвовал от [[${u.krujok.name}]]
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
+
                 <div data-html2canvas-ignore="true">
                     <h3 class="mt-4">Сертификаты и грамоты:</h3>
                     <table class="table table-sm">
@@ -510,6 +548,7 @@ var grades = /*[[${grades}]]*/ [];
         return color;
       }
     });
+
 
 
 

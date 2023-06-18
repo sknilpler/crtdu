@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface WorkTimeRepository extends CrudRepository<WorkTime, Long> {
     List<WorkTime> findByDayOfWeekAndTeacherId(String day, Long id);
+    List<WorkTime> findByTeacherId(Long id);
 }

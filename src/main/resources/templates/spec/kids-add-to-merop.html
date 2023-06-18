@@ -199,11 +199,18 @@
                             </p>
                         </div>
                     </div>
-                    <h5 class="mt-4">Кружки и посещаемость:</h5>
+<!--                    <h5 class="mt-4">Кружки и посещаемость:</h5>-->
+<!--                    <div class="krujki-list" th:fragment="krujki-list">-->
+<!--                        <ul>-->
+<!--                            <li th:each="krujok : ${marks}"-->
+<!--                                th:text="${krujok.key} + ' % посещаемости: ' + ${krujok.value}"></li>-->
+<!--                        </ul>-->
+<!--                    </div>-->
+                    <h5 class="mt-4">Кружкиь:</h5>
                     <div class="krujki-list" th:fragment="krujki-list">
                         <ul>
                             <li th:each="krujok : ${marks}"
-                                th:text="${krujok.key} + ' % посещаемости: ' + ${krujok.value}"></li>
+                                th:text="${krujok.key}"></li>
                         </ul>
                     </div>
                     <h5 class="mt-4">Достижения и призовые места:</h5>

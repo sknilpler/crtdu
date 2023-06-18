@@ -47,7 +47,7 @@ public class TeacherService {
     public boolean isMoreThan24Hours(Date date1, Date date2) {
         long differenceInMillis = Math.abs(date1.getTime() - date2.getTime());
         long hours = differenceInMillis / (60 * 60 * 1000); // Количество часов между датами
-
+        System.out.println(hours);
         return hours > 24;
     }
 }
