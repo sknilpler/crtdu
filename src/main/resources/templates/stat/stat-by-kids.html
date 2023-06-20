@@ -235,7 +235,7 @@ var arrNapr =  /*[[${arrNapr}]]*/ '';
             var chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['3-5 лет', '6-8 лет', '9-11 лет', '12-15 лет', '16-17 лет'],
+                    labels: ['3-5 лет', '6-7 лет', '8-11 лет', '12-14 лет', '15-17 лет'],
                     datasets: [{
                         label: 'Мальчики',
                         backgroundColor: 'rgba(54, 162, 235, 0.5)',
@@ -434,6 +434,11 @@ for (let row = 9; row <= 10 + tableRows.length; row++) {
   titleCell.font = { name: 'Times New Roman', size: 12, bold: true };
   titleCell.alignment = { horizontal: 'center' };
 
+// Добавление строки "Итого"
+  const toRow = worksheet.addRow([]);
+  const toLabelCell = totalRow.getCell(2); // Столбец B
+  toLabelCell.value = 'Итого';
+  toLabelCell.font = { name: 'Times New Roman', size: 12, bold: true };
 
   // Генерация Excel-документа
   workbook.xlsx.writeBuffer().then(buffer => {

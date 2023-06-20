@@ -8,6 +8,7 @@
         :root {
             --bs-body-color: #000000;
         }
+
     </style>
 </head>
 <body>
@@ -38,23 +39,25 @@
                                             title="Возраст воспитанников">
                                         <option value="0" selected disabled>-- Выберите возраст --</option>
                                         <option value="3-5">3-5 лет</option>
-                                        <option value="6-8">6-8 лет</option>
-                                        <option value="9-11">9-11 лет</option>
-                                        <option value="12-15">12-15 лет</option>
-                                        <option value="16-17">16-17 лет</option>
+                                        <option value="6-7">6-7 лет</option>
+                                        <option value="8-11">8-11 лет</option>
+                                        <option value="12-14">12-14 лет</option>
+                                        <option value="16-17">15-17 лет</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="hoursPerWeek" class="form-label">Кол-во академических часов в неделю</label>
+                                    <label for="hoursPerWeek" class="form-label">Кол-во академических часов в
+                                        неделю</label>
                                     <input type="number" class="form-control" th:field="*{hoursPerWeek}"
                                            id="hoursPerWeek"
                                            name="hoursPerWeek" placeholder="Кол-во часов в неделю"
                                            title="Кол-во часов в неделю">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="hoursPerDay" class="form-label">Кол-во академических часов в день</label>
+                                    <label for="hoursPerDay" class="form-label">Кол-во академических часов в
+                                        день</label>
                                     <input type="number" class="form-control" th:field="*{hoursPerDay}" id="hoursPerDay"
                                            name="hoursPerDay" placeholder="Кол-во часов в день"
                                            title="Кол-во часов в день">
@@ -66,6 +69,14 @@
                                 </button>
                                 <button th:unless="${norma != null and norma.age != null and norma.age != ''}"
                                         class="btn btn-success" th:onclick="'javascript:save2();'">Сохранить
+                                </button>
+                                <a class="btn btn-secondary" href="/img/SP_2.4.3648-20.pdf">Скачать СП
+                                </a>
+                                <button
+                                        class="btn btn-outline-secondary" onclick="showSPModal()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 50 50">
+                                        <path d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 25 11 A 3 3 0 0 0 22 14 A 3 3 0 0 0 25 17 A 3 3 0 0 0 28 14 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 22 23 L 23 23 L 23 36 L 22 36 L 21 36 L 21 38 L 22 38 L 23 38 L 27 38 L 28 38 L 29 38 L 29 36 L 28 36 L 27 36 L 27 21 L 26 21 L 22 21 L 21 21 z"></path>
+                                    </svg>
                                 </button>
                             </div>
                             <br>
@@ -119,6 +130,66 @@
                     </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно с информацией об участниках -->
+<div class="modal fade" id="sp-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Выдержка из СП 2.4.3648–20</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <h5>
+                        3.4.16. При реализации образовательных программ должны соблюдаться следующие
+                        санитарно-эпидемиологические требования
+                    </h5>
+                    <p>
+                        Объем обязательной части образовательной программы начального общего образования должен
+                        составлять 80%, образовательной программы основного общего — 70% и
+                        образовательной программы среднего общего образования — 60%. Суммарный объем
+                        обязательной части образовательной программы и части, формируемой участниками
+                        образовательных отношений, реализуется в рамках максимального общего объема недельной
+                        образовательной нагрузки
+                    </p>
+                    <p>
+                        Часы, отведенные на внеурочную деятельность, должны быть организованы в формах, отличных от
+                        урочных, предусматривающих проведение общественно полезных
+                        практик, исследовательской деятельности, реализации образовательных проектов, экскурсий,
+                        походов, соревнований, посещений театров, музеев и иные формы.
+                    </p>
+                    <p>
+                        Расписание уроков составляется с учетом дневной и недельной умственной работоспособности
+                        обучающихся и шкалы трудности учебных предметов, определенной гигиеническими нормативами.
+                    </p>
+                    <p>
+                        Образовательная недельная нагрузка распределяется равномерно в течение учебной
+                        недели, при этом объем максимально допустимой нагрузки в течение дня составляет:
+                    </p>
+                    <ul>
+                        <li>
+                            для обучающихся 1-х классов — не должен превышать 4 уроков и один раз в неделю — 5 уроков, за счет урока физической культуры,
+                        </li>
+                        <li>
+                            для обучающихся 2–4 классов — не более 5 уроков и один раз в неделю 6 уроков за
+                            счет урока физической культуры
+                        </li>
+                        <li>
+                            для обучающихся 5–6 классов — не более 6 уроков,
+                        </li>
+                        <li>
+                            для обучающихся 7–11 классов — не более 7 уроков.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
         </div>
     </div>
@@ -181,7 +252,9 @@ function post(path, method = 'post') {
 	form.submit();
 }
 
-
+function showSPModal(){
+    $('#sp-modal').modal('show');
+}
 
 
 

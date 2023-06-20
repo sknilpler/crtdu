@@ -1572,25 +1572,25 @@ public class SpecController {
             if (kid.isSex()) {
                 if (age >= 3 && age <= 5) {
                     from3to5m++;
-                } else if (age >= 6 && age <= 8) {
+                } else if (age >= 6 && age <= 7) {
                     from6to8m++;
-                } else if (age >= 9 && age <= 11) {
+                } else if (age >= 8 && age <= 11) {
                     from9to11m++;
-                } else if (age >= 12 && age <= 15) {
+                } else if (age >= 12 && age <= 14) {
                     from12to15m++;
-                } else if (age >= 16 && age <= 17) {
+                } else if (age >= 15 && age <= 17) {
                     from16to17m++;
                 }
             } else {
                 if (age >= 3 && age <= 5) {
                     from3to5f++;
-                } else if (age >= 6 && age <= 8) {
+                } else if (age >= 6 && age <= 7) {
                     from6to8f++;
-                } else if (age >= 9 && age <= 11) {
+                } else if (age >= 8 && age <= 11) {
                     from9to11f++;
-                } else if (age >= 12 && age <= 15) {
+                } else if (age >= 12 && age <= 14) {
                     from12to15f++;
-                } else if (age >= 16 && age <= 17) {
+                } else if (age >= 15 && age <= 17) {
                     from16to17f++;
                 }
             }
