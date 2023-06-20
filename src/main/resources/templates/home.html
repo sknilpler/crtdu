@@ -42,18 +42,10 @@
 //}
 
 
-   /* Выделение строк и столбцов при наведении мыши */
-  table tr:hover td {
-    background-color: yellow;
-  }
-
-  table td:hover {
-    background-color: yellow;
-  }
 
   /* Выделение ячейки под курсором */
   table td.highlight {
-    background-color: blue;
+    background-color: Silver;
   }
 
 
@@ -85,7 +77,7 @@
     <div class="raspis" th:fragment="raspis">
 
 
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="rasp">
             <thead>
             <tr>
                 <th class="text-center">Наименование объединения</th>
@@ -100,13 +92,13 @@
             </thead>
             <tbody>
             <tr th:each="r : ${rasp}">
-                <th>
+                <td>
                     <strong th:text="${r.krujok.name}"></strong><br>
                     <a th:text="${r.krujok.vozrast}+' лет'"></a><br>
                     <a th:text="${r.teacher.getShortFIO()}"></a><br>
                     <a th:text="${r.krujok.mesto}"></a>
-                </th>
-                <th>
+                </td>
+                <td>
                     <div class="text-center">
                         <div th:unless="${r.monday==''}">
                             <p
@@ -130,8 +122,8 @@
                             </button>
                         </div>
                     </div>
-                </th>
-                <th>
+                </td>
+                <td>
                     <div class="text-center">
                         <div th:unless="${r.tuesday==''}">
                             <p
@@ -155,8 +147,8 @@
                             </button>
                         </div>
                     </div>
-                </th>
-                <th>
+                </td>
+                <td>
                     <div class="text-center">
                         <div th:if="${r.wednesday == ''}">
                             <button type="button" class="btn btn-outline-secondary"
@@ -180,8 +172,8 @@
                             <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.wednesday}"></p>
                         </div>
                     </div>
-                </th>
-                <th>
+                </td>
+                <td>
                     <div class="text-center">
                         <div th:if="${r.thursday == ''}">
                             <button type="button" class="btn btn-outline-secondary"
@@ -205,8 +197,8 @@
                             <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.thursday}"></p>
                         </div>
                     </div>
-                </th>
-                <th>
+                </td>
+                <td>
                     <div class="text-center">
                         <div th:if="${r.friday == ''}">
                             <button type="button" class="btn btn-outline-secondary"
@@ -230,8 +222,8 @@
                             <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.friday}"></p>
                         </div>
                     </div>
-                </th>
-                <th>
+                </td>
+                <td>
                     <div class="text-center">
                         <div th:if="${r.saturday == ''}">
                             <button type="button" class="btn btn-outline-secondary"
@@ -255,8 +247,8 @@
                             <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.saturday}"></p>
                         </div>
                     </div>
-                </th>
-                <th>
+                </td>
+                <td>
                     <div class="text-center">
                         <div th:if="${r.sunday == ''}">
                             <button type="button" class="btn btn-outline-secondary"
@@ -280,7 +272,7 @@
                             <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.sunday}"></p>
                         </div>
                     </div>
-                </th>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -431,7 +423,7 @@
     var currentWeek = Math.ceil((currentDay + firstDayOfWeek) / 7);
 
     // Формируем текст для вставки в элемент h2
-    var scheduleText = "Расписание занятий по дням недели за " + getMonthName(currentMonth) + " " + currentYear + " г. неделя " + currentWeek;
+    var scheduleText = "Расписание занятий по дням недели за " + getMonthName(currentMonth) + " " + currentYear + " г.";
 
     // Находим элемент h2 по его id
     var scheduleTitleElement = document.getElementById("scheduleTitle");
@@ -720,6 +712,46 @@ function updateEndTimeE() {
             updateEndTime();
         }
     }
+
+    /////////////////////////////
+
+ // JavaScript код
+  var weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  var today = new Date();
+  var currentDay = today.getDay(); // Получаем номер текущего дня недели (0 - Воскресенье, 1 - Понедельник, и т.д.)
+  var mondayOffset = currentDay > 0 ? -currentDay + 1 : -6; // Вычисляем смещение для понедельника
+
+  // Обновляем заголовки таблицы с наименованием объединения, днями недели и датами
+  var table = document.getElementById('rasp');
+  var thElements = table.getElementsByTagName('th');
+
+  // Обновляем наименование объединения
+  thElements[0].innerHTML = 'Наименование объединения';
+
+  for (var i = 1; i < 8; i++) {
+    var th = thElements[i];
+    var dayIndex = (currentDay + i - 1) % 7; // Индекс дня недели (0 - Понедельник, 1 - Вторник, и т.д.)
+    var date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + mondayOffset + i - 1);
+    var formattedDate = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'numeric' });
+    th.innerHTML = weekdays[i-1] + ' ' + formattedDate;
+
+
+  }
+
+// Определяем индекс столбца с текущей датой
+  var columnIdx = currentDay;
+
+  // Выделяем столбец с текущей датой зеленым цветом
+  var tdElements = table.getElementsByTagName('td');
+
+  // Выделяем заголовок столбца
+  thElements[columnIdx].style.backgroundColor = 'LightGreen';
+
+  // Выделяем ячейки в столбце
+  for (var i = columnIdx; i < tdElements.length; i += thElements.length) {
+    tdElements[i].style.backgroundColor = 'LightGreen';
+  }
+
 </script>
 </body>
 
