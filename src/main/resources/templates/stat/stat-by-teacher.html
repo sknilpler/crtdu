@@ -20,6 +20,7 @@
 <!-- Modal windows for accepting delete -->
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
 <div th:insert="blocks/sidebar :: sidebar"></div>
+<p th:text="${userfio}" id="userfio" style="display: none"></p>
 <div class="container-fluid">
 
     <h1 class="text-center mb-4">Статистическая информация о педагогах</h1>
@@ -235,6 +236,12 @@ for (let row = 9; row <= 9 + tableRows.length; row++) {
   titleCell.font = { name: 'Times New Roman', size: 12, bold: true };
   titleCell.alignment = { horizontal: 'center' };
 
+  worksheet.addRow([]);
+  const toRow = worksheet.addRow([]);
+  const toLabelCell = toRow.getCell(2); // Столбец B
+  const fio = document.getElementById('userfio').innerHTML;
+  toLabelCell.value = '____________________ '+fio+'  '+today();
+  toLabelCell.font = { name: 'Times New Roman', size: 12, bold: true };
 
   // Генерация Excel-документа
   workbook.xlsx.writeBuffer().then(buffer => {
@@ -286,6 +293,14 @@ function formatDate(date) {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = String(date.getFullYear());
   return `${day}.${month}.${year}`;
+}
+
+function today(){
+    var today = new Date();
+    var day = String(today.getDate()).padStart(2, '0');
+    var month = String(today.getMonth() + 1).padStart(2, '0');
+    var year = today.getFullYear();
+    return day + '.' + month + '.' + year;
 }
 </script>
 </body>

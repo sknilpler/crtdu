@@ -249,20 +249,21 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-<!--                    <h3 class="mt-4">Кружки и посещаемость:</h3>-->
-<!--                    <div class="krujki-list" th:fragment="krujki-list">-->
-<!--                        <ul>-->
-<!--                            <li th:each="krujok : ${marks}"-->
-<!--                                th:text="${krujok.key} + ' % посещаемости: ' + ${krujok.value}"></li>-->
-<!--                        </ul>-->
-<!--                    </div>-->
-                    <h3 class="mt-4">Кружки:</h3>
+                    <h3 class="mt-4">Кружки и посещаемость:</h3>
                     <div class="krujki-list" th:fragment="krujki-list">
                         <ul>
                             <li th:each="krujok : ${marks}"
-                                th:text="${krujok.key}"></li>
+                                th:text="${krujok.name} + ', посещаемость: ' + ${krujok.percent}+'%'" th:onclick="'javascript:showStat(\'' + ${krujok.id} + '\');'">
+                            </li>
                         </ul>
                     </div>
+<!--                    <h3 class="mt-4">Кружки:</h3>-->
+<!--                    <div class="krujki-list" th:fragment="krujki-list">-->
+<!--                        <ul>-->
+<!--                            <li th:each="krujok : ${marks}"-->
+<!--                                th:text="${krujok.key}"></li>-->
+<!--                        </ul>-->
+<!--                    </div>-->
                     <h3 class="mt-4">Достижения и призовые места:</h3>
                     <ul>
                         <li th:each="d : ${dost}">
@@ -397,161 +398,203 @@
 <script src="/js/html2pdf.bundle.js"></script>
 <script src="/js/chart.js"></script>
 <script th:inline="javascript">
-
-function openKrujkiModal(){
+function openKrujkiModal() {
     $('#zapis-modal').modal('show');
 }
 
-function addKidToKrujok(id){
+function addKidToKrujok(id) {
     $.ajax({
-		type: 'get',
-		url: '/spec/portfolio/add-to-kruj/' + id,
-		success: function(data) {
-			$('.kruj-table').html(data);
-			//updateKrujList();
-		},
-	})
+        type: 'get',
+        url: '/spec/portfolio/add-to-kruj/' + id,
+        success: function(data) {
+            $('.kruj-table').html(data);
+        },
+    })
 }
 
-function openDelKrujkiModal(){
+function openDelKrujkiModal() {
     $('#otpis-modal').modal('show');
 }
 
-function delKidFromKrujok(id){
+function delKidFromKrujok(id) {
     $.ajax({
-		type: 'get',
-		url: '/spec/portfolio/del-from-kruj/' + id,
-		success: function(data) {
-			$('.kruj-table-vih').html(data);
-		},
-	})
+        type: 'get',
+        url: '/spec/portfolio/del-from-kruj/' + id,
+        success: function(data) {
+            $('.kruj-table-vih').html(data);
+        },
+    })
 }
 
-function updateKrujList(){
+function updateKrujList() {
     $.ajax({
-		type: 'get',
-		url: '/spec/portfolio/update-kruj/',
-		success: function(data) {
-			$('.krujki-list').html(data);
-		},
-	})
+        type: 'get',
+        url: '/spec/portfolio/update-kruj/',
+        success: function(data) {
+            $('.krujki-list').html(data);
+        },
+    })
 }
-////////////
-//function print(){
-// // Создаем экземпляр jsPDF
-//  const doc = new jsPDF();
-//
-//  // Получаем HTML контейнер, который нужно экспортировать в PDF
-//  const htmlContainer = document.querySelector(".my-html-container");
-//
-//  // Получаем данные для экспорта из HTML контейнера
-//  const exportData = htmlContainer.innerHTML;
-//
-//  // Добавляем данные в PDF документ
-//  doc.fromHTML(exportData);
-//
-//  // Сохраняем PDF документ
-//  doc.save("portfolio.pdf");
-//}
 
-function print(){
+function print() {
     const element = document.getElementById('toPDF');
 
     const fio = document.getElementById('fio').textContent;
 
-  var opt = {
-  margin:       0,
-  filename:     'портфолио '+fio+'.pdf',
-  image:        { type: 'jpeg', quality: 0.98 },
-  html2canvas:  { scale: 4 },
-  jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
-};
+    var opt = {
+        margin: 0,
+        filename: 'портфолио ' + fio + '.pdf',
+        image: {
+            type: 'jpeg',
+            quality: 0.98
+        },
+        html2canvas: {
+            scale: 4
+        },
+        jsPDF: {
+            unit: 'in',
+            format: 'letter',
+            orientation: 'landscape'
+        }
+    };
 
-// New Promise-based usage:
-html2pdf().set(opt).from(element).save();
-    //html2pdf()
-    //    .from(element)
-    //    .save();
+    // New Promise-based usage:
+    html2pdf().set(opt).from(element).save();
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-      // Данные для графика
-     // var dates = ["2023-01-01", "2023-04-01", "2023-07-01"]; // Даты поставленных оценок
-     // var subjects = ["Математика", "Физика", "Химия", "История"]; // Названия предметов
-     // var grades = [
-     //   [8, 7, 9], // Оценки по Математике
-     //   [6, 8, 7], // Оценки по Физике
-     //   [9, 9, 8], // Оценки по Химии
-     //   [7, 7, 6]  // Оценки по Истории
-     // ];
-
-var dates = /*[[${dates}]]*/ [];
-var subjects = /*[[${subjects}]]*/ [];
-var grades = /*[[${grades}]]*/ [];
+//document.addEventListener("DOMContentLoaded", function() {
+    var dates = /*[[${dates}]]*/ [];
+    var subjects = /*[[${subjects}]]*/ [];
+    var grades = /*[[${grades}]]*/ [];
 
 
     console.log(dates);
     console.log(subjects);
     console.log(grades);
-      // Создание графика
-      var ctx = document.getElementById("marksChart").getContext("2d");
-      var chart = new Chart(ctx, {
+    // Создание графика
+    var ctx = document.getElementById("marksChart").getContext("2d");
+    var chart = new Chart(ctx, {
         type: "line",
         data: {
-          labels: dates,
-          datasets: createDatasets()
+            labels: dates,
+            datasets: createDatasets()
         },
         options: {
-          responsive: true,
-          scales: {
-            x: {
-              display: true,
-              title: {
-                display: true,
-                text: ""
-              }
-            },
-            y: {
-              display: true,
-              title: {
-                display: true,
-                text: "Оценка"
-              },
-              suggestedMin: 1,
-              suggestedMax: 10
+            responsive: true,
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: ""
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: "Оценка"
+                    },
+                    suggestedMin: 1,
+                    suggestedMax: 10
+                }
             }
-          }
         }
-      });
+    });
 
-      // Функция для создания наборов данных для графика
-      function createDatasets() {
+    // Функция для создания наборов данных для графика
+    function createDatasets() {
         var datasets = [];
 
-          datasets.push({
+        datasets.push({
             label: subjects[0],
             data: grades,
             borderColor: getRandomColor(),
             fill: false
-          });
+        });
 
         return datasets;
-      }
+    }
 
-      // Функция для генерации случайного цвета
-      function getRandomColor() {
+    // Функция для генерации случайного цвета
+    function getRandomColor() {
         var letters = "0123456789ABCDEF";
         var color = "#";
         for (var i = 0; i < 6; i++) {
-          color += letters[Math.floor(Math.random() * 16)];
+            color += letters[Math.floor(Math.random() * 16)];
         }
         return color;
-      }
+    }
+//});
+
+function showStat(id) {
+    $.ajax({
+        type: 'get',
+        url: '/spec/portfolio/update-graf/' + id,
+        success: function(data) {
+            chart.destroy();
+            repaintGrafik(data.dates, data.statBal, data.subjects)
+        },
+    })
+}
+
+function repaintGrafik(dates, grades, subjects) {
+    // Создание графика
+    var ctx = document.getElementById("marksChart").getContext("2d");
+
+    chart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: dates,
+            datasets: createDatasets2(subjects, grades)
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: ""
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: "Оценка"
+                    },
+                    suggestedMin: 1,
+                    suggestedMax: 10
+                }
+            }
+        }
+    });
+}
+
+//// Функция для генерации случайного цвета
+//function getRandomColor() {
+//    var letters = "0123456789ABCDEF";
+//    var color = "#";
+//    for (var i = 0; i < 6; i++) {
+//        color += letters[Math.floor(Math.random() * 16)];
+//    }
+//    return color;
+//}
+
+// Функция для создания наборов данных для графика
+function createDatasets2(subjects, grades) {
+    var datasets = [];
+
+    datasets.push({
+        label: subjects[0],
+        data: grades,
+        borderColor: getRandomColor(),
+        fill: false
     });
 
-
-
-
+    return datasets;
+}
 </script>
 </body>
 </html>

@@ -58,7 +58,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="phone" class="form-label">Телефон</label>
-                    <input type="tel" class="form-control tel" id="phone" name="phone" required oninput="allowPhoneNumber(this)">
+                    <input type="tel" class="form-control tel" id="phone" name="phone" required>
                 </div>
                 <div class="mb-3">
                     <label for="school" class="form-label">Школа</label>
@@ -79,7 +79,13 @@
 </div>
 
 <script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.maskedinput.min.js"></script>
 <script>
+$(function(){
+  //2. Получить элемент, к которому необходимо добавить маску
+  $("#phone").mask("+7(999) 999-9999");
+});
 // очистка полей ввода данных
 document.getElementById("clear-btn").addEventListener("click", function() {
 	location.reload();
@@ -99,12 +105,12 @@ document.getElementById("save-btn").addEventListener("click", function(event) {
 	var school = document.getElementById("school").value;
 	var klas = document.getElementById("klas").value;
 	// регулярные выражения для проверки формата телефона и даты рождения
-	var phoneRegExp = /^\+?\d{10,12}$/;;
+	//var phoneRegExp = /^\+?\d{10,12}$/;;
 	// проверяем формат телефона
-	if(!phoneRegExp.test(phone)) {
-		alert("Номер телефона должен быть в формате: +XXXXXXXXXXX (от 10 до 12 цифр)");
-		return;
-	}
+	//if(!phoneRegExp.test(phone)) {
+	//	alert("Номер телефона должен быть в формате: +XXXXXXXXXXX (от 10 до 12 цифр)");
+	//	return;
+	//}
 	// Генерируем уникальный логин, используя первую букву имени, полностью фамилию и случайное число от 0 до 9999
 	var username = transliterate(surname) + transliterate(name) + Math.floor(Math.random() * 10000);
 	// Генерируем уникальный пароль, используя первые три буквы фамилии, длину имени и случайную строку из символов
@@ -184,42 +190,7 @@ function allowLettersOnly(input) {
   input.value = input.value.replace(/[^a-zA-Zа-яА-Я]/g, '');
 }
 
-window.addEventListener("DOMContentLoaded", function() {
-    [].forEach.call( document.querySelectorAll('.tel'), function(input) {
-    var keyCode;
-    function mask(event) {
-        event.keyCode && (keyCode = event.keyCode);
-        var pos = this.selectionStart;
-        if (pos < 3) event.preventDefault();
-        var matrix = "+7 (___) ___ ____",
-            i = 0,
-            def = matrix.replace(/\D/g, ""),
-            val = this.value.replace(/\D/g, ""),
-            new_value = matrix.replace(/[_\d]/g, function(a) {
-                return i < val.length ? val.charAt(i++) || def.charAt(i) : a
-            });
-        i = new_value.indexOf("_");
-        if (i != -1) {
-            i < 5 && (i = 3);
-            new_value = new_value.slice(0, i)
-        }
-        var reg = matrix.substr(0, this.value.length).replace(/_+/g,
-            function(a) {
-                return "\\d{1," + a.length + "}"
-            }).replace(/[+()]/g, "\\$&");
-        reg = new RegExp("^" + reg + "$");
-        if (!reg.test(this.value) || this.value.length < 5 || keyCode > 47 && keyCode < 58) this.value = new_value;
-        if (event.type == "blur" && this.value.length < 5)  this.value = ""
-    }
 
-    input.addEventListener("input", mask, false);
-    input.addEventListener("focus", mask, false);
-    input.addEventListener("blur", mask, false);
-    input.addEventListener("keydown", mask, false)
-
-  });
-
-});
 	</script>
 </body>
 </html>

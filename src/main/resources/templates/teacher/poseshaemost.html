@@ -5,7 +5,7 @@
     <title>Посещаемость</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <style>
-        :root {
+    :root {
             --bs-body-color: #000000;
         }
     .table-wrapper {
@@ -18,13 +18,6 @@
       background-color: white;
       width: 150px; /* Фиксированная ширина первого столбца */
     }
-
-
-
-
-
-
-
     </style>
 </head>
 <body>
@@ -39,7 +32,7 @@
                     data-bs-toggle="tab"
                     th:data-bs-target="'#tab-' + ${k.id}" type="button" role="tab"
                     th:aria-controls="'tab-' + ${k.id}" aria-selected="true"
-                    th:text="${k.name}"
+                    th:text="${k.name}+' ('+${k.vozrast}+')'"
                     th:onclick="'javascript:openTab(\'' + ${k.id} + '\');'"></button>
         </li>
     </ul>
@@ -132,10 +125,10 @@
                     <input type="date" class="form-control"
                            id="data-zan">
                 </div>
-                <div class="mb-3">
-                    <label for="dlitelnost" class="form-label">Длительность занятия, мин</label>
-                    <input type="number" min="0" class="form-control" id="dlitelnost">
-                </div>
+<!--                <div class="mb-3">-->
+<!--                    <label for="dlitelnost" class="form-label">Длительность занятия, мин</label>-->
+<!--                    <input type="number" min="0" class="form-control" id="dlitelnost">-->
+<!--                </div>-->
                 <div class="mb-3">
                     <label for="mesto" class="form-label">Место проведения</label>
                     <input type="text"  class="form-control" id="mesto">
@@ -176,7 +169,7 @@
     function newZanyatie(){
     var date = document.getElementById('data-zan').value;
     var mesto = document.getElementById('mesto').value;
-    var dlitelnost = document.getElementById('dlitelnost').value;
+    var dlitelnost = 45;
 
         $.ajax({
 		type: 'get',

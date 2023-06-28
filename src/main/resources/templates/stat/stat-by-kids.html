@@ -20,6 +20,7 @@
 <!-- Modal windows for accepting delete -->
 <div th:insert="blocks/accept-delete :: accept-delete"></div>
 <div th:insert="blocks/sidebar :: sidebar"></div>
+<p th:text="${userfio}" id="userfio" style="display: none"></p>
 <div class="container main-content">
 
     <h1 class="text-center mb-4">Статистическая информация о воспитанниках</h1>
@@ -122,7 +123,7 @@
 
       // Данные для второй диаграммы (количество детей по гражданству)
       const dataByCitizenship = {
-  labels: ['Граждане РФ', 'Граждане РК', 'Другое гражданство'],
+  labels: mergeArrays(['Граждане РФ', 'Граждане РК', 'Другое гражданство'], getPercent(listCitizenship)),
   datasets: [
     {
       label: 'Количество детей по гражданству',
@@ -143,8 +144,29 @@
 };
 
 
+function getPercent(array) {
+    // Вычисляем сумму всех элементов исходного массива
+    var sum = array.reduce(function(total, value) {
+        return total + value;
+    }, 0);
 
+    // Создаем новый массив с процентным представлением элементов (округленными до целых процентов)
+    return array.map(function(value) {
+        var percent = Math.round((value / sum) * 100); // Округляем процентное значение до целого числа
+        return percent + '%'; // Добавляем знак процента
+    });
+}
 
+function mergeArrays(array1, array2) {
+  var mergedArray = [];
+
+  for (var i = 0; i < array1.length; i++) {
+    var mergedElement = array1[i] + ' - ' + array2[i];
+    mergedArray.push(mergedElement);
+  }
+
+  return mergedArray;
+}
 
 ////опции для 2 диаграммы
 //const optionsCitizenship = {
@@ -182,7 +204,7 @@ const chartByCitizenship = new Chart(
 
 // Данные для третей диаграммы (количество достижений по направлениям)
       const dataByDost = {
-        labels: listNapr,
+        labels: mergeArrays(listNapr, getPercent(listDostNum)),
         datasets: [
           {
             label: 'Количество достижений по направлениям',
@@ -393,6 +415,7 @@ worksheet.eachRow({ min: startRow, max: endRow }, row => {
   totalLabelCell.value = 'Итого';
   totalLabelCell.font = { name: 'Times New Roman', size: 12, bold: true };
 
+
   // Подсчет сумм столбцов C, D, E, F, G, H
   const sumFormula = `SUM(C10:C${tableRows.length + 9})`; // Формула суммы для столбца C
   const sumCell = totalRow.getCell(3); // Столбец C
@@ -433,11 +456,11 @@ for (let row = 9; row <= 10 + tableRows.length; row++) {
   titleCell.value = 'СПРАВКА';
   titleCell.font = { name: 'Times New Roman', size: 12, bold: true };
   titleCell.alignment = { horizontal: 'center' };
-
-// Добавление строки "Итого"
+  worksheet.addRow([]);
   const toRow = worksheet.addRow([]);
-  const toLabelCell = totalRow.getCell(2); // Столбец B
-  toLabelCell.value = 'Итого';
+  const toLabelCell = toRow.getCell(2); // Столбец B
+  const fio = document.getElementById('userfio').innerHTML;
+  toLabelCell.value = '____________________ '+fio+'  '+today();
   toLabelCell.font = { name: 'Times New Roman', size: 12, bold: true };
 
   // Генерация Excel-документа
@@ -483,6 +506,14 @@ function getColumnLetter(columnIndex) {
   const letter = alphabet[letterIndex];
   const repeatCount = Math.floor((columnIndex - 1) / 26);
   return repeatCount > 0 ? `${alphabet[repeatCount - 1]}${letter}` : letter;
+}
+
+function today(){
+    var today = new Date();
+    var day = String(today.getDate()).padStart(2, '0');
+    var month = String(today.getMonth() + 1).padStart(2, '0');
+    var year = today.getFullYear();
+    return day + '.' + month + '.' + year;
 }
 </script>
 

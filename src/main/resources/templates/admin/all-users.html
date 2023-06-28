@@ -29,14 +29,14 @@
             </div>
         </div>
         <div class="col-md-4">
-            <h4>Воспитанники</h4>
+            <h4>Законные представители</h4>
             <div th:each="el : ${kUsers}" class="alert alert-warning mt-2">
                 <h3 th:text="${el.username}"/>
                 <a th:href="'/admin/all-users/user-details/' + ${el.id}" class="btn btn-warning">Детальнее</a>
             </div>
         </div>
         <div class="col-md-4">
-            <h4>Специалисты</h4>
+            <h4>Работники</h4>
             <div th:each="el : ${oUsers}" class="alert alert-secondary mt-2">
                 <h3 th:text="${el.username}"/>
                 <a th:href="'/admin/all-users/user-details/' + ${el.id}" class="btn btn-warning">Детальнее</a>

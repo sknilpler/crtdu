@@ -51,18 +51,26 @@
 
 
 
+
+
     </style>
 </head>
 
 <body>
 <header sec:authorize="!hasRole('ROLE_TEACHER') && !hasRole('ROLE_KID')" th:insert="blocks/header :: header"></header>
 <header sec:authorize="hasRole('ROLE_TEACHER') || hasRole('ROLE_KID')" th:insert="blocks/header2 :: header2"></header>
-<div class="container-fluid">
+<div class="container-fluid" id="toPDF">
     <div class="row">
         <div class="col-md-10">
             <h2 id="scheduleTitle"></h2>
         </div>
-        <div class="col-md-2 text-md-end">
+        <div class="col-md-2 text-md-end" data-html2canvas-ignore="true">
+            <button class="btn btn-outline-success" id="export" title="Экспорт расписания в PDF" onclick="print()">
+                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
+                    <!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+                    <path d="M48 96V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V170.5c0-4.2-1.7-8.3-4.7-11.3l33.9-33.9c12 12 18.7 28.3 18.7 45.3V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H309.5c17 0 33.3 6.7 45.3 18.7l74.5 74.5-33.9 33.9L320.8 84.7c-.3-.3-.5-.5-.8-.8V184c0 13.3-10.7 24-24 24H104c-13.3 0-24-10.7-24-24V80H64c-8.8 0-16 7.2-16 16zm80-16v80H272V80H128zm32 240a64 64 0 1 1 128 0 64 64 0 1 1 -128 0z"/>
+                </svg>
+            </button>
             <a class="btn btn-outline-warning" id="export-btn" href="/spec/raspisanie/create"
                title="Обновить расписание" sec:authorize="hasRole('ROLE_ADMIN')">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"
@@ -110,7 +118,7 @@
                             </p>
                             <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.monday}"></p>
                         </div>
-                        <div th:if="${r.monday==''}">
+                        <div th:if="${r.monday==''}" data-html2canvas-ignore="true">
                             <button type="button" class="btn btn-outline-secondary"
                                     sec:authorize="hasRole('ROLE_ADMIN')"
                                     th:onclick="'javascript:modalNewMonday(\'' + ${r.id} + '\');'">
@@ -135,7 +143,7 @@
                             </p>
                             <p sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${r.tuesday}"></p>
                         </div>
-                        <div th:if="${r.tuesday==''}">
+                        <div th:if="${r.tuesday==''}" data-html2canvas-ignore="true">
                             <button type="button" class="btn btn-outline-secondary"
                                     sec:authorize="hasRole('ROLE_ADMIN')"
                                     th:onclick="'javascript:modalNewTuesday(\'' + ${r.id} + '\');'">
@@ -150,7 +158,7 @@
                 </td>
                 <td>
                     <div class="text-center">
-                        <div th:if="${r.wednesday == ''}">
+                        <div th:if="${r.wednesday == ''}" data-html2canvas-ignore="true">
                             <button type="button" class="btn btn-outline-secondary"
                                     sec:authorize="hasRole('ROLE_ADMIN')"
                                     th:onclick="'javascript:modalNewWednesday(\'' + ${r.id} + '\');'">
@@ -175,7 +183,7 @@
                 </td>
                 <td>
                     <div class="text-center">
-                        <div th:if="${r.thursday == ''}">
+                        <div th:if="${r.thursday == ''}" data-html2canvas-ignore="true">
                             <button type="button" class="btn btn-outline-secondary"
                                     sec:authorize="hasRole('ROLE_ADMIN')"
                                     th:onclick="'javascript:modalNewThursday(\'' + ${r.id} + '\');'">
@@ -200,7 +208,7 @@
                 </td>
                 <td>
                     <div class="text-center">
-                        <div th:if="${r.friday == ''}">
+                        <div th:if="${r.friday == ''}" data-html2canvas-ignore="true">
                             <button type="button" class="btn btn-outline-secondary"
                                     sec:authorize="hasRole('ROLE_ADMIN')"
                                     th:onclick="'javascript:modalNewFriday(\'' + ${r.id} + '\');'">
@@ -225,7 +233,7 @@
                 </td>
                 <td>
                     <div class="text-center">
-                        <div th:if="${r.saturday == ''}">
+                        <div th:if="${r.saturday == ''}" data-html2canvas-ignore="true">
                             <button type="button" class="btn btn-outline-secondary"
                                     sec:authorize="hasRole('ROLE_ADMIN')"
                                     th:onclick="'javascript:modalNewSaturday(\'' + ${r.id} + '\');'">
@@ -250,7 +258,7 @@
                 </td>
                 <td>
                     <div class="text-center">
-                        <div th:if="${r.sunday == ''}">
+                        <div th:if="${r.sunday == ''}" data-html2canvas-ignore="true">
                             <button type="button" class="btn btn-outline-secondary"
                                     sec:authorize="hasRole('ROLE_ADMIN')"
                                     th:onclick="'javascript:modalNewSunday(\'' + ${r.id} + '\');'">
@@ -279,7 +287,7 @@
     </div>
 </div>
 <!-- Modal window for add new time -->
-<div class="modal fade" id="add-rasp-modal">
+<div class="modal fade" id="add-rasp-modal" data-html2canvas-ignore="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -312,7 +320,7 @@
     </div>
 </div>
 <!-- Modal window for edit time -->
-<div class="modal-edit-time" th:fragment="modal-edit-time">
+<div class="modal-edit-time" th:fragment="modal-edit-time" data-html2canvas-ignore="true">
     <div class="modal fade" id="edit-rasp-modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -349,7 +357,7 @@
         </div>
     </div>
 </div>
-<div class="modal-warning1" th:fragment="modal-warning1">
+<div class="modal-warning1" th:fragment="modal-warning1" data-html2canvas-ignore="true">
     <div class="modal fade" id="warning-modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -360,7 +368,8 @@
                 <div class="modal-body">
 
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        <strong>Время занято!</strong> <br>Введенное Вами время пересекается с другими занятиями. <br>Выберите другой временной диапазон.
+                        <strong>Время занято!</strong> <br>Введенное Вами время пересекается с другими занятиями. <br>Выберите
+                        другой временной диапазон.
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -371,7 +380,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="warning-modal2">
+<div class="modal fade" id="warning-modal2" data-html2canvas-ignore="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -381,7 +390,8 @@
             <div class="modal-body">
 
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>Нерабочее время!</strong><br> Введенный Вами временной диапазон попадает на нерабочие часы преподавателя. <br>Введите другое время или измените график работы преподавателя.
+                    <strong>Нерабочее время!</strong><br> Введенный Вами временной диапазон попадает на нерабочие часы
+                    преподавателя. <br>Введите другое время или измените график работы преподавателя.
                 </div>
             </div>
             <div class="modal-footer">
@@ -393,206 +403,203 @@
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/theme.js"></script>
 <script src="/js/jquery.min.js"></script>
+<script src="/js/html2pdf.bundle.js"></script>
 <script>
-//const header = document.getElementById("header");
-//header.addEventListener("mousemove", (e) => {
-//  const x = e.clientX / window.innerWidth;
-//  const y = e.clientY / window.innerHeight;
-//  header.style.backgroundPosition = `${x * 100}% ${y * 100}%`;
-//});
-
 // Получаем текущую дату
-    var currentDate = new Date();
+var currentDate = new Date();
 
-    // Получаем номер текущего месяца (0 - январь, 1 - февраль, и т.д.)
-    var currentMonth = currentDate.getMonth();
+// Получаем номер текущего месяца (0 - январь, 1 - февраль, и т.д.)
+var currentMonth = currentDate.getMonth();
 
-    // Получаем текущий год
-    var currentYear = currentDate.getFullYear();
+// Получаем текущий год
+var currentYear = currentDate.getFullYear();
 
-    // Создаем новый объект Date, устанавливая его на 1 число текущего месяца
-    var firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+// Создаем новый объект Date, устанавливая его на 1 число текущего месяца
+var firstDayOfMonth = new Date(currentYear, currentMonth, 1);
 
-    // Получаем день недели первого дня месяца (0 - воскресенье, 1 - понедельник, и т.д.)
-    var firstDayOfWeek = firstDayOfMonth.getDay();
+// Получаем день недели первого дня месяца (0 - воскресенье, 1 - понедельник, и т.д.)
+var firstDayOfWeek = firstDayOfMonth.getDay();
 
-    // Вычисляем текущий день в месяце
-    var currentDay = currentDate.getDate();
+// Вычисляем текущий день в месяце
+var currentDay = currentDate.getDate();
 
-    // Вычисляем номер недели в текущем месяце
-    var currentWeek = Math.ceil((currentDay + firstDayOfWeek) / 7);
+// Вычисляем номер недели в текущем месяце
+var currentWeek = Math.ceil((currentDay + firstDayOfWeek) / 7);
 
-    // Формируем текст для вставки в элемент h2
-    var scheduleText = "Расписание занятий по дням недели за " + getMonthName(currentMonth) + " " + currentYear + " г.";
+// Формируем текст для вставки в элемент h2
+var scheduleText = "Расписание занятий по дням недели за " + getMonthName(currentMonth) + " " + currentYear + " г";
 
-    // Находим элемент h2 по его id
-    var scheduleTitleElement = document.getElementById("scheduleTitle");
+// Находим элемент h2 по его id
+var scheduleTitleElement = document.getElementById("scheduleTitle");
 
-    // Вставляем сформированный текст в элемент h2
-    scheduleTitleElement.innerText = scheduleText;
+// Вставляем сформированный текст в элемент h2
+scheduleTitleElement.innerText = scheduleText;
 
-    // Функция для получения названия месяца по его номеру
-    function getMonthName(monthNumber) {
-        var months = [
-            "январь", "февраль", "март", "апрель", "май", "июнь", "июль",
-            "август", "сентябрь", "октябрь", "ноябрь", "декабрь"
-        ];
+// Функция для получения названия месяца по его номеру
+function getMonthName(monthNumber) {
+    var months = [
+        "январь", "февраль", "март", "апрель", "май", "июнь", "июль",
+        "август", "сентябрь", "октябрь", "ноябрь", "декабрь"
+    ];
 
-        return months[monthNumber];
-    }
+    return months[monthNumber];
+}
 
 
 var dayOfWeek;
 var id_rasp;
 
-function modalNewMonday(id){
+function modalNewMonday(id) {
     dayOfWeek = "Понедельник";
     id_rasp = id;
     $('#add-rasp-modal').modal('show');
 }
-function modalNewTuesday(id){
+
+function modalNewTuesday(id) {
     dayOfWeek = "Вторник";
     id_rasp = id;
     $('#add-rasp-modal').modal('show');
 }
-function modalNewWednesday(id){
+
+function modalNewWednesday(id) {
     dayOfWeek = "Среда";
     id_rasp = id;
     $('#add-rasp-modal').modal('show');
 }
-function modalNewThursday(id){
+
+function modalNewThursday(id) {
     dayOfWeek = "Четверг";
     id_rasp = id;
     $('#add-rasp-modal').modal('show');
 }
-function modalNewFriday(id){
+
+function modalNewFriday(id) {
     dayOfWeek = "Пятница";
     id_rasp = id;
     $('#add-rasp-modal').modal('show');
 }
-function modalNewSaturday(id){
+
+function modalNewSaturday(id) {
     dayOfWeek = "Суббота";
     id_rasp = id;
     $('#add-rasp-modal').modal('show');
 }
-function modalNewSunday(id){
+
+function modalNewSunday(id) {
     dayOfWeek = "Воскресенье";
     id_rasp = id;
     $('#add-rasp-modal').modal('show');
 }
 
 
-function modalMonday(id){
+function modalMonday(id) {
     dayOfWeek = "Понедельник";
     id_rasp = id;
     $.ajax({
-		type: 'get',
-		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
-		success: function(data) {
-			$('.modal-edit-time').html(data);
-			$('#edit-rasp-modal').modal('show');
-		},
-	})
+        type: 'get',
+        url: '/spec/raspisanie/edit-modal/' + id_rasp + '/' + dayOfWeek,
+        success: function(data) {
+            $('.modal-edit-time').html(data);
+            $('#edit-rasp-modal').modal('show');
+        },
+    })
 }
-function modalTuesday(id){
+
+function modalTuesday(id) {
     dayOfWeek = "Вторник";
     id_rasp = id;
     $.ajax({
-		type: 'get',
-		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
-		success: function(data) {
-			$('.modal-edit-time').html(data);
-			$('#edit-rasp-modal').modal('show');
-		},
-	})
+        type: 'get',
+        url: '/spec/raspisanie/edit-modal/' + id_rasp + '/' + dayOfWeek,
+        success: function(data) {
+            $('.modal-edit-time').html(data);
+            $('#edit-rasp-modal').modal('show');
+        },
+    })
 }
-function modalWednesday(id){
+
+function modalWednesday(id) {
     dayOfWeek = "Среда";
     id_rasp = id;
     $.ajax({
-		type: 'get',
-		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
-		success: function(data) {
-			$('.modal-edit-time').html(data);
-			$('#edit-rasp-modal').modal('show');
-		},
-	})
+        type: 'get',
+        url: '/spec/raspisanie/edit-modal/' + id_rasp + '/' + dayOfWeek,
+        success: function(data) {
+            $('.modal-edit-time').html(data);
+            $('#edit-rasp-modal').modal('show');
+        },
+    })
 }
-function modalThursday(id){
+
+function modalThursday(id) {
     dayOfWeek = "Четверг";
     id_rasp = id;
     $.ajax({
-		type: 'get',
-		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
-		success: function(data) {
-			$('.modal-edit-time').html(data);
-			$('#edit-rasp-modal').modal('show');
-		},
-	})
+        type: 'get',
+        url: '/spec/raspisanie/edit-modal/' + id_rasp + '/' + dayOfWeek,
+        success: function(data) {
+            $('.modal-edit-time').html(data);
+            $('#edit-rasp-modal').modal('show');
+        },
+    })
 }
-function modalFriday(id){
+
+function modalFriday(id) {
     dayOfWeek = "Пятница";
     id_rasp = id;
     $.ajax({
-		type: 'get',
-		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
-		success: function(data) {
-			$('.modal-edit-time').html(data);
-			$('#edit-rasp-modal').modal('show');
-		},
-	})
+        type: 'get',
+        url: '/spec/raspisanie/edit-modal/' + id_rasp + '/' + dayOfWeek,
+        success: function(data) {
+            $('.modal-edit-time').html(data);
+            $('#edit-rasp-modal').modal('show');
+        },
+    })
 }
-function modalSaturday(id){
+
+function modalSaturday(id) {
     dayOfWeek = "Суббота";
     id_rasp = id;
     $.ajax({
-		type: 'get',
-		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
-		success: function(data) {
-			$('.modal-edit-time').html(data);
-			$('#edit-rasp-modal').modal('show');
-		},
-	})
+        type: 'get',
+        url: '/spec/raspisanie/edit-modal/' + id_rasp + '/' + dayOfWeek,
+        success: function(data) {
+            $('.modal-edit-time').html(data);
+            $('#edit-rasp-modal').modal('show');
+        },
+    })
 }
 
-function modalSunday(id){
+function modalSunday(id) {
     dayOfWeek = "Воскресенье";
     id_rasp = id;
     $.ajax({
-		type: 'get',
-		url: '/spec/raspisanie/edit-modal/' + id_rasp+'/'+dayOfWeek,
-		success: function(data) {
-			$('.modal-edit-time').html(data);
-			$('#edit-rasp-modal').modal('show');
-		},
-	})
+        type: 'get',
+        url: '/spec/raspisanie/edit-modal/' + id_rasp + '/' + dayOfWeek,
+        success: function(data) {
+            $('.modal-edit-time').html(data);
+            $('#edit-rasp-modal').modal('show');
+        },
+    })
 }
 
-function saveNewTime(){
+function saveNewTime() {
     var startTime = document.getElementById("startTime").value;
     var endTime = document.getElementById("endTime").value;
 
-	post('/spec/raspisanie/add/' + id_rasp+'/'+dayOfWeek+'/'+startTime+'/'+endTime);
+    post('/spec/raspisanie/add/' + id_rasp + '/' + dayOfWeek + '/' + startTime + '/' + endTime);
 
 }
 
-//function saveEditTime(){
-//    var startTimeE = document.getElementById("startTimeE").value;
-//    var endTimeE = document.getElementById("endTimeE").value;
-//
-//	post('/spec/raspisanie/edit/' + id_rasp+'/'+dayOfWeek+'/'+startTimeE+'/'+endTimeE);
-//
-//}
+function saveEditTime() {
+    var startTimeE = document.getElementById("startTimeE").value;
+    var endTimeE = document.getElementById("endTimeE").value;
 
-function saveEditTime(){
-        var startTimeE = document.getElementById("startTimeE").value;
-        var endTimeE = document.getElementById("endTimeE").value;
-
-        $.ajax({
-		type: 'post',
-		url: '/spec/raspisanie/edit/' + id_rasp+'/'+dayOfWeek+'/'+startTimeE+'/'+endTimeE,
-		success: function(data) {
-		    console.log(data);
+    $.ajax({
+        type: 'post',
+        url: '/spec/raspisanie/edit/' + id_rasp + '/' + dayOfWeek + '/' + startTimeE + '/' + endTimeE,
+        success: function(data) {
+            console.log(data);
             if (data == 3) {
                 $('#warning-modal').modal('show');
             }
@@ -603,154 +610,202 @@ function saveEditTime(){
                 window.location.href = '/';
             }
         },
-	})
+    })
 }
 
-function delTime(){
-	post('/spec/raspisanie/delete/' + id_rasp+'/'+dayOfWeek);
+function delTime() {
+    post('/spec/raspisanie/delete/' + id_rasp + '/' + dayOfWeek);
 }
 
 function post(path, method = 'post') {
-	const form = document.createElement('form');
-	form.method = method;
-	form.action = path;
-	const hiddenField = document.createElement('input');
-	hiddenField.type = 'hidden';
-	form.appendChild(hiddenField);
-	document.body.appendChild(form);
-	form.submit();
+    const form = document.createElement('form');
+    form.method = method;
+    form.action = path;
+    const hiddenField = document.createElement('input');
+    hiddenField.type = 'hidden';
+    form.appendChild(hiddenField);
+    document.body.appendChild(form);
+    form.submit();
 }
 
 
 // Добавление класса highlight к ячейке при наведении на неё мыши
-  var tds = document.getElementsByTagName("td");
-  for (var i = 0; i < tds.length; i++) {
+var tds = document.getElementsByTagName("td");
+for (var i = 0; i < tds.length; i++) {
     tds[i].addEventListener("mouseover", function() {
-      this.classList.add("highlight");
-      var colIndex = this.cellIndex;
-      var rows = document.getElementsByTagName("tr");
-      for (var j = 0; j < rows.length; j++) {
-        rows[j].getElementsByTagName("td")[colIndex].classList.add("highlight");
-      }
+        this.classList.add("highlight");
+        var colIndex = this.cellIndex;
+        var rows = document.getElementsByTagName("tr");
+        for (var j = 0; j < rows.length; j++) {
+            rows[j].getElementsByTagName("td")[colIndex].classList.add("highlight");
+        }
     });
     tds[i].addEventListener("mouseout", function() {
-      this.classList.remove("highlight");
-      var colIndex = this.cellIndex;
-      var rows = document.getElementsByTagName("tr");
-      for (var j = 0; j < rows.length; j++) {
-        rows[j].getElementsByTagName("td")[colIndex].classList.remove("highlight");
-      }
+        this.classList.remove("highlight");
+        var colIndex = this.cellIndex;
+        var rows = document.getElementsByTagName("tr");
+        for (var j = 0; j < rows.length; j++) {
+            rows[j].getElementsByTagName("td")[colIndex].classList.remove("highlight");
+        }
     });
-  }
+}
 ///////////////////////////////////
 
 function updateEndTimeE() {
-        var startTimeInput = document.getElementById("startTimeE");
-        var endTimeInput = document.getElementById("endTimeE");
+    var startTimeInput = document.getElementById("startTimeE");
+    var endTimeInput = document.getElementById("endTimeE");
 
-        var startTime = startTimeInput.value.split(":");
-        var endTime = endTimeInput.value.split(":");
+    var startTime = startTimeInput.value.split(":");
+    var endTime = endTimeInput.value.split(":");
 
-        var startHour = parseInt(startTime[0]);
-        var endHour = parseInt(endTime[0]);
+    var startHour = parseInt(startTime[0]);
+    var endHour = parseInt(endTime[0]);
 
-        // Проверяем, если выбранное время второго поля меньше времени первого поля, обновляем его
-        if (endHour <= startHour) {
-            endHour = startHour + 1;
+    // Проверяем, если выбранное время второго поля меньше времени первого поля, обновляем его
+    if (endHour <= startHour) {
+        endHour = startHour + 1;
 
-            // Устанавливаем новое значение для второго поля
-            endTimeInput.value = padZero(endHour) + ":" + startTime[1];
-        }
-
-        // Обновляем атрибут min для запрета выбора времени меньше, чем в первом поле
-        endTimeInput.min = startTimeInput.value;
+        // Устанавливаем новое значение для второго поля
+        endTimeInput.value = padZero(endHour) + ":" + startTime[1];
     }
 
-    function padZero(number) {
-        // Функция добавляет ведущий ноль, если число меньше 10
-        return (number < 10) ? "0" + number : number;
+    // Обновляем атрибут min для запрета выбора времени меньше, чем в первом поле
+    endTimeInput.min = startTimeInput.value;
+}
+
+function padZero(number) {
+    // Функция добавляет ведущий ноль, если число меньше 10
+    return (number < 10) ? "0" + number : number;
+}
+
+function validateEndTimeE() {
+    var startTimeInput = document.getElementById("startTimeE");
+    var endTimeInput = document.getElementById("endTimeE");
+
+    // Если выбранное время второго поля меньше времени первого поля, устанавливаем его равным времени первого поля
+    if (endTimeInput.value <= startTimeInput.value) {
+        updateEndTimeE();
+    }
+}
+
+function updateEndTime() {
+    var startTimeInput = document.getElementById("startTime");
+    var endTimeInput = document.getElementById("endTime");
+
+    var startTime = startTimeInput.value.split(":");
+    var endTime = endTimeInput.value.split(":");
+
+    var startHour = parseInt(startTime[0]);
+    var endHour = parseInt(endTime[0]);
+
+    // Проверяем, если выбранное время второго поля меньше времени первого поля, обновляем его
+    if (endHour <= startHour) {
+        endHour = startHour + 1;
+
+        // Устанавливаем новое значение для второго поля
+        endTimeInput.value = padZero(endHour) + ":" + startTime[1];
     }
 
-    function validateEndTimeE() {
-        var startTimeInput = document.getElementById("startTimeE");
-        var endTimeInput = document.getElementById("endTimeE");
+    // Обновляем атрибут min для запрета выбора времени меньше, чем в первом поле
+    endTimeInput.min = startTimeInput.value;
+}
 
-        // Если выбранное время второго поля меньше времени первого поля, устанавливаем его равным времени первого поля
-        if (endTimeInput.value <= startTimeInput.value) {
-            updateEndTime();
-        }
+function validateEndTime() {
+    var startTimeInput = document.getElementById("startTime");
+    var endTimeInput = document.getElementById("endTime");
+
+    // Если выбранное время второго поля меньше времени первого поля, устанавливаем его равным времени первого поля
+    if (endTimeInput.value <= startTimeInput.value) {
+        updateEndTime();
     }
+}
 
-    function updateEndTime() {
-        var startTimeInput = document.getElementById("startTime");
-        var endTimeInput = document.getElementById("endTime");
+/////////////////////////////
 
-        var startTime = startTimeInput.value.split(":");
-        var endTime = endTimeInput.value.split(":");
+// JavaScript код
+var weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+var today = new Date();
+var currentDay = today.getDay(); // Получаем номер текущего дня недели (0 - Воскресенье, 1 - Понедельник, и т.д.)
+var mondayOffset = currentDay > 0 ? -currentDay + 1 : -6; // Вычисляем смещение для понедельника
 
-        var startHour = parseInt(startTime[0]);
-        var endHour = parseInt(endTime[0]);
+// Обновляем заголовки таблицы с наименованием объединения, днями недели и датами
+var table = document.getElementById('rasp');
+var thElements = table.getElementsByTagName('th');
 
-        // Проверяем, если выбранное время второго поля меньше времени первого поля, обновляем его
-        if (endHour <= startHour) {
-            endHour = startHour + 1;
+// Обновляем наименование объединения
+thElements[0].innerHTML = 'Наименование объединения';
 
-            // Устанавливаем новое значение для второго поля
-            endTimeInput.value = padZero(endHour) + ":" + startTime[1];
-        }
-
-        // Обновляем атрибут min для запрета выбора времени меньше, чем в первом поле
-        endTimeInput.min = startTimeInput.value;
-    }
-
-    function validateEndTime() {
-        var startTimeInput = document.getElementById("startTime");
-        var endTimeInput = document.getElementById("endTime");
-
-        // Если выбранное время второго поля меньше времени первого поля, устанавливаем его равным времени первого поля
-        if (endTimeInput.value <= startTimeInput.value) {
-            updateEndTime();
-        }
-    }
-
-    /////////////////////////////
-
- // JavaScript код
-  var weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  var today = new Date();
-  var currentDay = today.getDay(); // Получаем номер текущего дня недели (0 - Воскресенье, 1 - Понедельник, и т.д.)
-  var mondayOffset = currentDay > 0 ? -currentDay + 1 : -6; // Вычисляем смещение для понедельника
-
-  // Обновляем заголовки таблицы с наименованием объединения, днями недели и датами
-  var table = document.getElementById('rasp');
-  var thElements = table.getElementsByTagName('th');
-
-  // Обновляем наименование объединения
-  thElements[0].innerHTML = 'Наименование объединения';
-
-  for (var i = 1; i < 8; i++) {
+for (var i = 1; i < 8; i++) {
     var th = thElements[i];
     var dayIndex = (currentDay + i - 1) % 7; // Индекс дня недели (0 - Понедельник, 1 - Вторник, и т.д.)
     var date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + mondayOffset + i - 1);
-    var formattedDate = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'numeric' });
-    th.innerHTML = weekdays[i-1] + ' ' + formattedDate;
+    var formattedDate = date.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'numeric'
+    });
+    th.innerHTML = weekdays[i - 1] + ' ' + formattedDate;
 
 
-  }
+}
 
 // Определяем индекс столбца с текущей датой
-  var columnIdx = currentDay;
+var columnIdx = currentDay;
 
-  // Выделяем столбец с текущей датой зеленым цветом
-  var tdElements = table.getElementsByTagName('td');
+// Выделяем столбец с текущей датой зеленым цветом
+var tdElements = table.getElementsByTagName('td');
 
-  // Выделяем заголовок столбца
-  thElements[columnIdx].style.backgroundColor = 'LightGreen';
+// Выделяем заголовок столбца
+thElements[columnIdx].style.backgroundColor = 'LightGreen';
 
-  // Выделяем ячейки в столбце
-  for (var i = columnIdx; i < tdElements.length; i += thElements.length) {
+// Выделяем ячейки в столбце
+for (var i = columnIdx; i < tdElements.length; i += thElements.length) {
     tdElements[i].style.backgroundColor = 'LightGreen';
-  }
+}
+
+
+function print() {
+    // Выделяем заголовок столбца
+    thElements[columnIdx].style.backgroundColor = null;
+
+    // Выделяем ячейки в столбце
+    for (var i = columnIdx; i < tdElements.length; i += thElements.length) {
+        tdElements[i].style.backgroundColor = null;
+    }
+
+
+    const element = document.getElementById('toPDF');
+
+    var opt = {
+        margin: 0,
+        filename: scheduleText + '.pdf',
+        image: {
+            type: 'jpeg',
+            quality: 0.98
+        },
+        html2canvas: {
+            scale: 4
+        },
+        jsPDF: {
+            unit: 'in',
+            format: 'letter',
+            orientation: 'landscape'
+        },
+        backgroundColor: null
+    };
+
+    // New Promise-based usage:
+    html2pdf().set(opt).from(element).save();
+
+    setTimeout(function() {
+        // Выделяем заголовок столбца
+        thElements[columnIdx].style.backgroundColor = 'LightGreen';
+        // Выделяем ячейки в столбце
+        for (var i = columnIdx; i < tdElements.length; i += thElements.length) {
+            tdElements[i].style.backgroundColor = 'LightGreen';
+        }
+    }, 2000);
+}
+
 
 </script>
 </body>

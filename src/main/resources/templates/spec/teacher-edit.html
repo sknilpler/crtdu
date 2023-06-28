@@ -140,6 +140,7 @@ function save(id) {
             var staj = document.getElementById("staj").value;
             var stajSpec = document.getElementById("stajSpec").value;
             var dopInfo = document.getElementById("dopInfo").value;
+            if (dopInfo == "") dopInfo = "-";
 
 	post('/spec/list-teachers/edit/' + id + '/' + surname + '/' + name + '/' + patronymic + '/' + doljnost +'/'+napravlenie+'/'+kvalif+'/'+staj+'/'+stajSpec+'/'+dopInfo);
 }

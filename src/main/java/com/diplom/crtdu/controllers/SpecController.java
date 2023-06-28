@@ -695,6 +695,7 @@ public class SpecController {
         model.addAttribute("merop", m);
         model.addAttribute("meropriyaties", meropriyatieRepository.findAll());
         model.addAttribute("kids", kidRepository.findAll());
+        model.addAttribute("krujki", krujokRepository.findAll());
         model.addAttribute("teachers", teacherRepository.findAll());
         return "spec/dost-add";
     }
@@ -728,6 +729,7 @@ public class SpecController {
         model.addAttribute("merop", m);
         model.addAttribute("meropriyaties", meropriyatieRepository.findAll());
         model.addAttribute("kids", kidRepository.findAll());
+        model.addAttribute("krujki", krujokRepository.findAll());
         model.addAttribute("teachers", teacherRepository.findAll());
         return "spec/dost-add";
     }
@@ -1296,7 +1298,8 @@ public class SpecController {
         List<Parents> parents = parentsRepository.findByKidsId(id);
         List<Dostijenie> dostijenies = dostijenieRepository.findByKidId(id);
         List<Krujok> krujoks = krujokRepository.findByKidId(id);
-        Map<String, Integer> marks = new HashMap<>();
+        // Map<String, Integer> marks = new HashMap<>();
+        List<KrujokPosechenie> marks = new ArrayList<>();
         List<String> dates = new ArrayList<>();
         List<String> subjects = new ArrayList<>();
         List<List<Integer>> g = new ArrayList<>();
@@ -1304,6 +1307,7 @@ public class SpecController {
         AtomicReference<Double> summ = new AtomicReference<>(0.0);
         krujoks.forEach(krujok -> {
             List<KidZanyatie> kidZanyaties = kidZanyatieRepository.findByKidIdAndKrujokId(id, krujok.getId());
+            summ.set(0.0);
             double size = 0.0;
             for (KidZanyatie zanyatie : kidZanyaties) {
                 size = size + 1.0;
@@ -1312,7 +1316,7 @@ public class SpecController {
                 }
             }
             double average = size > 0 ? summ.get() / size : 0.0;
-            marks.put(krujok.getName(), (int) (average * 100));
+            marks.add(new KrujokPosechenie(krujok.getId(), krujok.getName(), (int) (average * 100)));
 
         });
 
@@ -1453,31 +1457,6 @@ public class SpecController {
         model.addAttribute("posesheniya", (int) posesheniya);
         model.addAttribute("ball", ball + (int) posesheniya);
 
-//        // Определение размеров двумерного массива
-//        int rowCount = g.size();
-//        int colCount = 0;
-//
-//// Нахождение максимальной длины внутренних списков
-//        for (List<Integer> row : g) {
-//            colCount = Math.max(colCount, row.size());
-//        }
-//
-//// Создание и заполнение двумерного массива
-//        int[][] grades = new int[rowCount][colCount];
-//        for (int i = 0; i < rowCount; i++) {
-//
-//            List<Integer> row = g.get(i);
-//            for (int j = 0; j < row.size(); j++) {
-//                grades[i][j] = row.get(j);
-//            }
-//        }
-//        int[] dates = new int[colCount];
-//        for (int i = 0; i < colCount; i++) {
-//            dates[i] = i + 1;
-//        }
-//        String[] subjects = s.toArray(new String[0]);
-
-
 // Передача строк JSON в модель
         model.addAttribute("dates", dates);
         model.addAttribute("subjects", subjects);
@@ -1487,12 +1466,163 @@ public class SpecController {
         model.addAttribute("parents", parents);
         model.addAttribute("dost", dostijenies);
         model.addAttribute("marks", marks);
-        model.addAttribute("krujki", StreamSupport.stream(krujokRepository.findAll().spliterator(), false)
+        // Создание объекта SimpleDateFormat с требуемым форматом
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        // Преобразование Date в строку
+        String formattedDate = sdf.format(k.getBirthday());
+        model.addAttribute("krujki", krujokRepository.findAllByOrderByCreativeAssociationNameAndKrujokNameBiKidBirthday(formattedDate).stream()
                 .filter(item -> !krujoks.contains(item))
                 .collect(Collectors.toList()));
         model.addAttribute("kr", krujoks);
         model.addAttribute("merops", uchastniks);
         return "spec/portfolio";
+    }
+
+    @GetMapping("/spec/portfolio/update-graf/{id}")
+    public ResponseEntity<PortfolioGrafik> updateGrafikByKrujok(@PathVariable("id") long id, Model model) {
+        List<Dostijenie> dostijenies = dostijenieRepository.findByKidId(portfolioKidId);
+        List<String> dates = new ArrayList<>();
+        List<String> subjects = new ArrayList<>();
+        List<List<Integer>> g = new ArrayList<>();
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
+
+        int ball = 0;
+        List<Integer> statBal = new ArrayList<>();
+        statBal.add(ball);
+        dates.add("0");
+        List<Uchastnik> uchastniks = uchastnikRepository.findByKidId(portfolioKidId);
+
+        for (Uchastnik u : uchastniks) {
+            StringBuilder action = new StringBuilder();
+            if (u.getKrujok().getId() == id) {
+                switch (u.getMeropriyatie().getLevel().getName()) {
+                    case "Международный":
+                        action.append("Участие");
+                        for (Dostijenie d : dostijenies) {
+                            if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                                switch (d.getWinPlace()) {
+                                    case "Первое":
+                                        ball = ball + 10;
+                                        action.append(", Место I");
+                                        break;
+                                    case "Второе":
+                                        ball = ball + 9;
+                                        action.append(", Место II");
+                                        break;
+                                    case "Третье":
+                                        ball = ball + 8;
+                                        action.append(", Место III");
+                                        break;
+                                }
+                            }
+                        }
+                        ball = ball + 5;
+                        break;
+                    case "Национальный":
+                        action.append("Участие");
+                        for (Dostijenie d : dostijenies) {
+                            if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                                switch (d.getWinPlace()) {
+                                    case "Первое":
+                                        ball = ball + 8;
+                                        action.append(", Место I");
+                                        break;
+                                    case "Второе":
+                                        ball = ball + 7;
+                                        action.append(", Место II");
+                                        break;
+                                    case "Третье":
+                                        ball = ball + 6;
+                                        action.append(", Место III");
+                                        break;
+                                }
+                            }
+                        }
+                        ball = ball + 5;
+                        break;
+                    case "Региональный":
+                        action.append("Участие");
+                        for (Dostijenie d : dostijenies) {
+                            if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                                switch (d.getWinPlace()) {
+                                    case "Первое":
+                                        ball = ball + 7;
+                                        action.append(", Место I");
+                                        break;
+                                    case "Второе":
+                                        ball = ball + 6;
+                                        action.append(", Место II");
+                                        break;
+                                    case "Третье":
+                                        ball = ball + 5;
+                                        action.append(", Место III");
+                                        break;
+                                }
+                            }
+                        }
+                        ball = ball + 4;
+                        break;
+                    case "Городской":
+                        action.append("Участие");
+                        for (Dostijenie d : dostijenies) {
+                            if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                                switch (d.getWinPlace()) {
+                                    case "Первое":
+                                        ball = ball + 6;
+                                        action.append(", Место I");
+                                        break;
+                                    case "Второе":
+                                        ball = ball + 5;
+                                        action.append(", Место II");
+                                        break;
+                                    case "Третье":
+                                        ball = ball + 4;
+                                        action.append(", Место III");
+                                        break;
+                                }
+                            }
+                        }
+                        ball = ball + 4;
+                        break;
+                    case "Районный":
+                        action.append("Участие");
+                        for (Dostijenie d : dostijenies) {
+                            if (Objects.equals(d.getMeropriyatie().getId(), u.getMeropriyatie().getId())) {
+                                switch (d.getWinPlace()) {
+                                    case "Первое":
+                                        ball = ball + 5;
+                                        action.append(", Место I");
+                                        break;
+                                    case "Второе":
+                                        ball = ball + 4;
+                                        action.append(", Место II");
+                                        break;
+                                    case "Третье":
+                                        ball = ball + 3;
+                                        action.append(", Место III");
+                                        break;
+                                }
+
+                            }
+                        }
+                        ball = ball + 2;
+                        break;
+                }
+
+                String strDate = dateFormat.format(u.getMeropriyatie().getData()) + " " + action;
+                dates.add(strDate);
+                statBal.add(ball);
+            }
+        }
+
+        subjects.add("Баллы");
+
+        // Передача строк JSON в модель
+        model.addAttribute("dates", dates);
+        model.addAttribute("subjects", subjects);
+        model.addAttribute("grades", statBal);
+
+        return ResponseEntity.ok(new PortfolioGrafik(dates,subjects,statBal));
     }
 
 
@@ -1505,10 +1635,15 @@ public class SpecController {
         kr.setKids(kids);
         krujokRepository.save(kr);
         log.warn("Saved new krujok-kid: {}", kr);
+        // Создание объекта SimpleDateFormat с требуемым форматом
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        // Преобразование Date в строку
+        String formattedDate = sdf.format(kid.getBirthday());
         List<Krujok> krujoks = krujokRepository.findByKidId(portfolioKidId);
-        model.addAttribute("krujki", StreamSupport.stream(krujokRepository.findAll().spliterator(), false)
+        List<Krujok> krujokList = krujokRepository.findAllByOrderByCreativeAssociationNameAndKrujokNameBiKidBirthday(formattedDate).stream()
                 .filter(item -> !krujoks.contains(item))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+        model.addAttribute("krujki", krujokList);
 
         return "spec/portfolio :: kruj-table";
     }
@@ -1542,7 +1677,10 @@ public class SpecController {
     //------------------------------- statistiks by kids ---------------------
 
     @GetMapping("/spec/stat-kids")
-    public String showDiagram(Model model) {
+    public String showDiagram(Model model, Authentication authentication) {
+
+        User user = userService.getUserByUsername(authentication.getName());
+        String userfio = user.getSurname() + " " + user.getName().charAt(0) + " " + user.getName().charAt(0);
 
         int kidRF = kidRepository.findByGrazhdanstvoAndArchive("РФ", false).size();
         int kidRK = kidRepository.findByGrazhdanstvoAndArchive("РК", false).size();
@@ -1671,11 +1809,14 @@ public class SpecController {
         model.addAttribute("arrNapr", arrNapr);
         model.addAttribute("labelNapr2", labelNapr2);
         model.addAttribute("numDost", numdost);
+        model.addAttribute("userfio", userfio);
         return "stat/stat-by-kids";
     }
 
     @GetMapping("/spec/stat-teacher")
-    public String showTeacherStat(Model model) {
+    public String showTeacherStat(Model model, Authentication authentication) {
+        User user = userService.getUserByUsername(authentication.getName());
+        String userfio = user.getSurname() + " " + user.getName().charAt(0) + " " + user.getName().charAt(0);
         int year = LocalDate.now().getYear(); // текущий год
         // дата 1 января текущего года
         String d1 = LocalDate.of(year, 1, 1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -1697,13 +1838,14 @@ public class SpecController {
                     Objects.requireNonNull(teacherRepository.findById(Long.parseLong(obj[0].toString())).orElse(null)).getKrujki().size()));
         }
         model.addAttribute("total", list);
+        model.addAttribute("userfio", userfio);
         return "stat/stat-by-teacher";
     }
 
     @GetMapping("/spec/stat-teacher/{d1}/{d2}")
-    public String filterTeacherStat(Model model, @PathVariable("d1") String d1,
+    public String filterTeacherStat(Model model,
+                                    @PathVariable("d1") String d1,
                                     @PathVariable("d2") String d2) {
-
         //таблица с подробными данными
         List<StatTeacher> list = new ArrayList<>();
 
@@ -1717,12 +1859,13 @@ public class SpecController {
                     Objects.requireNonNull(teacherRepository.findById(Long.parseLong(obj[0].toString())).orElse(null)).getKrujki().size()));
         }
         model.addAttribute("total", list);
-
         return "stat/stat-by-teacher :: table-stat";
     }
 
     @GetMapping("/spec/stat-merop")
-    public String getStatMerop(Model model) throws ParseException {
+    public String getStatMerop(Model model, Authentication authentication) throws ParseException {
+        User user = userService.getUserByUsername(authentication.getName());
+        String userfio = user.getSurname() + " " + user.getName().charAt(0) + " " + user.getName().charAt(0);
         int year = LocalDate.now().getYear(); // текущий год
         // дата 1 января текущего года
         String d1 = LocalDate.of(year, 1, 1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -1742,6 +1885,7 @@ public class SpecController {
                     Integer.parseInt(obj[7].toString()), Integer.parseInt(obj[8].toString())));
         }
         model.addAttribute("total", list);
+        model.addAttribute("userfio", userfio);
         return "stat/stat-by-merop";
     }
 
@@ -2022,7 +2166,7 @@ public class SpecController {
                                                 @PathVariable("endTimeE") String endTime) {
         System.out.println(startTime + "-" + endTime);
         Raspisanie r = raspisanieRepository.findById(id).orElse(null);
-        if (isWorkedTime(r.getTeacher(),dayOfWeek,startTime,endTime)){
+        if (isWorkedTime(r.getTeacher(), dayOfWeek, startTime, endTime)) {
             if (isFree(r, dayOfWeek, startTime, endTime)) {
                 switch (dayOfWeek) {
                     case "Понедельник":

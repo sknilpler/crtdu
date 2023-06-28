@@ -31,5 +31,11 @@ public interface KrujokRepository extends CrudRepository<Krujok,Long> {
     @Query(value = "select krujok.* from krujok where krujok.archive = false order by krujok.creative_association_id, krujok.name", nativeQuery = true)
     List<Krujok> findAllByOrderByCreativeAssociationNameAndKrujokName();
 
+    @Query(value = "SELECT *\n" +
+            "FROM krujok\n" +
+            "WHERE TIMESTAMPDIFF(YEAR, :d, CURDATE()) BETWEEN\n" +
+            "    CAST(SUBSTRING_INDEX(vozrast, '-', 1) AS UNSIGNED) AND\n" +
+            "    CAST(SUBSTRING_INDEX(vozrast, '-', -1) AS UNSIGNED) AND krujok.archive = false order by krujok.creative_association_id, krujok.name",nativeQuery = true)
+    List<Krujok> findAllByOrderByCreativeAssociationNameAndKrujokNameBiKidBirthday(@Param("d") String d);
 
 }

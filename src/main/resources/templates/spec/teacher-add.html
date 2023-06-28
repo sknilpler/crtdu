@@ -111,7 +111,7 @@
             var staj = document.getElementById("staj").value;
             var stajSpec = document.getElementById("stajSpec").value;
             var dopInfo = document.getElementById("dopInfo").value;
-
+            if (dopInfo == "") dopInfo = "-";
 			// Генерируем уникальный логин, используя первую букву имени, полностью фамилию и случайное число от 0 до 9999
             var username = transliterate(surname) + transliterate(name) + Math.floor(Math.random() * 10000);
 
